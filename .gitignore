@@ -156,3 +156,6 @@ rai-fork
 
 vid/
 *.ppm
+
+%% intellij files
+.idea/*
