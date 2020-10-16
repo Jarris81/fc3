@@ -1,0 +1,1743 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="MasterThesisJasonHarris"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\git\;CMake Files\..\..\git\opencv\;CMake Files\..\..\git\opencv\build\;CMake Files\pybind11\;CMake Files\pybind11\tools\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/jason/Master/thesis_2020/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/jason/Master/thesis_2020/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/jason/Master/thesis_2020/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rai">
+				<Option output="/home/jason/Master/thesis_2020/cmake-build-debug/librai.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/jason/Master/thesis_2020/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DRAI_ROOT_PATH=&quot;/home/jason/Master/thesis_2020/rai&quot;"/>
+					<Add option="-DRAI_X11"/>
+					<Add option="-DRAI_LAPACK"/>
+					<Add option="-DRAI_EIGEN"/>
+					<Add option="-DRAI_PTHREAD"/>
+					<Add option="-DRAI_GL"/>
+					<Add option="-DRAI_GLFW"/>
+					<Add option="-DRAI_ANN"/>
+					<Add option="-DRAI_QHULL"/>
+					<Add option="-DRAI_ASSIMP"/>
+					<Add option="-DNO_CYCLE_DETECTION"/>
+					<Add option="-DRAI_PNG"/>
+					<Add option="-DRAI_SWIFT"/>
+					<Add option="-DRAI_GJK"/>
+					<Add option="-DRAI_FCL"/>
+					<Add option="-DRAI_CCD"/>
+					<Add option="-DRAI_OPENCV"/>
+					<Add option="-DRAI_PYBIND"/>
+					<Add option="-DRAI_PHYSX"/>
+					<Add option="-D_DEBUG"/>
+					<Add option="-DPX_DISABLE_FLUIDS"/>
+					<Add option="-DCORELIB"/>
+					<Add option="-DPX32"/>
+					<Add option="-DLINUX"/>
+					<Add option="-DRAI_BULLET"/>
+					<Add directory="/home/jason/Master/thesis_2020/rai/rai"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/bullet"/>
+					<Add directory="/home/jason/opt/physx3.4/include"/>
+					<Add directory="/home/jason/opt/physx3.4/include/physx"/>
+					<Add directory="/home/jason/git/opencv/build"/>
+					<Add directory="/home/jason/git/opencv/include"/>
+					<Add directory="/home/jason/git/opencv/modules/core/include"/>
+					<Add directory="/home/jason/git/opencv/modules/flann/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hdf/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/intensity_transform/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ml/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/phase_unwrapping/include"/>
+					<Add directory="/home/jason/git/opencv/modules/photo/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/plot/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/quality/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/reg/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/surface_matching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xphoto/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/alphamat/include"/>
+					<Add directory="/home/jason/git/opencv/modules/dnn/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_superres/include"/>
+					<Add directory="/home/jason/git/opencv/modules/features2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/freetype/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/fuzzy/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hfs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/img_hash/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgcodecs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/line_descriptor/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/saliency/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/text/include"/>
+					<Add directory="/home/jason/git/opencv/modules/videoio/include"/>
+					<Add directory="/home/jason/git/opencv/modules/calib3d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/datasets/include"/>
+					<Add directory="/home/jason/git/opencv/modules/highgui/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/mcc/include"/>
+					<Add directory="/home/jason/git/opencv/modules/objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rapid/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rgbd/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/shape/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/structured_light/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ts/include"/>
+					<Add directory="/home/jason/git/opencv/modules/video/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/videostab/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xfeatures2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ximgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xobjdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/aruco/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bgsegm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bioinspired/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ccalib/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dpm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/face/include"/>
+					<Add directory="/home/jason/git/opencv/modules/gapi/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/optflow/include"/>
+					<Add directory="/home/jason/git/opencv/modules/stitching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/superres/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/tracking/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/stereo/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 rai"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rai/fast">
+				<Option output="/home/jason/Master/thesis_2020/cmake-build-debug/librai.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/jason/Master/thesis_2020/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DRAI_ROOT_PATH=&quot;/home/jason/Master/thesis_2020/rai&quot;"/>
+					<Add option="-DRAI_X11"/>
+					<Add option="-DRAI_LAPACK"/>
+					<Add option="-DRAI_EIGEN"/>
+					<Add option="-DRAI_PTHREAD"/>
+					<Add option="-DRAI_GL"/>
+					<Add option="-DRAI_GLFW"/>
+					<Add option="-DRAI_ANN"/>
+					<Add option="-DRAI_QHULL"/>
+					<Add option="-DRAI_ASSIMP"/>
+					<Add option="-DNO_CYCLE_DETECTION"/>
+					<Add option="-DRAI_PNG"/>
+					<Add option="-DRAI_SWIFT"/>
+					<Add option="-DRAI_GJK"/>
+					<Add option="-DRAI_FCL"/>
+					<Add option="-DRAI_CCD"/>
+					<Add option="-DRAI_OPENCV"/>
+					<Add option="-DRAI_PYBIND"/>
+					<Add option="-DRAI_PHYSX"/>
+					<Add option="-D_DEBUG"/>
+					<Add option="-DPX_DISABLE_FLUIDS"/>
+					<Add option="-DCORELIB"/>
+					<Add option="-DPX32"/>
+					<Add option="-DLINUX"/>
+					<Add option="-DRAI_BULLET"/>
+					<Add directory="/home/jason/Master/thesis_2020/rai/rai"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/bullet"/>
+					<Add directory="/home/jason/opt/physx3.4/include"/>
+					<Add directory="/home/jason/opt/physx3.4/include/physx"/>
+					<Add directory="/home/jason/git/opencv/build"/>
+					<Add directory="/home/jason/git/opencv/include"/>
+					<Add directory="/home/jason/git/opencv/modules/core/include"/>
+					<Add directory="/home/jason/git/opencv/modules/flann/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hdf/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/intensity_transform/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ml/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/phase_unwrapping/include"/>
+					<Add directory="/home/jason/git/opencv/modules/photo/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/plot/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/quality/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/reg/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/surface_matching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xphoto/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/alphamat/include"/>
+					<Add directory="/home/jason/git/opencv/modules/dnn/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_superres/include"/>
+					<Add directory="/home/jason/git/opencv/modules/features2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/freetype/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/fuzzy/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hfs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/img_hash/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgcodecs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/line_descriptor/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/saliency/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/text/include"/>
+					<Add directory="/home/jason/git/opencv/modules/videoio/include"/>
+					<Add directory="/home/jason/git/opencv/modules/calib3d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/datasets/include"/>
+					<Add directory="/home/jason/git/opencv/modules/highgui/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/mcc/include"/>
+					<Add directory="/home/jason/git/opencv/modules/objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rapid/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rgbd/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/shape/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/structured_light/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ts/include"/>
+					<Add directory="/home/jason/git/opencv/modules/video/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/videostab/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xfeatures2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ximgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xobjdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/aruco/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bgsegm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bioinspired/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ccalib/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dpm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/face/include"/>
+					<Add directory="/home/jason/git/opencv/modules/gapi/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/optflow/include"/>
+					<Add directory="/home/jason/git/opencv/modules/stitching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/superres/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/tracking/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/stereo/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 rai/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="libry">
+				<Option output="/home/jason/Master/thesis_2020/cmake-build-debug/libry.cpython-38-x86_64-linux-gnu.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/jason/Master/thesis_2020/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DRAI_ROOT_PATH=&quot;/home/jason/Master/thesis_2020/rai&quot;"/>
+					<Add option="-DRAI_X11"/>
+					<Add option="-DRAI_LAPACK"/>
+					<Add option="-DRAI_EIGEN"/>
+					<Add option="-DRAI_PTHREAD"/>
+					<Add option="-DRAI_GL"/>
+					<Add option="-DRAI_GLFW"/>
+					<Add option="-DRAI_ANN"/>
+					<Add option="-DRAI_QHULL"/>
+					<Add option="-DRAI_ASSIMP"/>
+					<Add option="-DNO_CYCLE_DETECTION"/>
+					<Add option="-DRAI_PNG"/>
+					<Add option="-DRAI_SWIFT"/>
+					<Add option="-DRAI_GJK"/>
+					<Add option="-DRAI_FCL"/>
+					<Add option="-DRAI_CCD"/>
+					<Add option="-DRAI_OPENCV"/>
+					<Add option="-DRAI_PYBIND"/>
+					<Add option="-DRAI_PHYSX"/>
+					<Add option="-D_DEBUG"/>
+					<Add option="-DPX_DISABLE_FLUIDS"/>
+					<Add option="-DCORELIB"/>
+					<Add option="-DPX32"/>
+					<Add option="-DLINUX"/>
+					<Add option="-DRAI_BULLET"/>
+					<Add directory="/home/jason/Master/thesis_2020/rai/rai"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/bullet"/>
+					<Add directory="/home/jason/opt/physx3.4/include"/>
+					<Add directory="/home/jason/opt/physx3.4/include/physx"/>
+					<Add directory="/usr/include/python3.8"/>
+					<Add directory="/home/jason/Master/thesis_2020/pybind11/include"/>
+					<Add directory="/home/jason/git/opencv/build"/>
+					<Add directory="/home/jason/git/opencv/include"/>
+					<Add directory="/home/jason/git/opencv/modules/core/include"/>
+					<Add directory="/home/jason/git/opencv/modules/flann/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hdf/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/intensity_transform/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ml/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/phase_unwrapping/include"/>
+					<Add directory="/home/jason/git/opencv/modules/photo/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/plot/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/quality/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/reg/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/surface_matching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xphoto/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/alphamat/include"/>
+					<Add directory="/home/jason/git/opencv/modules/dnn/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_superres/include"/>
+					<Add directory="/home/jason/git/opencv/modules/features2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/freetype/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/fuzzy/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hfs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/img_hash/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgcodecs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/line_descriptor/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/saliency/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/text/include"/>
+					<Add directory="/home/jason/git/opencv/modules/videoio/include"/>
+					<Add directory="/home/jason/git/opencv/modules/calib3d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/datasets/include"/>
+					<Add directory="/home/jason/git/opencv/modules/highgui/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/mcc/include"/>
+					<Add directory="/home/jason/git/opencv/modules/objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rapid/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rgbd/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/shape/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/structured_light/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ts/include"/>
+					<Add directory="/home/jason/git/opencv/modules/video/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/videostab/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xfeatures2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ximgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xobjdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/aruco/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bgsegm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bioinspired/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ccalib/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dpm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/face/include"/>
+					<Add directory="/home/jason/git/opencv/modules/gapi/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/optflow/include"/>
+					<Add directory="/home/jason/git/opencv/modules/stitching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/superres/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/tracking/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/stereo/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 libry"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="libry/fast">
+				<Option output="/home/jason/Master/thesis_2020/cmake-build-debug/libry.cpython-38-x86_64-linux-gnu.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/jason/Master/thesis_2020/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DRAI_ROOT_PATH=&quot;/home/jason/Master/thesis_2020/rai&quot;"/>
+					<Add option="-DRAI_X11"/>
+					<Add option="-DRAI_LAPACK"/>
+					<Add option="-DRAI_EIGEN"/>
+					<Add option="-DRAI_PTHREAD"/>
+					<Add option="-DRAI_GL"/>
+					<Add option="-DRAI_GLFW"/>
+					<Add option="-DRAI_ANN"/>
+					<Add option="-DRAI_QHULL"/>
+					<Add option="-DRAI_ASSIMP"/>
+					<Add option="-DNO_CYCLE_DETECTION"/>
+					<Add option="-DRAI_PNG"/>
+					<Add option="-DRAI_SWIFT"/>
+					<Add option="-DRAI_GJK"/>
+					<Add option="-DRAI_FCL"/>
+					<Add option="-DRAI_CCD"/>
+					<Add option="-DRAI_OPENCV"/>
+					<Add option="-DRAI_PYBIND"/>
+					<Add option="-DRAI_PHYSX"/>
+					<Add option="-D_DEBUG"/>
+					<Add option="-DPX_DISABLE_FLUIDS"/>
+					<Add option="-DCORELIB"/>
+					<Add option="-DPX32"/>
+					<Add option="-DLINUX"/>
+					<Add option="-DRAI_BULLET"/>
+					<Add directory="/home/jason/Master/thesis_2020/rai/rai"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/bullet"/>
+					<Add directory="/home/jason/opt/physx3.4/include"/>
+					<Add directory="/home/jason/opt/physx3.4/include/physx"/>
+					<Add directory="/usr/include/python3.8"/>
+					<Add directory="/home/jason/Master/thesis_2020/pybind11/include"/>
+					<Add directory="/home/jason/git/opencv/build"/>
+					<Add directory="/home/jason/git/opencv/include"/>
+					<Add directory="/home/jason/git/opencv/modules/core/include"/>
+					<Add directory="/home/jason/git/opencv/modules/flann/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hdf/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/intensity_transform/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ml/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/phase_unwrapping/include"/>
+					<Add directory="/home/jason/git/opencv/modules/photo/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/plot/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/quality/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/reg/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/surface_matching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xphoto/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/alphamat/include"/>
+					<Add directory="/home/jason/git/opencv/modules/dnn/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_superres/include"/>
+					<Add directory="/home/jason/git/opencv/modules/features2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/freetype/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/fuzzy/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hfs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/img_hash/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgcodecs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/line_descriptor/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/saliency/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/text/include"/>
+					<Add directory="/home/jason/git/opencv/modules/videoio/include"/>
+					<Add directory="/home/jason/git/opencv/modules/calib3d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/datasets/include"/>
+					<Add directory="/home/jason/git/opencv/modules/highgui/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/mcc/include"/>
+					<Add directory="/home/jason/git/opencv/modules/objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rapid/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rgbd/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/shape/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/structured_light/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ts/include"/>
+					<Add directory="/home/jason/git/opencv/modules/video/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/videostab/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xfeatures2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ximgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xobjdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/aruco/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bgsegm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bioinspired/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ccalib/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dpm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/face/include"/>
+					<Add directory="/home/jason/git/opencv/modules/gapi/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/optflow/include"/>
+					<Add directory="/home/jason/git/opencv/modules/stitching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/superres/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/tracking/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/stereo/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 libry/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="kinEdit">
+				<Option output="/home/jason/Master/thesis_2020/cmake-build-debug/kinEdit" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/jason/Master/thesis_2020/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DRAI_ROOT_PATH=&quot;/home/jason/Master/thesis_2020/rai&quot;"/>
+					<Add option="-DRAI_X11"/>
+					<Add option="-DRAI_LAPACK"/>
+					<Add option="-DRAI_EIGEN"/>
+					<Add option="-DRAI_PTHREAD"/>
+					<Add option="-DRAI_GL"/>
+					<Add option="-DRAI_GLFW"/>
+					<Add option="-DRAI_ANN"/>
+					<Add option="-DRAI_QHULL"/>
+					<Add option="-DRAI_ASSIMP"/>
+					<Add option="-DNO_CYCLE_DETECTION"/>
+					<Add option="-DRAI_PNG"/>
+					<Add option="-DRAI_SWIFT"/>
+					<Add option="-DRAI_GJK"/>
+					<Add option="-DRAI_FCL"/>
+					<Add option="-DRAI_CCD"/>
+					<Add option="-DRAI_OPENCV"/>
+					<Add option="-DRAI_PYBIND"/>
+					<Add option="-DRAI_PHYSX"/>
+					<Add option="-D_DEBUG"/>
+					<Add option="-DPX_DISABLE_FLUIDS"/>
+					<Add option="-DCORELIB"/>
+					<Add option="-DPX32"/>
+					<Add option="-DLINUX"/>
+					<Add option="-DRAI_BULLET"/>
+					<Add directory="/home/jason/Master/thesis_2020/rai/rai"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/bullet"/>
+					<Add directory="/home/jason/opt/physx3.4/include"/>
+					<Add directory="/home/jason/opt/physx3.4/include/physx"/>
+					<Add directory="/home/jason/git/opencv/build"/>
+					<Add directory="/home/jason/git/opencv/include"/>
+					<Add directory="/home/jason/git/opencv/modules/core/include"/>
+					<Add directory="/home/jason/git/opencv/modules/flann/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hdf/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/intensity_transform/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ml/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/phase_unwrapping/include"/>
+					<Add directory="/home/jason/git/opencv/modules/photo/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/plot/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/quality/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/reg/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/surface_matching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xphoto/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/alphamat/include"/>
+					<Add directory="/home/jason/git/opencv/modules/dnn/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_superres/include"/>
+					<Add directory="/home/jason/git/opencv/modules/features2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/freetype/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/fuzzy/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hfs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/img_hash/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgcodecs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/line_descriptor/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/saliency/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/text/include"/>
+					<Add directory="/home/jason/git/opencv/modules/videoio/include"/>
+					<Add directory="/home/jason/git/opencv/modules/calib3d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/datasets/include"/>
+					<Add directory="/home/jason/git/opencv/modules/highgui/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/mcc/include"/>
+					<Add directory="/home/jason/git/opencv/modules/objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rapid/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rgbd/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/shape/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/structured_light/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ts/include"/>
+					<Add directory="/home/jason/git/opencv/modules/video/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/videostab/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xfeatures2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ximgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xobjdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/aruco/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bgsegm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bioinspired/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ccalib/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dpm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/face/include"/>
+					<Add directory="/home/jason/git/opencv/modules/gapi/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/optflow/include"/>
+					<Add directory="/home/jason/git/opencv/modules/stitching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/superres/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/tracking/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/stereo/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 kinEdit"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="kinEdit/fast">
+				<Option output="/home/jason/Master/thesis_2020/cmake-build-debug/kinEdit" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/jason/Master/thesis_2020/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DRAI_ROOT_PATH=&quot;/home/jason/Master/thesis_2020/rai&quot;"/>
+					<Add option="-DRAI_X11"/>
+					<Add option="-DRAI_LAPACK"/>
+					<Add option="-DRAI_EIGEN"/>
+					<Add option="-DRAI_PTHREAD"/>
+					<Add option="-DRAI_GL"/>
+					<Add option="-DRAI_GLFW"/>
+					<Add option="-DRAI_ANN"/>
+					<Add option="-DRAI_QHULL"/>
+					<Add option="-DRAI_ASSIMP"/>
+					<Add option="-DNO_CYCLE_DETECTION"/>
+					<Add option="-DRAI_PNG"/>
+					<Add option="-DRAI_SWIFT"/>
+					<Add option="-DRAI_GJK"/>
+					<Add option="-DRAI_FCL"/>
+					<Add option="-DRAI_CCD"/>
+					<Add option="-DRAI_OPENCV"/>
+					<Add option="-DRAI_PYBIND"/>
+					<Add option="-DRAI_PHYSX"/>
+					<Add option="-D_DEBUG"/>
+					<Add option="-DPX_DISABLE_FLUIDS"/>
+					<Add option="-DCORELIB"/>
+					<Add option="-DPX32"/>
+					<Add option="-DLINUX"/>
+					<Add option="-DRAI_BULLET"/>
+					<Add directory="/home/jason/Master/thesis_2020/rai/rai"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/bullet"/>
+					<Add directory="/home/jason/opt/physx3.4/include"/>
+					<Add directory="/home/jason/opt/physx3.4/include/physx"/>
+					<Add directory="/home/jason/git/opencv/build"/>
+					<Add directory="/home/jason/git/opencv/include"/>
+					<Add directory="/home/jason/git/opencv/modules/core/include"/>
+					<Add directory="/home/jason/git/opencv/modules/flann/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hdf/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/intensity_transform/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ml/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/phase_unwrapping/include"/>
+					<Add directory="/home/jason/git/opencv/modules/photo/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/plot/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/quality/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/reg/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/surface_matching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xphoto/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/alphamat/include"/>
+					<Add directory="/home/jason/git/opencv/modules/dnn/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_superres/include"/>
+					<Add directory="/home/jason/git/opencv/modules/features2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/freetype/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/fuzzy/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hfs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/img_hash/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgcodecs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/line_descriptor/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/saliency/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/text/include"/>
+					<Add directory="/home/jason/git/opencv/modules/videoio/include"/>
+					<Add directory="/home/jason/git/opencv/modules/calib3d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/datasets/include"/>
+					<Add directory="/home/jason/git/opencv/modules/highgui/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/mcc/include"/>
+					<Add directory="/home/jason/git/opencv/modules/objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rapid/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rgbd/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/shape/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/structured_light/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ts/include"/>
+					<Add directory="/home/jason/git/opencv/modules/video/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/videostab/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xfeatures2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ximgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xobjdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/aruco/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bgsegm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bioinspired/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ccalib/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dpm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/face/include"/>
+					<Add directory="/home/jason/git/opencv/modules/gapi/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/optflow/include"/>
+					<Add directory="/home/jason/git/opencv/modules/stitching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/superres/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/tracking/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/stereo/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 kinEdit/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="testKOMO">
+				<Option output="/home/jason/Master/thesis_2020/cmake-build-debug/testKOMO" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/jason/Master/thesis_2020/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DRAI_ROOT_PATH=&quot;/home/jason/Master/thesis_2020/rai&quot;"/>
+					<Add option="-DRAI_X11"/>
+					<Add option="-DRAI_LAPACK"/>
+					<Add option="-DRAI_EIGEN"/>
+					<Add option="-DRAI_PTHREAD"/>
+					<Add option="-DRAI_GL"/>
+					<Add option="-DRAI_GLFW"/>
+					<Add option="-DRAI_ANN"/>
+					<Add option="-DRAI_QHULL"/>
+					<Add option="-DRAI_ASSIMP"/>
+					<Add option="-DNO_CYCLE_DETECTION"/>
+					<Add option="-DRAI_PNG"/>
+					<Add option="-DRAI_SWIFT"/>
+					<Add option="-DRAI_GJK"/>
+					<Add option="-DRAI_FCL"/>
+					<Add option="-DRAI_CCD"/>
+					<Add option="-DRAI_OPENCV"/>
+					<Add option="-DRAI_PYBIND"/>
+					<Add option="-DRAI_PHYSX"/>
+					<Add option="-D_DEBUG"/>
+					<Add option="-DPX_DISABLE_FLUIDS"/>
+					<Add option="-DCORELIB"/>
+					<Add option="-DPX32"/>
+					<Add option="-DLINUX"/>
+					<Add option="-DRAI_BULLET"/>
+					<Add directory="/home/jason/Master/thesis_2020/rai/rai"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/bullet"/>
+					<Add directory="/home/jason/opt/physx3.4/include"/>
+					<Add directory="/home/jason/opt/physx3.4/include/physx"/>
+					<Add directory="/home/jason/git/opencv/build"/>
+					<Add directory="/home/jason/git/opencv/include"/>
+					<Add directory="/home/jason/git/opencv/modules/core/include"/>
+					<Add directory="/home/jason/git/opencv/modules/flann/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hdf/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/intensity_transform/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ml/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/phase_unwrapping/include"/>
+					<Add directory="/home/jason/git/opencv/modules/photo/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/plot/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/quality/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/reg/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/surface_matching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xphoto/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/alphamat/include"/>
+					<Add directory="/home/jason/git/opencv/modules/dnn/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_superres/include"/>
+					<Add directory="/home/jason/git/opencv/modules/features2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/freetype/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/fuzzy/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hfs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/img_hash/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgcodecs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/line_descriptor/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/saliency/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/text/include"/>
+					<Add directory="/home/jason/git/opencv/modules/videoio/include"/>
+					<Add directory="/home/jason/git/opencv/modules/calib3d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/datasets/include"/>
+					<Add directory="/home/jason/git/opencv/modules/highgui/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/mcc/include"/>
+					<Add directory="/home/jason/git/opencv/modules/objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rapid/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rgbd/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/shape/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/structured_light/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ts/include"/>
+					<Add directory="/home/jason/git/opencv/modules/video/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/videostab/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xfeatures2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ximgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xobjdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/aruco/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bgsegm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bioinspired/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ccalib/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dpm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/face/include"/>
+					<Add directory="/home/jason/git/opencv/modules/gapi/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/optflow/include"/>
+					<Add directory="/home/jason/git/opencv/modules/stitching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/superres/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/tracking/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/stereo/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 testKOMO"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="testKOMO/fast">
+				<Option output="/home/jason/Master/thesis_2020/cmake-build-debug/testKOMO" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/jason/Master/thesis_2020/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DRAI_ROOT_PATH=&quot;/home/jason/Master/thesis_2020/rai&quot;"/>
+					<Add option="-DRAI_X11"/>
+					<Add option="-DRAI_LAPACK"/>
+					<Add option="-DRAI_EIGEN"/>
+					<Add option="-DRAI_PTHREAD"/>
+					<Add option="-DRAI_GL"/>
+					<Add option="-DRAI_GLFW"/>
+					<Add option="-DRAI_ANN"/>
+					<Add option="-DRAI_QHULL"/>
+					<Add option="-DRAI_ASSIMP"/>
+					<Add option="-DNO_CYCLE_DETECTION"/>
+					<Add option="-DRAI_PNG"/>
+					<Add option="-DRAI_SWIFT"/>
+					<Add option="-DRAI_GJK"/>
+					<Add option="-DRAI_FCL"/>
+					<Add option="-DRAI_CCD"/>
+					<Add option="-DRAI_OPENCV"/>
+					<Add option="-DRAI_PYBIND"/>
+					<Add option="-DRAI_PHYSX"/>
+					<Add option="-D_DEBUG"/>
+					<Add option="-DPX_DISABLE_FLUIDS"/>
+					<Add option="-DCORELIB"/>
+					<Add option="-DPX32"/>
+					<Add option="-DLINUX"/>
+					<Add option="-DRAI_BULLET"/>
+					<Add directory="/home/jason/Master/thesis_2020/rai/rai"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/usr/include/bullet"/>
+					<Add directory="/home/jason/opt/physx3.4/include"/>
+					<Add directory="/home/jason/opt/physx3.4/include/physx"/>
+					<Add directory="/home/jason/git/opencv/build"/>
+					<Add directory="/home/jason/git/opencv/include"/>
+					<Add directory="/home/jason/git/opencv/modules/core/include"/>
+					<Add directory="/home/jason/git/opencv/modules/flann/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hdf/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/intensity_transform/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ml/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/phase_unwrapping/include"/>
+					<Add directory="/home/jason/git/opencv/modules/photo/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/plot/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/quality/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/reg/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/surface_matching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xphoto/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/alphamat/include"/>
+					<Add directory="/home/jason/git/opencv/modules/dnn/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_superres/include"/>
+					<Add directory="/home/jason/git/opencv/modules/features2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/freetype/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/fuzzy/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/hfs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/img_hash/include"/>
+					<Add directory="/home/jason/git/opencv/modules/imgcodecs/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/line_descriptor/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/saliency/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/text/include"/>
+					<Add directory="/home/jason/git/opencv/modules/videoio/include"/>
+					<Add directory="/home/jason/git/opencv/modules/calib3d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/datasets/include"/>
+					<Add directory="/home/jason/git/opencv/modules/highgui/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/mcc/include"/>
+					<Add directory="/home/jason/git/opencv/modules/objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rapid/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/rgbd/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/shape/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/structured_light/include"/>
+					<Add directory="/home/jason/git/opencv/modules/ts/include"/>
+					<Add directory="/home/jason/git/opencv/modules/video/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/videostab/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xfeatures2d/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ximgproc/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/xobjdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/aruco/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bgsegm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/bioinspired/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/ccalib/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dnn_objdetect/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/dpm/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/face/include"/>
+					<Add directory="/home/jason/git/opencv/modules/gapi/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/optflow/include"/>
+					<Add directory="/home/jason/git/opencv/modules/stitching/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/superres/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/tracking/include"/>
+					<Add directory="/home/jason/git/opencv_contrib/modules/stereo/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 testKOMO/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jason/Master/thesis_2020/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/bin/src_kinEdit/main.cpp">
+			<Option target="kinEdit"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/MLcourse.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/MLcourse.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/algos.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/algos.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/ann.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/ann.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/astar.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/astar.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/dataNeighbored.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/dataNeighbored.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/eigenValues.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/eigenValues.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/gaussianProcess.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/gaussianProcess.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/gaussianProcess_plot.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/gpOp.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/gpOp.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/hungarian.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/hungarian.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/kalman.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/kalman.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/priorityQueue.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/priorityQueue.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/rrt.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/rrt.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/spline.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Algo/spline.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/CtrlObjective.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/CtrlObjective.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/CtrlProblem.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/CtrlProblem.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/CtrlSet.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/CtrlSet.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/CtrlSolvers.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/CtrlSolvers.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/CtrlTargets.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/CtrlTargets.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/RTControllerSimulation.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/RTControllerSimulation.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/TaskControlThread.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/TaskControlThread.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/control.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/control.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/gravityCompensation.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/gravityCompensation.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/komoControl.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Control/komoControl.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Core/array.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Core/array.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Core/graph.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Core/graph.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Core/thread.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Core/thread.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Core/util.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Core/util.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/GJK/gjk.c">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/GJK/gjk.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/fclInterface.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/fclInterface.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/geo.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/geo.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/geoms.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/geoms.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/mesh.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/mesh.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/mesh_readAssimp.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/mesh_readAssimp.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/pairCollision.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/pairCollision.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/pqp_RectDist.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/qhull.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Geo/qhull.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Gui/graphview.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Gui/graphview.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Gui/gtk.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Gui/gtk.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Gui/opengl.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Gui/opengl.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Gui/viewer.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Gui/viewer.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/KOMO/komo-ext.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/KOMO/komo-ext.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/KOMO/komo.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/KOMO/komo.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/KOMO/objective.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/KOMO/objective.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/KOMO/pathTools.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/KOMO/pathTools.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_PairCollision.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_PairCollision.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_contacts.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_contacts.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_dynamics.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_dynamics.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_geometrics.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_geometrics.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_operators.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_operators.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_pose.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_pose.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_qFeatures.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_qFeatures.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_static.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/F_static.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/PhysXThread.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/PhysXThread.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/SWIFT/fileio.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/SWIFT/lut.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/SWIFT/mesh.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/SWIFT/mesh_utils.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/SWIFT/object.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/SWIFT/pair.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/SWIFT/pqueue.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/SWIFT/scene.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/TM_BeliefTransition.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/TM_BeliefTransition.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/TM_angVel.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/TM_angVel.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/TM_default.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/TM_default.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/TM_proxy.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/TM_proxy.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/TM_qUncertainties.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/TM_qUncertainties.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/TM_time.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/TM_time.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/cameraview.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/cameraview.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/feature.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/feature.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/featureSymbols.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/featureSymbols.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/forceExchange.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/forceExchange.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/frame.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/frame.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kin.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kin.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kinViewer.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kinViewer.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kin_bullet.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kin_bullet.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kin_feather.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kin_feather.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kin_ode.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kin_ode.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kin_physx.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kin_physx.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kin_swift.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/kin_swift.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/proxy.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/proxy.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/simulation.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/simulation.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/switch.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/switch.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/uncertainty.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/uncertainty.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/viewer.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Kin/viewer.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Logic/fol.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Logic/fol.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Logic/fol_mcts_world.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Logic/fol_mcts_world.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Logic/relationalMachine.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Logic/relationalMachine.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/BayesOpt.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/BayesOpt.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/GlobalIterativeNewton.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/GlobalIterativeNewton.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/GraphOptim.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/GraphOptim.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/Graph_Problem.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/Graph_Problem.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/KOMO_Problem.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/KOMO_Problem.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/MathematicalProgram.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/MathematicalProgram.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/RidgeRegression.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/RidgeRegression.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/benchmarks.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/benchmarks.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/constrained.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/constrained.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/convert.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/convert.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/gradient.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/gradient.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/lagrangian.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/lagrangian.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/newton.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/newton.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/opt-ceres.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/opt-ceres.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/opt-ipopt.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/opt-ipopt.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/opt-nlopt.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/opt-nlopt.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/optimization.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/optimization.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/primalDual.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Optim/primalDual.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/audio.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/audio.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/avutil.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/avutil.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/colorseg.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/colorseg.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/dataStructures.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/dataStructures.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/depth2PointCloud.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/depth2PointCloud.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/depth_packing.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/depth_packing.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/g4data.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/g4data.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/kinect2pointCloud.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/kinect2pointCloud.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/minEigModel.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/minEigModel.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/modelEnsemble.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/modelEnsemble.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/object.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/object.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/object_detector.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/object_detector.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/opencv.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/opencv.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/opencvCamera.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/opencvCamera.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/pcl.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/pcl.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/pclPlaneExtraction.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/pclPlaneExtraction.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/percept.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/percept.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/perceptSyncer.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/perceptSyncer.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/perceptViewer.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/perceptViewer.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/pointcloud_io.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/pointcloud_io.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/surfels.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/surfels.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/videoEncoder.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/videoEncoder.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Perception/video_opencv.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Plot/plot.cpp">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/Plot/plot.h">
+			<Option target="rai"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry-Camera.cpp">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry-Camera.h">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry-Config.cpp">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry-Config.h">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry-Feature.cpp">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry-Feature.h">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry-Frame.cpp">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry-Frame.h">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry-KOMO.cpp">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry-KOMO.h">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry-Simulation.cpp">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry-Simulation.h">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry.cpp">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/ry.h">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/types.cpp">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/rai/ry/types.h">
+			<Option target="libry"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/rai/test/KOMO/komo/main.cpp">
+			<Option target="testKOMO"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/../../git/opencv/build/OpenCVConfig-version.cmake">
+			<Option virtualFolder="CMake Files\..\..\git\opencv\build\"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/../../git/opencv/build/OpenCVConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\git\opencv\build\"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/../../git/opencv/build/OpenCVModules.cmake">
+			<Option virtualFolder="CMake Files\..\..\git\opencv\build\"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/pybind11/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\pybind11\"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/pybind11/tools/FindPythonLibsNew.cmake">
+			<Option virtualFolder="CMake Files\pybind11\tools\"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/pybind11/tools/pybind11Common.cmake">
+			<Option virtualFolder="CMake Files\pybind11\tools\"/>
+		</Unit>
+		<Unit filename="/home/jason/Master/thesis_2020/pybind11/tools/pybind11Tools.cmake">
+			<Option virtualFolder="CMake Files\pybind11\tools\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
