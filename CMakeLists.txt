@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.4)
 
-project(MasterThesisJasonHarris)
-
-set("OpenCV_DIR" "/home/jason/git/opencv/build/")
+project(Jason)
 
 find_package( OpenCV REQUIRED )
 find_package( Bullet REQUIRED )
@@ -10,8 +8,6 @@ find_package( Bullet REQUIRED )
 add_compile_options(
   -O3 -g -Wall -fPIC -std=c++14 -Wno-terminate
   )
-
-set(CMAKE_CXX_STANDARD 14)
 
 add_definitions(
   -DRAI_ROOT_PATH=\"${CMAKE_SOURCE_DIR}/rai\"
@@ -68,7 +64,7 @@ add_library(rai SHARED
   ${SRC_Kin}
   ${SRC_KinSwift}
   ${SRC_KOMO}
-  ${SRC_Logic}
+  #${SRC_Logic}
   #${SRC_LGP}
   #${SRC_RosCom}
   ${SRC_Perception}
