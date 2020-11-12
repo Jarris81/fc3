@@ -94,8 +94,10 @@ pybind11_add_module(libry SHARED
   #ry-LGP_Tree.cpp
   #ry-Operate.cpp
   #ry-PhysX.cpp
+  rai/rai/ry/ry-Control.cpp
   rai/rai/ry/ry-Simulation.cpp
   rai/rai/ry/types.cpp
+
   )
 
 target_link_libraries(libry PRIVATE
