@@ -1,9 +1,11 @@
 from pyddl import Domain, Problem, State, Action, neg, planner
-
-
+from src.util.setup_env import setup_tower_env
+import numpy as np
+import time
 
 
 def problem(verbose):
+
     pick_up = Action("pick-up",
                parameters=(
                    ("block", "b"),
@@ -21,20 +23,20 @@ def problem(verbose):
                ))
     place_on = Action("place_on",
            parameters=(
-               ("block", "b"),
+               ("block", "d"),
                ("gripper", "g"),
                ("block", "c")
            ),
            preconditions=(
-               ("inhand", "g", "b"),
+               ("inhand", "g", "d"),
                ("free", "c")
            ),
            effects=(
-               neg(("inhand", "g", "b")),
+               neg(("inhand", "g", "d")),
                neg(("free", "c")),
-               ("free", "b"),
+               ("free", "d"),
                ("empty", "g"),
-               ("on", "b", "c")
+               ("on", "d", "c")
 
            ))
 
@@ -86,8 +88,8 @@ def problem(verbose):
                 predicates.append(predicate)
         temp_state = State(predicates, functions)
         final_state = temp_state.apply(action)
-        print("Start_cond", temp_state.predicates)
-        print("final_cond", final_state.predicates)
+        #print("Start_cond", temp_state.predicates)
+        #print("final_cond", final_state.predicates)
 
     def get_implicit_feasibility(plan, goal):
 

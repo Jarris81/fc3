@@ -1,1 +1,4 @@
 pyddl
+
+numpy~=1.19.4
+setuptools~=50.3.0

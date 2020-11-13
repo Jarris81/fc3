@@ -18,7 +18,7 @@ OPENCV = 0
 GRAPHVIZ = 0
 GTK = 0
 G4 = 0
-#PYBIND = 0
+PYBIND = 0
 #PNG = 0
 
 #EIGEN = 0
