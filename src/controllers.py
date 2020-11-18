@@ -27,18 +27,25 @@ class BaseController:
 
     def get_action_pyddl(self):
 
-        # get symbols starting with A
-        #symbol = [chr(x + ord('A')) for x in range(len(self.frames_symbol))]
-
         # list of tuples, with the frames and their symbols
         action_parameters = tuple(zip(self.frame_type, self.frames_symbol))
 
-        # temporary dictionary we need to translate from frame to symbol
-        #frame2symbol = dict((zip(self.frames_symbol, symbol)))
+        type2sym = {
+            str(ry.OT.eq): "=",
+            str(ry.OT.ineq): "<=",
+            str(ry.OT.sos): "=="
+        }
 
-        preconditions = [(str(o.FS), *o.frames_symbol) for o in self.objectives if o.isImmediate()]
+        preconditions = []
+        effects = []
 
-        effects = [(str(o.FS), *o.frames_symbol) for o in self.objectives if not o.isImmediate()]
+        for o in self.objectives:
+            if o.is_immediate():
+                preconditions.extend(o.get_pyddl_description(type2sym))
+            elif o.is_transient():
+                effects.extend(o.get_pyddl_description(type2sym))
+            else:
+                print("Objectives should be immediate or transient only!")
 
         return Action(
             name=self.name,
@@ -56,6 +63,32 @@ class BaseController:
             objective.groundObjective(frames_real_objective)
 
 
+class CloseGripper(BaseController):
+
+    def __init__(self):
+        super().__init__(__class__.__name__)
+
+        self.frame_type = ["block", "gripper"]
+        self.frames_symbol = ["B1", "G"]
+
+        self.objectives.extend((
+            Objective(
+                FS=ry.FS.distance,
+                frames=self.frames_symbol,
+                target=[1],
+                OT_type=ry.OT.ineq,
+                scale=[1],
+                transientStep=.005
+            ),
+            Objective(
+                FS="grasping",
+                frames=self.frames_symbol,
+                OT_type=ry.OT.sos,
+                transientStep=.005
+            ),
+        ))
+
+
 class GraspBlock(BaseController):
 
     def __init__(self):
@@ -66,21 +99,22 @@ class GraspBlock(BaseController):
 
         self.objectives.extend((
             Objective(
-                FS=ry.FS.vectorZDiff,
+                FS=ry.FS.distance,
                 frames=self.frames_symbol,
-                scale=[1e1],
-                type=ry.OT.sos,
+                target=[1],
+                OT_type=ry.OT.sos,
+                scale=[1],
                 transientStep=.005
             ),
             Objective(
-                FS=ry.FS.distance,
+                FS=ry.FS.vectorZDiff,
                 frames=self.frames_symbol,
-                scale=[1e1],
-                type=ry.OT.sos,
+                target=[1] * 3,
+                OT_type=ry.OT.sos,
+                scale=[1] * 3,
                 transientStep=.005
             )
         ))
-        # print(self.objectives)
 
 
 class PlaceOn(BaseController):
@@ -94,25 +128,31 @@ class PlaceOn(BaseController):
 
         self.objectives.extend((
             Objective(
+                FS=ry.FS.vectorZDiff,
+                frames=[self.frames_symbol[0], self.frames_symbol[1]],
+                OT_type=ry.OT.ineq,
+                target=[10] * 3,
+                scale=[1e0] * 3,
+            ),
+            Objective(
+                FS="grasping",
+                frames=[self.frames_symbol[0], self.frames_symbol[1]],
+                OT_type=ry.OT.eq,
+                transientStep=.005
+            ),
+            Objective(
                 FS=ry.FS.distance,
                 frames=[self.frames_symbol[0], self.frames_symbol[1]],
-                scale=[1e1],
-                type=ry.OT.ineq,
-                transientStep=.005
+                OT_type=ry.OT.ineq,
+                target=[1],
+                scale=[1e0],
             ),
             Objective(
-                ry.FS.vectorZDiff,
-                frames=[self.frames_symbol[0], self.frames_symbol[1]],
-                scale=[1e1],
-                type=ry.OT.ineq,
-                transientStep=.005
-
-            ),
-            Objective(
-                ry.FS.standingAbove,
+                FS=ry.FS.standingAbove,
                 frames=[self.frames_symbol[0], self.frames_symbol[2]],
-                scale=[1e1],
-                type=ry.OT.sos,
+                OT_type=ry.OT.sos,
+                target=[1, 1, 1, 1],
+                scale=[1e0],
                 transientStep=.005
             )
         ))
@@ -120,18 +160,19 @@ class PlaceOn(BaseController):
 
 class Objective:
 
-    def __init__(self, FS, frames, scale, type, target=0, transientStep=-1.0):
+    def __init__(self, FS, frames, OT_type, target=None, scale=None, transientStep=-1.0):
         self.FS = FS
         self.frames_symbol = frames
+        self.target = target
         self.scale = scale
-        self.type = type
+        self.type = OT_type
         self.transientStep = transientStep
 
-    def isImmediate(self):
+    def is_immediate(self):
         return self.type is ry.OT.eq or self.type is ry.OT.ineq
 
-    def isTransient(self):
-        return not self.isImmediate()
+    def is_transient(self):
+        return not self.is_immediate()
 
     def objective2symbol(self):
         return str(self.FS)[3:] + "/" + "/".join(self.frames_symbol)
@@ -140,3 +181,12 @@ class Objective:
         """
         Create an instance of this objective
         """
+
+    def get_pyddl_description(self, type2sym):
+
+        if self.FS == "grasping":
+            return [(self.FS, *self.frames_symbol)]
+
+        return ((type2sym[str(self.type)], (f"{self.FS}_{i}", *self.frames_symbol), int(self.target[i]))
+                for i in range(len(self.target)))
+

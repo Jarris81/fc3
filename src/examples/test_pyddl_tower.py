@@ -40,6 +40,8 @@ def problem(verbose):
 
            ))
 
+
+
     # define domain here (possible actions)
     domain = Domain((
         pick_up,
