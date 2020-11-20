@@ -11,29 +11,29 @@ def problem():
     #C.view()
     # time.sleep(10)
 
+    objects = {
+        "block": ("b1", "b2", "b3"),
+        "gripper": ("g",)
+    }
+
     # two actions
     print("Action grasp")
-    grasp = con.GraspBlock()
-    grasp_action = grasp.get_action_pyddl()
+    grasp = con.Approach()
+    grasp_action = grasp.get_action_pyddl(objects)
     print(grasp_action.effects)
 
     print("Action place")
     place = con.PlaceOn()
-    place_action = place.get_action_pyddl()
+    place_action = place.get_action_pyddl(objects)
 
     close_gripper = con.CloseGripper()
-    close_gripper_action = close_gripper.get_action_pyddl()
+    close_gripper_action = close_gripper.get_action_pyddl(objects)
 
     domain = Domain((
         grasp_action,
         place_action,
         close_gripper_action
     ))
-
-    objects = {
-        "block": ("b1", "b2", "b3"),
-        "gripper": "g"
-    }
 
     type2sym = {
         str(ry.OT.eq): "=",

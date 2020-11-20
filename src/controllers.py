@@ -1,6 +1,7 @@
 import libry as ry
-from pyddl import Action
-import array
+from pyddl import Action, neg
+from objective import Objective
+import itertools as it
 
 
 class BaseController:
@@ -9,8 +10,14 @@ class BaseController:
         self.name = name
         self.objectives = []
         self.frame_type = []
+        self.target = None
 
         self.frames_symbol = []
+        self.frame_type_count = {}
+
+    def set_frame_type_count(self):
+        self.frame_type_count = \
+            {obj_type: self.frame_type.count(obj_type) for obj_type in set(self.frame_type)}
 
     def getAllObjectives(self):
 
@@ -25,10 +32,37 @@ class BaseController:
         for objective in self.objectives:
             print(objective.objective2symbol())
 
-    def get_action_pyddl(self):
+    def get_action_pyddl(self, all_objects):
+
+        # all_obj_grounded = set([x for x in it.product(*all_objects.values())])
+        # list of tuple of all objects of all
+
+        all_types_count = {obj_type: len(all_objects[obj_type]) for obj_type in all_objects.keys()}
+        self.set_frame_type_count()
+
+        delete_types_count = {x: all_types_count[x] - self.frame_type_count[x] if x in self.frame_type_count \
+            else all_types_count[x] for x in all_objects.keys()}
 
         # list of tuples, with the frames and their symbols
-        action_parameters = tuple(zip(self.frame_type, self.frames_symbol))
+        action_parameters = list(zip(self.frame_type, self.frames_symbol))
+
+        # delete_predicates = all_action_parameters.difference(all_action_parameters)
+        #
+        # print("all_action_parameters", all_action_parameters)
+        # print("action_parameters", action_parameters)
+        print("delete: ", delete_types_count)
+
+        delete_parameters = []
+
+        counter = 0
+        for x in delete_types_count:
+            for i in range(delete_types_count[x]):
+                temp = (x, chr(ord("Z")-counter))
+                action_parameters.append(temp)
+                delete_parameters.append(temp)
+                counter += 1
+
+        print("action_parameters", action_parameters)
 
         type2sym = {
             str(ry.OT.eq): "=",
@@ -41,11 +75,16 @@ class BaseController:
 
         for o in self.objectives:
             if o.is_immediate():
-                preconditions.extend(o.get_pyddl_description(type2sym))
+                preconditions.extend(o.get_pyddl_description(type2sym, self.target))
+                #for x in delete_parameters:
+                    #preconditions.append(neg(("target", x[1])))
             elif o.is_transient():
-                effects.extend(o.get_pyddl_description(type2sym))
+                effects.extend(o.get_pyddl_description(type2sym, self.target))
             else:
                 print("Objectives should be immediate or transient only!")
+
+        # look at other objects in the domain, unset their focus
+        # effects.extend([("is_focus", *self.frames_symbol)])
 
         return Action(
             name=self.name,
@@ -71,6 +110,8 @@ class CloseGripper(BaseController):
         self.frame_type = ["block", "gripper"]
         self.frames_symbol = ["B1", "G"]
 
+        self.target = "B1"
+
         self.objectives.extend((
             Objective(
                 FS=ry.FS.distance,
@@ -84,18 +125,19 @@ class CloseGripper(BaseController):
                 FS="grasping",
                 frames=self.frames_symbol,
                 OT_type=ry.OT.sos,
-                transientStep=.005
             ),
         ))
 
 
-class GraspBlock(BaseController):
+class Approach(BaseController):
 
     def __init__(self):
         super().__init__(__class__.__name__)
 
         self.frame_type = ["block", "gripper"]
         self.frames_symbol = ["B1", "G"]
+
+        self.target = "B1"
 
         self.objectives.extend((
             Objective(
@@ -113,7 +155,7 @@ class GraspBlock(BaseController):
                 OT_type=ry.OT.sos,
                 scale=[1] * 3,
                 transientStep=.005
-            )
+            ),
         ))
 
 
@@ -125,6 +167,8 @@ class PlaceOn(BaseController):
         # define symbols here
         self.frame_type = ["block", "gripper", "block"]
         self.frames_symbol = ["B1", "G", "B2"]
+
+        self.target = "B1"
 
         self.objectives.extend((
             Objective(
@@ -156,37 +200,3 @@ class PlaceOn(BaseController):
                 transientStep=.005
             )
         ))
-
-
-class Objective:
-
-    def __init__(self, FS, frames, OT_type, target=None, scale=None, transientStep=-1.0):
-        self.FS = FS
-        self.frames_symbol = frames
-        self.target = target
-        self.scale = scale
-        self.type = OT_type
-        self.transientStep = transientStep
-
-    def is_immediate(self):
-        return self.type is ry.OT.eq or self.type is ry.OT.ineq
-
-    def is_transient(self):
-        return not self.is_immediate()
-
-    def objective2symbol(self):
-        return str(self.FS)[3:] + "/" + "/".join(self.frames_symbol)
-
-    def groundObjective(self, frames_real):
-        """
-        Create an instance of this objective
-        """
-
-    def get_pyddl_description(self, type2sym):
-
-        if self.FS == "grasping":
-            return [(self.FS, *self.frames_symbol)]
-
-        return ((type2sym[str(self.type)], (f"{self.FS}_{i}", *self.frames_symbol), int(self.target[i]))
-                for i in range(len(self.target)))
-
