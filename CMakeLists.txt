@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.4)
 
 project(Jason)
 
+set(CMAKE_CXX_STANDARD 14 CACHE STRING "C++ version selection")
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#set(CMAKE_CXX_EXTENSIONS OFF)  # optional, keep compiler extensionsn off
+
 find_package( OpenCV REQUIRED )
 find_package( Bullet REQUIRED )
 
@@ -18,6 +22,7 @@ add_definitions(
   -DRAI_PYBIND
   -DRAI_PHYSX -D_DEBUG -DPX_DISABLE_FLUIDS -DCORELIB -DPX32 -DLINUX #physx
   -DRAI_BULLET #bullet
+  -DRAI_BIND_KOMO
   )
 
 add_subdirectory(pybind11)
@@ -91,6 +96,7 @@ pybind11_add_module(libry SHARED
   rai/rai/ry/ry-Feature.cpp
   rai/rai/ry/ry-Frame.cpp
   rai/rai/ry/ry-KOMO.cpp
+  rai/rai/ry/ry-Optim.cpp
   #ry-LGP_Tree.cpp
   #ry-Operate.cpp
   #ry-PhysX.cpp
