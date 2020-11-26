@@ -1,5 +1,5 @@
 import libry as ry
-from pyddl import Action
+from pyddl import Action, neg
 
 
 class Objective:
@@ -32,8 +32,11 @@ class Objective:
         if self.FS == "grasping":
             predicates.extend([(self.FS, *self.frames_symbol)])
 
-        # if self.FS == "is_focus":
-        #     return [(self.FS, *self.frames_symbol)]
+        if self.FS == "focus":
+            return [(self.FS, *self.frames_symbol)]
+
+        if self.FS == "un_focus":
+            return [neg(("focus", *self.frames_symbol))]
 
         if self.FS.__class__ == ry.FS:
             predicates.extend((type2sym[str(self.type)], (f"{self.FS}_{i}", *self.frames_symbol), int(self.target[i]))

@@ -17,10 +17,10 @@ def problem():
     }
 
     # two actions
-    print("Action grasp")
-    grasp = con.Approach()
-    grasp_action = grasp.get_action_pyddl(objects)
-    print(grasp_action.effects)
+    print("Action Approach")
+    approach = con.Approach()
+    approach_action = approach.get_action_pyddl(objects)
+    print(approach_action.effects)
 
     print("Action place")
     place = con.PlaceOn()
@@ -30,7 +30,7 @@ def problem():
     close_gripper_action = close_gripper.get_action_pyddl(objects)
 
     domain = Domain((
-        grasp_action,
+        approach_action,
         place_action,
         close_gripper_action
     ))
@@ -105,7 +105,6 @@ def problem():
     else:
         for action in plan:
             print(action)
-
 
 
 if __name__ == '__main__':

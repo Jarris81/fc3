@@ -32,6 +32,11 @@ class BaseController:
         for objective in self.objectives:
             print(objective.objective2symbol())
 
+    def get_simple_action(self):
+
+        # This needs to be implemented for each controller
+        print(f"This function needs to be implemented! {self.__name__}")
+
     def get_action_pyddl(self, all_objects):
 
         # all_obj_grounded = set([x for x in it.product(*all_objects.values())])
@@ -64,6 +69,7 @@ class BaseController:
 
         print("action_parameters", action_parameters)
 
+
         type2sym = {
             str(ry.OT.eq): "=",
             str(ry.OT.ineq): "<=",
@@ -74,6 +80,11 @@ class BaseController:
         effects = []
 
         for o in self.objectives:
+
+            # if o.FS == "focus" and o.is_transient():
+            #     # unset other focuses
+            #     preconditions.append((neg("focus")))
+            #
             if o.is_immediate():
                 preconditions.extend(o.get_pyddl_description(type2sym, self.target))
                 #for x in delete_parameters:
@@ -90,7 +101,8 @@ class BaseController:
             name=self.name,
             parameters=action_parameters,
             preconditions=preconditions,
-            effects=effects
+            effects=effects,
+            unique=True
         )
 
     def activate_controller(self, C, frames_realized, scales):
@@ -109,8 +121,7 @@ class CloseGripper(BaseController):
 
         self.frame_type = ["block", "gripper"]
         self.frames_symbol = ["B1", "G"]
-
-        self.target = "B1"
+        self.target = self.frames_symbol[0]
 
         self.objectives.extend((
             Objective(
@@ -120,6 +131,11 @@ class CloseGripper(BaseController):
                 OT_type=ry.OT.ineq,
                 scale=[1],
                 transientStep=.005
+            ),
+            Objective(
+                FS="focus",
+                frames=self.target,
+                OT_type=ry.OT.eq,
             ),
             Objective(
                 FS="grasping",
@@ -137,7 +153,7 @@ class Approach(BaseController):
         self.frame_type = ["block", "gripper"]
         self.frames_symbol = ["B1", "G"]
 
-        self.target = "B1"
+        self.target = self.frames_symbol[0]
 
         self.objectives.extend((
             Objective(
@@ -156,6 +172,11 @@ class Approach(BaseController):
                 scale=[1] * 3,
                 transientStep=.005
             ),
+            Objective(
+                FS="focus",
+                frames=self.target,
+                OT_type=ry.OT.sos,
+            )
         ))
 
 
@@ -198,5 +219,9 @@ class PlaceOn(BaseController):
                 target=[1, 1, 1, 1],
                 scale=[1e0],
                 transientStep=.005
-            )
+            ),
+            Objective(
+                FS="un_focus",
+                frames=self.target,
+                OT_type=ry.OT.sos)
         ))
