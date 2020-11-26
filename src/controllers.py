@@ -42,33 +42,7 @@ class BaseController:
         # all_obj_grounded = set([x for x in it.product(*all_objects.values())])
         # list of tuple of all objects of all
 
-        all_types_count = {obj_type: len(all_objects[obj_type]) for obj_type in all_objects.keys()}
-        self.set_frame_type_count()
-
-        delete_types_count = {x: all_types_count[x] - self.frame_type_count[x] if x in self.frame_type_count \
-            else all_types_count[x] for x in all_objects.keys()}
-
-        # list of tuples, with the frames and their symbols
         action_parameters = list(zip(self.frame_type, self.frames_symbol))
-
-        # delete_predicates = all_action_parameters.difference(all_action_parameters)
-        #
-        # print("all_action_parameters", all_action_parameters)
-        # print("action_parameters", action_parameters)
-        #print("delete: ", delete_types_count)
-
-        delete_parameters = []
-
-        counter = 0
-        for x in delete_types_count:
-            for i in range(delete_types_count[x]):
-                temp = (x, chr(ord("Z")-counter))
-                action_parameters.append(temp)
-                delete_parameters.append(temp)
-                counter += 1
-
-        print("action_parameters", action_parameters)
-
 
         type2sym = {
             str(ry.OT.eq): "=",
@@ -80,10 +54,30 @@ class BaseController:
         effects = []
 
         for o in self.objectives:
-            # special case: when we are focusing a block, we need to unset focus on other blocks
-            # otherwise we get a weird behavior (double approach)
 
             if o.FS == "focus" and o.is_transient():
+                # special case: when we are focusing a block, we need to unset focus on other blocks
+                # otherwise we get a weird behavior (double approach)
+
+                all_types_count = {obj_type: len(all_objects[obj_type]) for obj_type in all_objects.keys()}
+                self.set_frame_type_count()
+
+                delete_types_count = {x: all_types_count[x] - self.frame_type_count[x] if x in self.frame_type_count \
+                    else all_types_count[x] for x in all_objects.keys()}
+
+                # list of tuples, with the frames and their symbols
+                action_parameters = list(zip(self.frame_type, self.frames_symbol))
+
+                delete_parameters = []
+
+                counter = 0
+                for x in delete_types_count:
+                    for i in range(delete_types_count[x]):
+                        temp = (x, chr(ord("Z") - counter))
+                        action_parameters.append(temp)
+                        delete_parameters.append(temp)
+                        counter += 1
+
                 for x in delete_parameters:
                     #print("setting unfocus on ", x[1])
                     effects.append(neg(("focus", x[1])))
@@ -98,7 +92,6 @@ class BaseController:
 
         # look at other objects in the domain, unset their focus
         # effects.extend([("is_focus", *self.frames_symbol)])
-
         return Action(
             name=self.name,
             parameters=action_parameters,
@@ -179,6 +172,49 @@ class CloseGripper(BaseController):
                 frames=self.frames_symbol,
                 OT_type=ry.OT.sos,
             ),
+            Objective(
+                FS="gripper_free",
+                frames=self.frames_symbol[1],
+                OT_type=ry.OT.eq,
+            ),
+            Objective(
+                FS="not_gripper_free",
+                frames=self.frames_symbol[1],
+                OT_type=ry.OT.sos,
+            ),
+        ))
+
+
+class OpenGripper(BaseController):
+
+    def __init__(self):
+        super().__init__(__class__.__name__)
+
+        self.frame_type = ["block", "gripper"]
+        self.frames_symbol = ["B1", "G"]
+        self.target = [self.frames_symbol[0]]
+
+        self.objectives.extend((
+            Objective(
+                FS="focus",
+                frames=self.target,
+                OT_type=ry.OT.eq,
+            ),
+            Objective(
+                FS="grasping",
+                frames=self.frames_symbol,
+                OT_type=ry.OT.eq,
+            ),
+            Objective(
+                FS="not_grasping",
+                frames=self.frames_symbol,
+                OT_type=ry.OT.sos,
+            ),
+            Objective(
+                FS="gripper_free",
+                frames=self.frames_symbol[1],
+                OT_type=ry.OT.sos,
+            ),
         ))
 
 
@@ -204,8 +240,7 @@ class PlaceOn(BaseController):
             Objective(
                 FS="grasping",
                 frames=[self.frames_symbol[0], self.frames_symbol[1]],
-                OT_type=ry.OT.eq,
-                transientStep=.005
+                OT_type=ry.OT.eq
             ),
             Objective(
                 FS=ry.FS.distance,
@@ -227,8 +262,6 @@ class PlaceOn(BaseController):
                 frames=self.target,
                 OT_type=ry.OT.eq,
             ),
-            Objective(
-                FS="un_focus",
-                frames=self.target,
-                OT_type=ry.OT.sos)
         ))
+
+

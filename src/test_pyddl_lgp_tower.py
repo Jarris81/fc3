@@ -16,36 +16,23 @@ def problem():
         "gripper": ("g",)
     }
 
-    # two actions
-    print("Action Approach")
-    approach = con.Approach()
-    approach_action = approach.get_action_pyddl(objects)
-    print("Conditions: ", approach_action.preconditions)
-    print("Effects:", approach_action.effects)
-    print("")
+    control_actions = [
+        con.Approach(),
+        con.PlaceOn(),
+        con.CloseGripper(),
+        con.OpenGripper()
+    ]
 
-    print("Action Close Gripper")
-    close_gripper = con.CloseGripper()
-    close_gripper_action = close_gripper.get_action_pyddl(objects)
-    print("Conditions: ", close_gripper_action.preconditions)
-    print("Effects:", close_gripper_action.effects)
-    print("")
+    for x in control_actions:
+        print(x.name)
+        y = x.get_action_pyddl(objects)
+        print(y.arg_names)
+        print(f"Preconditions: {y.preconditions}")
+        print(f"Effects: {y.effects}")
+        print("")
 
-    print("Action Place")
-    place = con.PlaceOn()
-    place_action = place.get_action_pyddl(objects)
-    print("Conditions: ", place_action.preconditions)
-    print("Effects:", place_action.effects)
-    print("")
-
-
-
-
-    domain = Domain((
-        approach_action,
-        place_action,
-        close_gripper_action
-    ))
+    # get pyddl action from all controllers
+    domain = Domain((x.get_action_pyddl(objects) for x in control_actions))
 
     type2sym = {
         str(ry.OT.eq): "=",
@@ -70,6 +57,7 @@ def problem():
     goal = (
         *goal_obj_1.get_pyddl_description(type2sym),
         *goal_obj_2.get_pyddl_description(type2sym),
+        #("cool", "g"),
     )
 
     ini_obj_1 = con.Objective(
@@ -100,7 +88,8 @@ def problem():
         domain,
         objects,
         init=(
-            *ini_obj_1.get_pyddl_description(type2sym),
+            #*ini_obj_1.get_pyddl_description(type2sym),
+            ("gripper_free", "g"),
             #*ini_obj_2.get_pyddl_description(type2sym),
             #*ini_obj_3.get_pyddl_description(type2sym),
             #("=", (str(ry.FS.standingAbove), "b2", "b1"), 100),
@@ -116,7 +105,7 @@ def problem():
         print('No Plan!')
     else:
         for action in plan:
-            print(action)
+            print(action.sig)
 
 
 if __name__ == '__main__':

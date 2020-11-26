@@ -32,11 +32,23 @@ class Objective:
         if self.FS == "grasping":
             predicates.extend([(self.FS, *self.frames_symbol)])
 
+        if self.FS == "not_grasping":
+            predicates.extend([neg(("grasping", *self.frames_symbol))])
+
         if self.FS == "focus":
             return [(self.FS, *self.frames_symbol)]
 
-        if self.FS == "un_focus":
+        if self.FS == "not_focus":
             return [neg(("focus", *self.frames_symbol))]
+
+        if self.FS == "gripper_free":
+            return [(self.FS, *self.frames_symbol)]
+
+        if self.FS == "cool":
+            return [(self.FS, *self.frames_symbol)]
+
+        if self.FS == "not_gripper_free":
+            return [neg(("gripper_free", *self.frames_symbol))]
 
         if self.FS.__class__ == ry.FS:
             predicates.extend((type2sym[str(self.type)], (f"{self.FS}_{i}", *self.frames_symbol), int(self.target[i]))
