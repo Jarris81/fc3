@@ -20,14 +20,26 @@ def problem():
     print("Action Approach")
     approach = con.Approach()
     approach_action = approach.get_action_pyddl(objects)
-    print(approach_action.effects)
+    print("Conditions: ", approach_action.preconditions)
+    print("Effects:", approach_action.effects)
+    print("")
 
-    print("Action place")
-    place = con.PlaceOn()
-    place_action = place.get_action_pyddl(objects)
-
+    print("Action Close Gripper")
     close_gripper = con.CloseGripper()
     close_gripper_action = close_gripper.get_action_pyddl(objects)
+    print("Conditions: ", close_gripper_action.preconditions)
+    print("Effects:", close_gripper_action.effects)
+    print("")
+
+    print("Action Place")
+    place = con.PlaceOn()
+    place_action = place.get_action_pyddl(objects)
+    print("Conditions: ", place_action.preconditions)
+    print("Effects:", place_action.effects)
+    print("")
+
+
+
 
     domain = Domain((
         approach_action,

@@ -55,7 +55,7 @@ class BaseController:
         #
         # print("all_action_parameters", all_action_parameters)
         # print("action_parameters", action_parameters)
-        print("delete: ", delete_types_count)
+        #print("delete: ", delete_types_count)
 
         delete_parameters = []
 
@@ -80,17 +80,19 @@ class BaseController:
         effects = []
 
         for o in self.objectives:
+            # special case: when we are focusing a block, we need to unset focus on other blocks
+            # otherwise we get a weird behavior (double approach)
 
-            # if o.FS == "focus" and o.is_transient():
-            #     # unset other focuses
-            #     preconditions.append((neg("focus")))
-            #
+            if o.FS == "focus" and o.is_transient():
+                for x in delete_parameters:
+                    #print("setting unfocus on ", x[1])
+                    effects.append(neg(("focus", x[1])))
+
             if o.is_immediate():
                 preconditions.extend(o.get_pyddl_description(type2sym, self.target))
-                #for x in delete_parameters:
-                    #preconditions.append(neg(("target", x[1])))
             elif o.is_transient():
                 effects.extend(o.get_pyddl_description(type2sym, self.target))
+
             else:
                 print("Objectives should be immediate or transient only!")
 
@@ -114,37 +116,6 @@ class BaseController:
             objective.groundObjective(frames_real_objective)
 
 
-class CloseGripper(BaseController):
-
-    def __init__(self):
-        super().__init__(__class__.__name__)
-
-        self.frame_type = ["block", "gripper"]
-        self.frames_symbol = ["B1", "G"]
-        self.target = self.frames_symbol[0]
-
-        self.objectives.extend((
-            Objective(
-                FS=ry.FS.distance,
-                frames=self.frames_symbol,
-                target=[1],
-                OT_type=ry.OT.ineq,
-                scale=[1],
-                transientStep=.005
-            ),
-            Objective(
-                FS="focus",
-                frames=self.target,
-                OT_type=ry.OT.eq,
-            ),
-            Objective(
-                FS="grasping",
-                frames=self.frames_symbol,
-                OT_type=ry.OT.sos,
-            ),
-        ))
-
-
 class Approach(BaseController):
 
     def __init__(self):
@@ -153,7 +124,7 @@ class Approach(BaseController):
         self.frame_type = ["block", "gripper"]
         self.frames_symbol = ["B1", "G"]
 
-        self.target = self.frames_symbol[0]
+        self.target = [self.frames_symbol[0]]
 
         self.objectives.extend((
             Objective(
@@ -180,6 +151,37 @@ class Approach(BaseController):
         ))
 
 
+class CloseGripper(BaseController):
+
+    def __init__(self):
+        super().__init__(__class__.__name__)
+
+        self.frame_type = ["block", "gripper"]
+        self.frames_symbol = ["B1", "G"]
+        self.target = [self.frames_symbol[0]]
+
+        self.objectives.extend((
+            Objective(
+                FS=ry.FS.distance,
+                frames=self.frames_symbol,
+                target=[1],
+                OT_type=ry.OT.ineq,
+                scale=[1],
+                transientStep=.005
+            ),
+            Objective(
+                FS="focus",
+                frames=self.target,
+                OT_type=ry.OT.eq,
+            ),
+            Objective(
+                FS="grasping",
+                frames=self.frames_symbol,
+                OT_type=ry.OT.sos,
+            ),
+        ))
+
+
 class PlaceOn(BaseController):
 
     def __init__(self):
@@ -189,7 +191,7 @@ class PlaceOn(BaseController):
         self.frame_type = ["block", "gripper", "block"]
         self.frames_symbol = ["B1", "G", "B2"]
 
-        self.target = "B1"
+        self.target = [self.frames_symbol[0]]
 
         self.objectives.extend((
             Objective(
@@ -219,6 +221,11 @@ class PlaceOn(BaseController):
                 target=[1, 1, 1, 1],
                 scale=[1e0],
                 transientStep=.005
+            ),
+            Objective(
+                FS="focus",
+                frames=self.target,
+                OT_type=ry.OT.eq,
             ),
             Objective(
                 FS="un_focus",
