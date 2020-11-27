@@ -100,13 +100,20 @@ class BaseController:
             unique=True
         )
 
-    def activate_controller(self, C, frames_realized, scales):
+    def get_grounded_control_set(self, C, frames_realized):
+
+        ctrl_set = ry.CtrlSet()
 
         symbol2real = dict(zip(self.frames_symbol, frames_realized))
 
-        for objective in self.objectives:
-            frames_real_objective = [symbol2real[frame] for frame in objective.frames_symbol]
-            objective.groundObjective(frames_real_objective)
+        for o in self.objectives:
+            if o.FS.__class__ == ry.FS:
+                real_frames = [symbol2real[x] for x in o.frames_symbol]
+                ctrl_set.addObjective(C.feature(o.FS, real_frames, o.scale, o.target), o.type, o.transientStep)
+            #elif o.FS == "grasping" and o.is_transient:
+                #ctrl_set.symbolicCommands.append({"closeGripper", "R_gripper"});
+
+        return ctrl_set
 
 
 class Approach(BaseController):
@@ -123,17 +130,17 @@ class Approach(BaseController):
             Objective(
                 FS=ry.FS.distance,
                 frames=self.frames_symbol,
-                target=[1],
+                target=[0],
                 OT_type=ry.OT.sos,
-                scale=[1],
+                scale=[1e1],
                 transientStep=.005
             ),
             Objective(
                 FS=ry.FS.vectorZDiff,
                 frames=self.frames_symbol,
-                target=[1] * 3,
+                target=[0] * 3,
                 OT_type=ry.OT.sos,
-                scale=[1] * 3,
+                scale=[1e1] * 3,
                 transientStep=.005
             ),
             Objective(
@@ -157,10 +164,9 @@ class CloseGripper(BaseController):
             Objective(
                 FS=ry.FS.distance,
                 frames=self.frames_symbol,
-                target=[1],
-                OT_type=ry.OT.ineq,
+                target=[0],
+                OT_type=ry.OT.eq,
                 scale=[1],
-                transientStep=.005
             ),
             Objective(
                 FS="focus",

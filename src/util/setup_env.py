@@ -20,9 +20,13 @@ def setup_tower_env(num_blocks=1, block_size=(.1, .1, .1)):
         (0.3, -0.1)
     )
 
+    block_names = []
+
     # create blocks
     for o in range(num_blocks):
-        block = C.addFrame(f"block_{o+1}")
+        name = f"bb{o+1}"
+        block = C.addFrame(name)
+        block_names.append(name)
 
         pos = []
         pos.extend(positions[o])
@@ -32,6 +36,6 @@ def setup_tower_env(num_blocks=1, block_size=(.1, .1, .1)):
         block.setQuaternion([1, 0, 0, 0])
         block.setShape(ry.ST.box, size=block_size)  # 0.001
 
-    return R, C
+    return R, C, block_names
 
 
