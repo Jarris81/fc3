@@ -251,16 +251,16 @@ class PlaceOn(BaseController):
             Objective(
                 FS=ry.FS.distance,
                 frames=[self.frames_symbol[0], self.frames_symbol[1]],
-                OT_type=ry.OT.ineq,
-                target=[1],
+                OT_type=ry.OT.eq,
+                target=[0],
                 scale=[1e0],
             ),
             Objective(
-                FS=ry.FS.standingAbove,
+                FS=ry.FS.aboveBox,
                 frames=[self.frames_symbol[0], self.frames_symbol[2]],
                 OT_type=ry.OT.sos,
-                target=[1, 1, 1, 1],
-                scale=[1e0],
+                target=[0, 0, 0, 0],
+                scale=[1e1],
                 transientStep=.005
             ),
             Objective(

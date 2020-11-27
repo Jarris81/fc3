@@ -31,23 +31,23 @@ def problem(control_actions, scene_obj):
     }
 
     goal_obj_1 = con.Objective(
-        FS=ry.FS.standingAbove,
-        frames=scene_obj["block"],
+        FS=ry.FS.aboveBox,
+        frames=scene_obj["block"][:2],
         OT_type=ry.OT.eq,
-        target=[1]*4,
+        target=[0]*4,
         scale=[1]*4)
 
     goal_obj_2 = con.Objective(
-        FS=ry.FS.standingAbove,
-        frames=["b2", "b3"],
+        FS=ry.FS.aboveBox,
+        frames=scene_obj["block"][1:],
         OT_type=ry.OT.eq,
-        target=[1] * 4,
-        scale=[1] * 4)
+        target=[0] * 4,
+        scale=[0] * 4)
 
     goal = (
-        #*goal_obj_1.get_pyddl_description(type2sym),
-        #*goal_obj_2.get_pyddl_description(type2sym),
-        ("grasping", scene_obj["block"][0], scene_obj["gripper"][0]),
+        *goal_obj_1.get_pyddl_description(type2sym),
+        *goal_obj_2.get_pyddl_description(type2sym),
+       # ("grasping", scene_obj["block"][0], scene_obj["gripper"][0]),
     )
 
     prob = Problem(
@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
     name2con = {x.name: x for x in control_actions}
 
-    _, C,  block_names = setup_tower_env(2)
+    _, C,  block_names = setup_tower_env(3)
 
     gripper_name = "R_gripperCenter"
 
@@ -114,16 +114,44 @@ if __name__ == '__main__':
         con = name2con[action.sig[0]]
         x = con.get_grounded_control_set(C, frames_realized=frames_real)
         grounded_con.append((action, x))
+        print(action)
 
     ctrl = ry.CtrlSolver(C, tau, 2)
 
     grounded_con = list(reversed(grounded_con))
+    for a in grounded_con:
+        print(a[0])
 
-    for t in range(0, 1000):
+    isDone = False
 
-        for c in grounded_con:
+    for t in range(0, 10000):
 
-            if c[1].canBeInitiated(ctrl):
+        for i, c in enumerate(grounded_con):
+
+            # check for special controllers
+            if c[0].sig[0] == "CloseGripper":
+                if c[1].canBeInitiated(ctrl):
+                    # attach frames
+                    temp = ("R_gripper", c[0].sig[-2])
+                    print("frames", temp)
+                    C.attach(*temp)
+
+            if c[0].sig[0] == "OpenGripper":
+                if c[1].canBeInitiated(ctrl):
+                    # attach frames
+                    temp = ("world", c[0].sig[-2])
+                    print("frames", temp)
+                    C.attach(*temp)
+
+            # if i == 0 and c[1].isConverged(ctrl):
+            #     print(c[0].sig)
+            #     print("plan is done!")
+            #     isDone = True
+            #     break
+
+            elif c[1].canBeInitiated(ctrl):
+                if c[1].isConverged(ctrl):
+                    print("this is converged")
                 print(f"Initiating: {c[0]}")
                 ctrl.set(c[1])
                 break
@@ -131,14 +159,25 @@ if __name__ == '__main__':
                 print(f"Cannot be initiated: {c[0]}")
                 continue
 
+        if isDone:
+
+            #print(C.frame("bb1").info()["parent"])
+            break
+
         ctrl.update(C)
         q = ctrl.solve()
         C.setJointState(q)
-        #C.computeCollisions()
+        C.computeCollisions()
 
         #     ctrl.report();
         #     C.watch(false, STRING(txt <<"t:" <<t));
         time.sleep(tau)
+
+
+    if isDone:
+        print("Plan was finished")
+    else:
+        print("time ran out")
 
 
 
