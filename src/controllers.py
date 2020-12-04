@@ -1,6 +1,7 @@
 import libry as ry
 from pyddl import Action, neg
 from objective import Objective
+import util.domain_tower as dt
 import itertools as it
 
 
@@ -32,7 +33,7 @@ class BaseController:
         for objective in self.objectives:
             print(objective.objective2symbol())
 
-    def get_simple_action(self):
+    def get_simple_action(self, all_objects=None):
 
         # This needs to be implemented for each controller
         print(f"This function needs to be implemented! {self.__name__}")
@@ -115,40 +116,47 @@ class BaseController:
 
         return ctrl_set
 
+    def _get_unset_effects(self, predicate, all_objects):
+        """
+        Get the
+        """
 
-class Approach(BaseController):
+        all_types_count = {obj_type: len(all_objects[obj_type]) for obj_type in all_objects.keys()}
+        self.set_frame_type_count()
 
-    def __init__(self):
-        super().__init__(__class__.__name__)
+        delete_types_count = {x: all_types_count[x] - self.frame_type_count[x] if x in self.frame_type_count \
+            else all_types_count[x] for x in all_objects.keys()}
 
-        self.frame_type = ["block", "gripper"]
-        self.frames_symbol = ["B1", "G"]
+        # list of tuples, with the frames and their symbols
+        action_parameters = list(zip(self.frame_type, self.frames_symbol))
 
-        self.target = [self.frames_symbol[0]]
+        all_types_count = {obj_type: len(all_objects[obj_type]) for obj_type in all_objects.keys()}
+        self.set_frame_type_count()
 
-        self.objectives.extend((
-            Objective(
-                FS=ry.FS.distance,
-                frames=self.frames_symbol,
-                target=[0],
-                OT_type=ry.OT.sos,
-                scale=[1e1],
-                transientStep=.005
-            ),
-            Objective(
-                FS=ry.FS.vectorZDiff,
-                frames=self.frames_symbol,
-                target=[0] * 3,
-                OT_type=ry.OT.sos,
-                scale=[1e1] * 3,
-                transientStep=.005
-            ),
-            Objective(
-                FS="focus",
-                frames=self.target,
-                OT_type=ry.OT.sos,
-            )
-        ))
+        delete_types_count = {x: all_types_count[x] - self.frame_type_count[x] if x in self.frame_type_count \
+            else all_types_count[x] for x in all_objects.keys()}
+
+        # list of tuples, with the frames and their symbols
+        action_parameters = list(zip(self.frame_type, self.frames_symbol))
+
+        delete_parameters = []
+
+        effects = []
+
+        counter = 0
+        for x in delete_types_count:
+            for i in range(delete_types_count[x]):
+                temp = (x, chr(ord("Z") - counter))
+                action_parameters.append(temp)
+                delete_parameters.append(temp)
+                counter += 1
+
+        for x in delete_parameters:
+            # print("setting unfocus on ", x[1])
+            effects.append(neg(("focus", x[1])))
+
+        return effects
+
 
 
 class CloseGripper(BaseController):
@@ -156,7 +164,7 @@ class CloseGripper(BaseController):
     def __init__(self):
         super().__init__(__class__.__name__)
 
-        self.frame_type = ["block", "gripper"]
+        self.frame_type = [dt.type_block, dt.type_gripper]
         self.frames_symbol = ["B1", "G"]
         self.target = [self.frames_symbol[0]]
 
@@ -190,13 +198,30 @@ class CloseGripper(BaseController):
             ),
         ))
 
+    def get_simple_action(self, all_objects=None):
+        return Action(self.name,
+                      parameters=(
+                          (dt.type_gripper, "g"),
+                          (dt.type_block, "b"),
+                      ),
+                      preconditions=(
+                          (dt.focus, "b"),
+                          (dt.hand_empty, "g"),
+                          (dt.block_free, "b"),
+                      ),
+                      effects=(
+                          (dt.in_hand, "b", "g"),
+                          neg((dt.hand_empty, "g")),
+                          neg((dt.block_free, "b"))
+                      ))
+
 
 class OpenGripper(BaseController):
 
     def __init__(self):
         super().__init__(__class__.__name__)
 
-        self.frame_type = ["block", "gripper"]
+        self.frame_type = [dt.type_block, dt.type_gripper]
         self.frames_symbol = ["B1", "G"]
         self.target = [self.frames_symbol[0]]
 
@@ -223,6 +248,76 @@ class OpenGripper(BaseController):
             ),
         ))
 
+    def get_simple_action(self, all_objects=None):
+        return Action(self.name,
+                      parameters=(
+                          (dt.type_gripper, "g"),
+                          (dt.type_block, "b")
+                      ),
+                      preconditions=(
+                          (dt.focus, "b"),
+                          (dt.in_hand, "b", "g")
+                      ),
+                      effects=(
+                          neg((dt.in_hand, "b", "g")),
+                          (dt.hand_empty, "g"),
+                          (dt.block_free, "b")
+                      ))
+
+
+class Approach(BaseController):
+
+    def __init__(self):
+        super().__init__(__class__.__name__)
+
+        self.frame_type = [dt.type_block, dt.type_gripper]
+        self.frames_symbol = ["B1", "G"]
+
+        self.target = [self.frames_symbol[0]]
+
+        self.objectives.extend((
+            Objective(
+                FS=ry.FS.distance,
+                frames=self.frames_symbol,
+                target=[0],
+                OT_type=ry.OT.sos,
+                scale=[1e1],
+                transientStep=.005
+            ),
+            Objective(
+                FS=ry.FS.vectorZDiff,
+                frames=self.frames_symbol,
+                target=[0] * 3,
+                OT_type=ry.OT.sos,
+                scale=[1e1] * 3,
+                transientStep=.005
+            ),
+            Objective(
+                FS="focus",
+                frames=self.target,
+                OT_type=ry.OT.sos,
+            )
+        ))
+
+    def get_simple_action(self, all_objects=None):
+        # special case, where we need to unset focus on other objects
+
+        unset_focus = self._get_unset_effects(dt.focus, all_objects)
+        #print(unset_effects)
+
+        return Action(self.name,
+                      parameters=(
+                          (dt.type_gripper, "g"),
+                          (dt.type_block, "b")
+                      ),
+                      preconditions=(
+                          (dt.hand_empty, "g"),
+                      ),
+                      effects=(
+                          (dt.focus, "b"),
+                          *unset_focus
+                      ))
+
 
 class PlaceOn(BaseController):
 
@@ -230,7 +325,7 @@ class PlaceOn(BaseController):
         super().__init__(__class__.__name__)
 
         # define symbols here
-        self.frame_type = ["block", "gripper", "block"]
+        self.frame_type = [dt.type_block, dt.type_gripper, dt.type_block]
         self.frames_symbol = ["B1", "G", "B2"]
 
         self.target = [self.frames_symbol[0]]
@@ -270,4 +365,19 @@ class PlaceOn(BaseController):
             ),
         ))
 
-
+    def get_simple_action(self, all_objects=None):
+        return Action(self.name,
+                      parameters=(
+                          (dt.type_gripper, "g"),
+                          (dt.type_block, "b"),
+                          (dt.type_block, "b_placed")
+                      ),
+                      preconditions=(
+                        (dt.focus, "b"),
+                        (dt.in_hand, "b", "g"),
+                        (dt.block_free, "b_placed")
+                      ),
+                      effects=(
+                          (dt.b_on_b, "b", "b_placed"),
+                          neg((dt.block_free, "b_placed")),
+                      ))

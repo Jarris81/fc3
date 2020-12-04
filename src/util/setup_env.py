@@ -30,13 +30,13 @@ def setup_tower_env(num_blocks=1, block_size=(.1, .1, .1, 0.001)):
 
     # create blocks
     for o in range(num_blocks):
-        name = f"bb{o+1}"
+        name = f"b{o+1}"
         block = C.addFrame(name)# parent="world")
         block_names.append(name)
 
         pos = []
         pos.extend(positions[o])
-        pos.append(block_size[2]+0.7)
+        pos.append(block_size[2]/2+0.7)
 
         block.setPosition(pos)
         block.setQuaternion([1, 0, 0, 0])

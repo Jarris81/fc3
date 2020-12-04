@@ -2,16 +2,17 @@ import controllers as con
 from pyddl import Domain, Problem, State, Action, neg, planner
 from util.setup_env import setup_tower_env
 import time
-
 import libry as ry
 
 
-def problem(control_actions, scene_obj):
+"""
+In this example, I try to create a planner which uses geometric features from RAI 
+as effects and conditions to create a plan, which can directly be translated into LGP-controllers.
+Therefore each action in controllers.py is translated into a pyddl action, containing all origial objectives. 
+(function  
+"""
 
-    # objects = {
-    #     "block": ("b1", "b2"),  # , "b3"),
-    #     "gripper": ("g",)
-    # }
+def problem(control_actions, scene_obj):
 
     for x in control_actions:
         print(x.name)
@@ -81,14 +82,14 @@ def setup_scene():
 
 if __name__ == '__main__':
 
-    control_actions = [
+    actions = [
         con.Approach(),
         con.PlaceOn(),
         con.CloseGripper(),
         con.OpenGripper()
     ]
 
-    name2con = {x.name: x for x in control_actions}
+    name2con = {x.name: x for x in actions}
 
     _, C,  block_names = setup_tower_env(3)
 
@@ -101,7 +102,10 @@ if __name__ == '__main__':
              "gripper": (gripper_name,)
          }
 
-    plan = problem(control_actions, all_objects)
+    plan = problem(actions, all_objects)
+
+
+    # Start simulation of plan here
 
     C.view()
     tau = .01
