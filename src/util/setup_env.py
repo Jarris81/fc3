@@ -36,7 +36,7 @@ def setup_tower_env(num_blocks=1, block_size=(.1, .1, .1, 0.001)):
 
         pos = []
         pos.extend(positions[o])
-        pos.append(block_size[2]/2+0.7)
+        pos.append(block_size[2]/2+0.65)
 
         block.setPosition(pos)
         block.setQuaternion([1, 0, 0, 0])

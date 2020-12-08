@@ -27,6 +27,9 @@ if __name__ == '__main__':
 
     solver = ry.CtrlSolver(C, tau, 2)
 
+
+    test = ry.CtrlObjective()
+
     grasp = ry.CtrlSet()
     move = ry.CtrlSet()
     #grasp.addObjective(C.feature(ry.FS.positionRel, ["b1", "R_gripperCenter"], [1e1], [.0, 0., -.15]), ry.OT.sos, .005)
