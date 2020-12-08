@@ -31,7 +31,7 @@ def setup_tower_env(num_blocks=1, block_size=(.1, .1, .1, 0.001)):
     # create blocks
     for o in range(num_blocks):
         name = f"b{o+1}"
-        block = C.addFrame(name)# parent="world")
+        block = C.addFrame(name)
         block_names.append(name)
 
         pos = []

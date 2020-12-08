@@ -111,10 +111,10 @@ target_link_libraries(libry PRIVATE
   )
 
 
-add_executable(kinEdit rai/bin/src_kinEdit/main.cpp)
-target_link_libraries(kinEdit rai)
+#add_executable(kinEdit rai/bin/src_kinEdit/main.cpp)
+#target_link_libraries(kinEdit rai)
 
-add_executable(testKOMO rai/test/KOMO/komo/main.cpp)
-target_link_libraries(testKOMO rai)
+#add_executable(testKOMO rai/test/KOMO/komo/main.cpp)
+#target_link_libraries(testKOMO rai)
 
 

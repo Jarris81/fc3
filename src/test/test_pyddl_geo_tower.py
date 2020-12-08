@@ -122,7 +122,7 @@ if __name__ == '__main__':
 
     ctrl = ry.CtrlSolver(C, tau, 2)
 
-    grounded_con = list(reversed(grounded_con))
+    grounded_con = list(grounded_con)
     for a in grounded_con:
         print(a[0])
 
