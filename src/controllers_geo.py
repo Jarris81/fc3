@@ -130,15 +130,6 @@ class BaseController:
         # list of tuples, with the frames and their symbols
         action_parameters = list(zip(self.frame_type, self.frames_symbol))
 
-        all_types_count = {obj_type: len(all_objects[obj_type]) for obj_type in all_objects.keys()}
-        self.set_frame_type_count()
-
-        delete_types_count = {x: all_types_count[x] - self.frame_type_count[x] if x in self.frame_type_count \
-            else all_types_count[x] for x in all_objects.keys()}
-
-        # list of tuples, with the frames and their symbols
-        action_parameters = list(zip(self.frame_type, self.frames_symbol))
-
         delete_parameters = []
 
         effects = []
@@ -156,7 +147,6 @@ class BaseController:
             effects.append(neg(("focus", x[1])))
 
         return effects
-
 
 
 class CloseGripper(BaseController):

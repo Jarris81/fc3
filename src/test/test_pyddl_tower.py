@@ -1,5 +1,5 @@
 from pyddl import Domain, Problem, State, Action, neg, planner
-import controllers as con
+import controllers_geo as con
 import util.domain_tower as dt
 from src.util.setup_env import setup_tower_env
 import numpy as np

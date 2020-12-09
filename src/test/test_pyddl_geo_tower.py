@@ -1,4 +1,4 @@
-import controllers as con
+import controllers_geo as con
 from pyddl import Domain, Problem, State, Action, neg, planner
 from util.setup_env import setup_tower_env
 import time
@@ -8,11 +8,12 @@ import libry as ry
 """
 In this example, I try to create a planner which uses geometric features from RAI 
 as effects and conditions to create a plan, which can directly be translated into LGP-controllers.
-Therefore each action in controllers.py is translated into a pyddl action, containing all origial objectives. 
+Therefore each action in controllers_geo.py is translated into a pyddl action, containing all origial objectives. 
 (function  
 """
 
-def problem(control_actions, scene_obj):
+
+def get_plan(control_actions, scene_obj):
 
     for x in control_actions:
         print(x.name)
@@ -102,7 +103,7 @@ if __name__ == '__main__':
              "gripper": (gripper_name,)
          }
 
-    plan = problem(actions, all_objects)
+    plan = get_plan(actions, all_objects)
 
 
     # Start simulation of plan here
@@ -153,8 +154,8 @@ if __name__ == '__main__':
             #     isDone = True
             #     break
 
-            elif c[1].canBeInitiated(ctrl):
-                if c[1].isConverged(ctrl):
+            elif c[1].canBeInitiated(C):
+                if c[1].isConverged(C):
                     print("this is converged")
                 print(f"Initiating: {c[0]}")
                 ctrl.set(c[1])
