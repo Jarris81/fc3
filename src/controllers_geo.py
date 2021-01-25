@@ -104,15 +104,29 @@ class BaseController:
     def get_grounded_control_set(self, C, frames_realized):
 
         ctrl_set = ry.CtrlSet()
-
         symbol2real = dict(zip(self.frames_symbol, frames_realized))
 
         for o in self.objectives:
+            real_frames = [symbol2real[x] for x in o.frames_symbol]
             if o.FS.__class__ == ry.FS:
-                real_frames = [symbol2real[x] for x in o.frames_symbol]
                 ctrl_set.addObjective(C.feature(o.FS, real_frames, o.scale, o.target), o.type, o.transientStep)
-            #elif o.FS == "grasping" and o.is_transient:
-                #ctrl_set.symbolicCommands.append({"closeGripper", "R_gripper"});
+
+            elif o.FS == "grasping":
+                grasp_command = [dt.SC_close_gripper, *real_frames[::-1]]  # hack, command is other way around
+                is_condition = not o.is_transient()
+                ctrl_set.addSymbolicCommand(grasp_command, is_condition)
+
+            elif o.FS == "not_grasping":
+                command = [dt.SC_open_gripper, *real_frames[::-1]]  # hack, command is other way around
+                is_condition = not o.is_transient
+                ctrl_set.addSymbolicCommand(command, is_condition)
+            elif o.FS == "focus" or o.FS == "gripper_free" or o.FS == "not_gripper_free":
+                # dont care about these, only symbolic
+                continue
+            else:
+                print("objective not specified")
+                print(o.FS)
+                assert False
 
         return ctrl_set
 
@@ -321,30 +335,30 @@ class PlaceOn(BaseController):
         self.target = [self.frames_symbol[0]]
 
         self.objectives.extend((
-            Objective(
-                FS=ry.FS.vectorZDiff,
-                frames=[self.frames_symbol[0], self.frames_symbol[1]],
-                OT_type=ry.OT.ineq,
-                target=[10] * 3,
-                scale=[1e0] * 3,
-            ),
+            # Objective(
+            #     FS=ry.FS.vectorZDiff,
+            #     frames=[self.frames_symbol[0], self.frames_symbol[1]],
+            #     OT_type=ry.OT.ineq,
+            #     target=[10] * 3,
+            #     scale=[1e0] * 3,
+            # ),
             Objective(
                 FS="grasping",
                 frames=[self.frames_symbol[0], self.frames_symbol[1]],
                 OT_type=ry.OT.eq
             ),
             Objective(
-                FS=ry.FS.distance,
-                frames=[self.frames_symbol[0], self.frames_symbol[1]],
-                OT_type=ry.OT.eq,
-                target=[0],
-                scale=[1e0],
+                FS=ry.FS.positionRel,
+                frames=[self.frames_symbol[2], self.frames_symbol[0]],
+                OT_type=ry.OT.sos,
+                target=[0]*3,
+                scale=[1e1]*3,
             ),
             Objective(
-                FS=ry.FS.aboveBox,
-                frames=[self.frames_symbol[0], self.frames_symbol[2]],
+                FS=ry.FS.scalarProductZZ,
+                frames=[self.frames_symbol[2], self.frames_symbol[0]],
                 OT_type=ry.OT.sos,
-                target=[0, 0, 0, 0],
+                target=[1],
                 scale=[1e1],
                 transientStep=.005
             ),

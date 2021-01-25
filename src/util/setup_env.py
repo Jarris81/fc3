@@ -6,7 +6,7 @@ import time
 def setup_tower_env(num_blocks=1, block_size=(.1, .1, .1, 0.001)):
 
     path_to_repo ="/home/jason/git/thesis_2020/"
-    #scene = "rai/test/KOMO/switches/model2.g"
+    #scene = "rai/testing/KOMO/switches/model2.g"
     scene = "rai-robotModels/scenarios/pandasTable.g"
 
     # setup simulation (Real World)
@@ -17,13 +17,13 @@ def setup_tower_env(num_blocks=1, block_size=(.1, .1, .1, 0.001)):
     C = ry.Config()
     C.addFile(path_to_repo+scene)
 
-    color = [[0, 1, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0],
+    color = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0],
              [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
 
     positions = (
-        (0.1, 0.1),
-        (0.3, -0.1),
-        (-0.3, -0.3)
+        (0.1, 0.2),
+        (0.3, 0.3),
+        (-0.1, -0.2)
     )
 
     block_names = []
