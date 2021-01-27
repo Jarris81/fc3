@@ -22,7 +22,7 @@ def get_plan(verbose, control_actions, scene_obj):
     goal = [(dt.b_on_b, scene_obj[dt.type_block][i], scene_obj[dt.type_block][i + 1])\
             for i in range(len(scene_obj[dt.type_block]) - 1)]
     # also append free hand
-    goal.append((dt.hand_empty, scene_obj[dt.type_gripper][0]))
+    #goal.append((dt.hand_empty, scene_obj[dt.type_gripper][0]))
 
 
     # normal initial conditions
