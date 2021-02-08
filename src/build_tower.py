@@ -7,6 +7,7 @@ import util.domain_tower as dt
 from testing.tower_planner import get_plan, get_goal_feature
 from util.setup_env import setup_tower_env
 from feasibility import check_feasibility
+from feasibility import check_feasibility2
 
 
 """
@@ -56,13 +57,16 @@ def build_tower(verbose=False):
         control_sets.append((grounded_action, controller.get_grounded_control_set(C, obj_frames)))
 
     # check if plan is feasible in current config
-    check_feasibility(C, control_sets)
+    komo_feasy = check_feasibility2(C, control_sets, steps_per_keyframe=1, hack=False, vis=True)
 
     # get goal condition
     goal_feature = get_goal_feature(C, goal)
     # get implicit conditions
     robust_plan = []
 
+
+
+    # not the way to go, should use the C and komo to check if feature is needed
     def is_equal_feature(f1, f2, C):
         if not f1.getFS() == f2.getFS():
             return False
@@ -78,12 +82,32 @@ def build_tower(verbose=False):
 
         return True
 
+    # Better: use the feasibility check, to see if the feature was already fulfilled in previous enter
+    # if feature is fulfilled, it is a immediate feature, otherwise it is transient feature
+    def is_feature_fulfilled(curr_trans=None, imm_next=None):
+
+        Ccopy = ry.Config()
+        Ccopy.copy(C)
+        frames_state = 0 # needs to be initialized somehow
+        frames_state = komo_feasy.getPathFrames(frames_state)
+        print(frames_state)
+
+        Ccopy.setFrameState(frames_state[-3])
+        Ccopy.view()
+        time.sleep(5)
+        Ccopy.view_close()
+
+    is_feature_fulfilled()
+
+    return
+
+
     for i, (name, ctrlset) in enumerate(reversed(control_sets)):
         # check if we need the goal or the last modified ctrlset
         if i == 0:
             action_next = goal_feature
         else:
-            action_next = robust_plan[-1][1]
+            action_next = robust_plan[-1]
 
         print(ctrlset.getObjectives())
         # get all transient features of current ctrlset
@@ -96,15 +120,20 @@ def build_tower(verbose=False):
         # check which objectives are are not contained in transient feature
         implicit_features = [x for x in immediate_next if not any([is_equal_feature(x, y, C) for y in transient_curr])]
 
-        print(f"{implicit_features=}")
-        print(f"{transient_curr=}")
-        print(f"{immediate_next=}")
+        # add implicit objectives to current controller as transient objectives
+        for implicit_feature in implicit_features:
 
-        for a in immediate_next:
-            for b in transient_curr:
-                print(b.description(C))
-                print(a.description(C))
-                print(dir(a))
+            ctrlset.addObjective(implicit_feature, ry.OT.eq, 0.005)
+
+        robust_plan.append(ctrlset)
+
+        print()
+        print(f"Impliciticit features for {name} are:")
+        for x in implicit_features: print(x.description(C))
+        print(f"Transient features for {name} are:")
+        for x in transient_curr: print(x.description(C))
+        print(f"{immediate_next=}")
+        print()
 
 
     #Start simulation of plan here

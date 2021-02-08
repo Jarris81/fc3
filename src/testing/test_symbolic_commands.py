@@ -16,25 +16,24 @@ if __name__ == '__main__':
 
     # grasp block, use symbolic command
     grasp = ry.CtrlSet()
-    grasp.addObjective(C.feature(ry.FS.aboveBox, ["b1", "R_gripperCenter"], [1e0]), ry.OT.ineq, -1)
-    grasp_command = ["close_gripper", "R_gripper", "b1"]
-    grasp.addSymbolicCommand(grasp_command, False)  # symbolic command to grasp object, Boolean if condition or run
+    grasp.addObjective(C.feature(ry.FS.aboveBox, ["R_gripperCenter","b1"], [1e0]), ry.OT.ineq, -1)
+    grasp.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, ("R_gripper", "b1"), False)  # symbolic command to grasp object, Boolean if condition or run
 
     # place on othe rblock
     place_on = ry.CtrlSet()
-    place_on.addSymbolicCommand(grasp_command, True)  # isCondition=True, therefore respected in initial feasibility
-    place_on.addObjective(C.feature(ry.FS.scalarProductZZ, ["b2", "b1"], [1e1], [1]), ry.OT.sos, .005)
+    place_on.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, ("R_gripper", "b1"), True) # isCondition=True, therefore respected in initial feasibility
+    place_on.addObjective(C.feature(ry.FS.scalarProductZZ, ["b2", "b1"], [1e1], [1]), ry.OT.sos, .01)
     place_on.addObjective(C.feature(ry.FS.positionRel, ["b2", "b1"], [1e1], [0, 0, -0.1]), ry.OT.sos, .005)
 
     open_gripper = ry.CtrlSet()
     open_command = ["open_gripper", "R_gripper", "b1"]
-    open_gripper.addSymbolicCommand(open_command, False)  # isCondition=True, therefore respected in initial feasibility
+    open_gripper.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", "b1"), False) # isCondition=True, therefore respected in initial feasibility
     open_gripper.addObjective(C.feature(ry.FS.scalarProductZZ, ["b2", "b1"], [1e1], [1]), ry.OT.eq, -1)
     open_gripper.addObjective(C.feature(ry.FS.positionRel, ["b2", "b1"], [1e1], [0, 0, -0.1]), ry.OT.eq, -1)
 
     # move away, after placing block, to make sure opening gripper works
     move_up = ry.CtrlSet()
-    move_up.addSymbolicCommand(open_command, True)
+    move_up.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", "b1"), True)
     move_up.addObjective(C.feature(ry.FS.positionRel, ["b3", "R_gripperCenter"], [1e1]), ry.OT.sos, .005)
     # only condition, should be solved through implicit conditions
     move_up.addObjective(C.feature(ry.FS.scalarProductZZ, ["b2", "b1"], [1e1], [1]), ry.OT.eq, -1)

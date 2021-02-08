@@ -95,11 +95,40 @@ class CloseGripper(BaseController):
         gripper_center = gripper + "Center"
         block = sym2frame['B']
 
+        # ctrl_set.addObjective(
+        #     C.feature(
+        #         ry.FS.positionRel,
+        #         [gripper_center, block],
+        #         [1e1] * 3,
+        #         [.0, 0., .05]),
+        #     ry.OT.eq,
+        #     -1)
+        # # align axis with block
+        # ctrl_set.addObjective(
+        #     C.feature(
+        #         ry.FS.vectorZDiff,
+        #         [gripper, block],
+        #         [1e1]),
+        #     ry.OT.eq,
+        #     -1)
+
+        gripper_start_pos = C.frame(gripper).getPosition()
+
+        # ctrl_set.addObjective(
+        #     C.feature(
+        #         ry.FS.position,
+        #         [gripper],
+        #         [1e1]*3,
+        #         gripper_start_pos),
+        #     ry.OT.sos,
+        #     0.005
+        # )
+
         # move close to block
         ctrl_set.addObjective(
-            C.feature(ry.FS.distance, [gripper_center, block], [1e1]),
-            ry.OT.eq, -1)
-        # align axis with block
+            C.feature(ry.FS.distance, [block, gripper], [1e1]),
+            ry.OT.ineq, -1)
+        #align axis with block
         ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
 
         return ctrl_set
@@ -138,6 +167,10 @@ class OpenGripper(BaseController):
 
         gripper = sym2frame['G']
         block = sym2frame['B']
+
+        # ctrl_set.addObjective(
+        #     C.feature(ry.FS.insideBox, [block, "R_gripperPregrasp"], [1e0]),
+        #     ry.OT.eq, -1)
 
         ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
         ctrl_set.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
