@@ -55,7 +55,7 @@ def get_plan(verbose, control_actions, scene_obj):
     return plan, goal
 
 
-def get_goal_feature(C, goal):
+def get_goal_controller(C, goal):
     goal_feature = ry.CtrlSet()
 
     # cut out last goal, which was free hand

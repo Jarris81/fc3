@@ -124,7 +124,7 @@ class CloseGripper(BaseController):
         #     0.005
         # )
 
-        # move close to block
+        #  move close to block
         ctrl_set.addObjective(
             C.feature(ry.FS.distance, [block, gripper], [1e1]),
             ry.OT.ineq, -1)

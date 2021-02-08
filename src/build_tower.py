@@ -4,7 +4,7 @@ import numpy as np
 
 import controllers as con
 import util.domain_tower as dt
-from testing.tower_planner import get_plan, get_goal_feature
+from testing.tower_planner import get_plan, get_goal_controller
 from util.setup_env import setup_tower_env
 from feasibility import check_feasibility
 from feasibility import check_feasibility2
@@ -56,14 +56,14 @@ def build_tower(verbose=False):
         controller = name2con[grounded_action.sig[0]]  # the actual control
         control_sets.append((grounded_action, controller.get_grounded_control_set(C, obj_frames)))
 
-    # check if plan is feasible in current config
-    komo_feasy = check_feasibility2(C, control_sets, steps_per_keyframe=1, hack=False, vis=True)
 
     # get goal condition
-    goal_feature = get_goal_feature(C, goal)
+    goal_controller = get_goal_controller(C, goal)
     # get implicit conditions
     robust_plan = []
 
+    # check if plan is feasible in current config
+    komo_feasy = check_feasibility2(C, control_sets, steps_per_keyframe=1, hack=False, vis=True, goal=goal_controller)
 
 
     # not the way to go, should use the C and komo to check if feature is needed
