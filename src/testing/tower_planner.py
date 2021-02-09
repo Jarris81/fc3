@@ -63,11 +63,15 @@ def get_goal_controller(C, goal):
 
         goal_feature.addObjective(
             C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.1]),
-            ry.OT.eq, 0.005)
+            ry.OT.eq, -1)
         # should have z-axis in same direction
         goal_feature.addObjective(
             C.feature(ry.FS.scalarProductZZ, [block, block_place_on], [1e1], [1]),
-            ry.OT.eq, 0.005)
+            ry.OT.eq, -1)
+
+        goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", block), True)
+
+
 
     return goal_feature
 
