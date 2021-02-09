@@ -158,7 +158,7 @@ def check_feasibility2(C, controls, steps_per_keyframe=1, hack=True, vis=False, 
         komo.view_play(.2, False)
 
         time.sleep(5)
-    report = komo.getReport()
-    time.sleep(30)
+        report = komo.getReport()
+        time.sleep(10)
     return komo
 

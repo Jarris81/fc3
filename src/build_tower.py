@@ -63,7 +63,7 @@ def build_tower(verbose=False):
     robust_plan = []
 
     # check if plan is feasible in current config
-    komo_feasy = check_feasibility2(C, control_sets, steps_per_keyframe=1, hack=False, vis=True, goal=goal_controller)
+    komo_feasy = check_feasibility2(C, control_sets, steps_per_keyframe=1, hack=False, vis=False, goal=goal_controller)
 
 
     # not the way to go, should use the C and komo to check if feature is needed
@@ -82,101 +82,153 @@ def build_tower(verbose=False):
 
         return True
 
-    # Better: use the feasibility check, to see if the feature was already fulfilled in previous enter
-    # if feature is fulfilled, it is a immediate feature, otherwise it is transient feature
-    def is_feature_fulfilled(curr_trans=None, imm_next=None):
+    def is_equal_sym_command(sc1, sc2):
+
+        if not sc1.getFrameNames() == sc2.getFrameNames():
+            return False
+        if not sc1.getCommand() == sc2.getCommand():
+            return False
+
+        return True
+    # Better: use the feasibility komo, to see if the immediate conditions of the following controller are present
+    # if yes, they are implied feature
+    def get_implied_features(step, current, follow, vis=False):
 
         Ccopy = ry.Config()
         Ccopy.copy(C)
-        frames_state = 0 # needs to be initialized somehow
+
+        frames_state = 0  # needs to be initialized somehow
         frames_state = komo_feasy.getPathFrames(frames_state)
-        print(frames_state)
 
-        Ccopy.setFrameState(frames_state[-3])
-        Ccopy.view()
-        time.sleep(5)
-        Ccopy.view_close()
+        implicit_features_list = []
 
-    is_feature_fulfilled()
+        if step < 9:
+            Ccopy.setFrameState(frames_state[-step])
 
-    return
+        for follow_obj in follow.getObjectives():
+            if follow_obj.get_OT() == ry.OT.eq or follow_obj.get_OT() == ry.OT.ineq:
+                follow_feat = follow_obj.feat()
+                result = follow_feat.eval(Ccopy)  # evaluate feature in frame switch
+                y = result[0]  # get the error
+                #print(follow_feat.description(Ccopy))
+                #print(f"Error: {np.sqrt(y*y)}")
 
+                if np.all(np.sqrt(y*y) < 1e-2):
+                    # check if feature is not already in current controller
+                    is_implicit = True
+                    for current_obj in current.getObjectives():
+                        if is_equal_feature(current_obj.feat(), follow_feat, Ccopy):
+                            is_implicit = False
+                            break
+
+                    if is_implicit:
+                        implicit_features_list.append(follow_feat)
+                    # print(f"Is implicit: {is_implicit}")
+
+        # additionally we need to get implicit symbolic commands (pretty much exactly like RLDS paper)
+        implicit_sym_commands_list = []
+
+        for sym_obj in follow.getSymbolicCommands():
+            if sym_obj.isCondition():
+                is_implicit = True
+                # check if the current controller has that same symbolic command as run
+                for current_sc in current.getSymbolicCommands():
+                    if is_equal_sym_command(sym_obj, current_sc):
+                        is_implicit = False
+                        break
+                if is_implicit:
+                    implicit_sym_commands_list.append(sym_obj)
+                    print(f"Is implicit SC: {is_implicit}")
+
+
+        for x in implicit_features_list: print(x.description(C))
+        if vis:
+            Ccopy.view()
+            time.sleep(1)
+            Ccopy.view_close()
+
+        return implicit_features_list, implicit_sym_commands_list
 
     for i, (name, ctrlset) in enumerate(reversed(control_sets)):
         # check if we need the goal or the last modified ctrlset
         if i == 0:
-            action_next = goal_feature
+            action_next = goal_controller
         else:
-            action_next = robust_plan[-1]
+            action_next = robust_plan[-1][1]
 
-        print(ctrlset.getObjectives())
-        # get all transient features of current ctrlset
-        transient_curr = [obj.feat() for obj in ctrlset.getObjectives() if obj.get_OT() == ry.OT.sos]
+        print(f"Implicit Features for {name}:")
+        implicit_features, implicit_scs = get_implied_features(i + 2, ctrlset, action_next, vis=False)
 
-        # get all immediate features of following ctrlset or goal
-        immediate_next = [obj.feat() for obj in action_next.getObjectives()
-                          if obj.get_OT() == ry.OT.eq or obj.get_OT() == ry.OT.ineq]
-
-        # check which objectives are are not contained in transient feature
-        implicit_features = [x for x in immediate_next if not any([is_equal_feature(x, y, C) for y in transient_curr])]
 
         # add implicit objectives to current controller as transient objectives
         for implicit_feature in implicit_features:
 
-            ctrlset.addObjective(implicit_feature, ry.OT.eq, 0.005)
+            # problem: implicit features come from sos, therefore they might have nct been solved perfectly?
+            ctrlset.addObjective(implicit_feature, ry.OT.eq, -1) # need to get the same OT here, could also be ineq
 
-        robust_plan.append(ctrlset)
+        for implicit_sc in implicit_scs:
+            ctrlset.addSymbolicCommand(implicit_sc.getCommand(), implicit_sc.getFrameNames(), True)  # always condition
 
-        print()
-        print(f"Impliciticit features for {name} are:")
-        for x in implicit_features: print(x.description(C))
-        print(f"Transient features for {name} are:")
-        for x in transient_curr: print(x.description(C))
-        print(f"{immediate_next=}")
-        print()
+        if "OPEN" in name.sig[0]:
+            ctrlset.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", "b2"), False)
+        robust_plan.append((name, ctrlset))
+
+    # return
+
+    # Start simulation of plan here
+    C.view()
+    tau = .01
+
+    isDone = False
+
+    for t in range(0, 10000):
+
+        ctrl = ry.CtrlSolver(C, tau, 2)
+
+        for i, (name, c) in enumerate(robust_plan):
+
+            if c.canBeInitiated(C):
+                print(f"Initiating: {name}")
+                ctrl.set(c)
+                if 4 == i:
+
+                    print(f"{name} b1 working")
+                    c = ry.CtrlSet()
+                    c.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", "b2"), False)  # isCondition=True, therefore respected in initial feasibility
+                    #c.addObjective(C.feature(ry.FS.scalarProductZZ, ["b2", "b1"], [1e1], [1]), ry.OT.eq, -1)
+                    #c.addObjective(C.feature(ry.FS.positionRel, ["b2", "b1"], [1e1], [0, 0, -0.1]), ry.OT.eq,
+                                              # -1)
+                    ctrl.set(c)
+                break
+            else:
+                print(f"Cannot be initiated: {name}, {i},")
+                continue
+
+        if isDone:
 
 
-    #Start simulation of plan here
-    # C.view()
-    # tau = .01
-    #
-    # ctrl = ry.CtrlSolver(C, tau, 2)
-    #
-    # isDone = False
-    #
-    # for t in range(0, 10000):
-    #
-    #     ctrl = ry.CtrlSolver(C, tau, 2)
-    #
-    #     for i, c in enumerate(reversed(control_sets)):
-    #
-    #         if c[1].canBeInitiated(C):
-    #             print(f"Initiating: {c[0]}")
-    #             ctrl.set(c[1])
-    #             break
-    #         else:
-    #             print(f"Cannot be initiated: {c[0]}")
-    #             continue
-    #
-    #     if isDone:
-    #
-    #         #print(C.frame("bb1").info()["parent"])
-    #         break
-    #
-    #     ctrl.update(C)
-    #     q = ctrl.solve(C)
-    #     C.setJointState(q)
-    #     C.computeCollisions()
-    #
-    #     #     ctrl.report();
-    #     #     C.watch(false, STRING(txt <<"t:" <<t));
-    #     time.sleep(tau)
-    #
-    #
-    # if isDone:
-    #     print("Plan was finished")
-    # else:
-    #     print("time ran out")
+            break
+
+        ctrl.update(C)
+        q = ctrl.solve(C)
+        C.setJointState(q)
+        C.computeCollisions()
+
+        if "parent" in C.frame("b2").info():
+            if "world" == C.frame("b2").info()["parent"]:
+                print("b2 is in world")
+            elif "R_gripper" == C.frame("b2").info()["parent"]:
+                print("b2 is attached")
+
+        #     ctrl.report();
+        #     C.watch(false, STRING(txt <<"t:" <<t));
+        time.sleep(tau)
+
+
+    if isDone:
+        print("Plan was finished")
+    else:
+        print("time ran out")
 
 
 if __name__ == '__main__':

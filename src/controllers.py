@@ -126,8 +126,8 @@ class CloseGripper(BaseController):
 
         #  move close to block
         ctrl_set.addObjective(
-            C.feature(ry.FS.distance, [block, gripper], [1e1]),
-            ry.OT.ineq, -1)
+            C.feature(ry.FS.distance, [block, gripper_center], [1e0]),
+            ry.OT.eq, -1)
         #align axis with block
         ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
 
@@ -167,10 +167,16 @@ class OpenGripper(BaseController):
 
         gripper = sym2frame['G']
         block = sym2frame['B']
+        gripper_center = gripper + "Center"
+
 
         # ctrl_set.addObjective(
         #     C.feature(ry.FS.insideBox, [block, "R_gripperPregrasp"], [1e0]),
         #     ry.OT.eq, -1)
+
+        ctrl_set.addObjective(
+            C.feature(ry.FS.distance, [block, gripper_center], [1e0]),
+            ry.OT.eq, -1)
 
         ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
         ctrl_set.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
@@ -282,7 +288,7 @@ class PlaceOn(BaseController):
             ry.OT.sos, 0.005)
         # should have z-axis in same direction
         ctrl_set.addObjective(
-            C.feature(ry.FS.scalarProductZZ, [block, block_place_on], [1e1], [1]),
+            C.feature(ry.FS.scalarProductZZ, [block, block_place_on], [1e0], [1]),
             ry.OT.sos, 0.005)
         # align axis with block
         ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
