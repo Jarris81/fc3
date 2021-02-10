@@ -96,6 +96,8 @@ def build_tower(verbose=False):
         q = ctrl.solve(C)
         C.setJointState(q)
         C.computeCollisions()
+        coll = C.getCollisions(0)
+        print(coll)
         time.sleep(tau)
 
     if isDone:

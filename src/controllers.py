@@ -215,21 +215,14 @@ class ApproachBlock(BaseController):
 
         # move close to block
         ctrl_set.addObjective(
-            C.feature(
-                ry.FS.positionRel,
-                [gripper_center, block],
-                [1e1] * 3,
-                [.0, 0., .05]),
-            ry.OT.sos,
-            0.005)
+            C.feature(ry.FS.positionRel, [gripper_center, block], [1e1] * 3, [.0, 0., .05]),
+            ry.OT.sos, 0.005)
         # align axis with block
         ctrl_set.addObjective(
-            C.feature(
-                ry.FS.vectorZDiff,
-                [gripper, block],
-                [1e1]),
-            ry.OT.sos,
-            0.01)
+            C.feature(ry.FS.vectorZDiff, [gripper, block], [1e1]),
+            ry.OT.sos, 0.01)
+
+
 
         return ctrl_set
 
@@ -278,9 +271,17 @@ class PlaceOn(BaseController):
             ry.OT.sos, 0.005)
         # should have z-axis in same direction
         ctrl_set.addObjective(
-            C.feature(ry.FS.scalarProductZZ, [block, block_place_on], [1e0], [1]),
+            C.feature(ry.FS.scalarProductZZ, [block, block_place_on], [1e1], [1]),
             ry.OT.sos, 0.005)
         # align axis with block
         ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
+
+        # not working between objects
+        ctrl_set.addObjective(C.feature(ry.FS.accumulatedCollisions, [], [1e1]), ry.OT.ineq)
+
+        # ctrl_set.addObjective(
+        #     C.feature(ry.FS.distance, ["b2", "b1"], [1e1], []),
+        #     ry.OT.ineq, -1)
+
 
         return ctrl_set

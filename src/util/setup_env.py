@@ -41,7 +41,8 @@ def setup_tower_env(num_blocks=1, block_size=(.1, .1, .1, 0.001)):
         block.setPosition(pos)
         block.setQuaternion([1, 0, 0, 0])
         block.setColor(color[o])
-        block.setShape(ry.ST.box, size=block_size)  # 0.001
+        block.setShape(ry.ST.ssBox, size=block_size)  # 0.001
+        block.setContact(1)
 
     return R, C, block_names
 

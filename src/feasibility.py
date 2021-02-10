@@ -31,7 +31,7 @@ def check_feasibility(C, controls, steps_per_keyframe=1, vis=False, goal=None):
             for o in controls[i+1][1].getObjectives():
                 if o.get_OT() == ry.OT.eq or o.get_OT() == ry.OT.ineq:
                     f = o.feat()
-                    komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C), o.get_OT(), f.getScale(), f.getTarget())
+                    #komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C), o.get_OT(), f.getScale(), f.getTarget())
             for ctrlCommand in controls[i + 1][1].getSymbolicCommands():
                 if not ctrlCommand.isCondition():
                     gripper, block = ctrlCommand.getFrameNames()
@@ -60,5 +60,7 @@ def check_feasibility(C, controls, steps_per_keyframe=1, vis=False, goal=None):
         time.sleep(5)
         report = komo.getReport()
         time.sleep(10)
+
+    report = komo.getReport()
     return komo
 

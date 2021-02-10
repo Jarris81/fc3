@@ -110,7 +110,7 @@ def get_robust_system(C, komo_feasy, controllers, goal_controller):
 
         # add implicit objectives to current controller as transient objectives
         for implicit_feature in implicit_features:
-            ctrlset.addObjective(implicit_feature, ry.OT.eq, -1) # need to get the same OT here, could also be ineq
+            ctrlset.addObjective(implicit_feature, ry.OT.eq, -1)  # TODO: need to get the same OT, could also be ineq
 
         for implicit_sc in implicit_scs:
             ctrlset.addSymbolicCommand(implicit_sc.getCommand(), implicit_sc.getFrameNames(), True)  # always condition
