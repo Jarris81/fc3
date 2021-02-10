@@ -11,8 +11,6 @@ Simple planner to build a tower, which uses (simple) symbolic actions (STRIPS st
 """
 # TODO: add block order
 
-
-
 def get_plan(verbose, control_actions, scene_obj):
 
     # get simple action from all controllers

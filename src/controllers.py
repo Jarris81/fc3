@@ -114,16 +114,6 @@ class CloseGripper(BaseController):
 
         gripper_start_pos = C.frame(gripper).getPosition()
 
-        # ctrl_set.addObjective(
-        #     C.feature(
-        #         ry.FS.position,
-        #         [gripper],
-        #         [1e1]*3,
-        #         gripper_start_pos),
-        #     ry.OT.sos,
-        #     0.005
-        # )
-
         #  move close to block
         ctrl_set.addObjective(
             C.feature(ry.FS.distance, [block, gripper_center], [1e0]),
@@ -175,7 +165,7 @@ class OpenGripper(BaseController):
         #     ry.OT.eq, -1)
 
         ctrl_set.addObjective(
-            C.feature(ry.FS.distance, [block, gripper_center], [1e0]),
+            C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
             ry.OT.eq, -1)
 
         ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
