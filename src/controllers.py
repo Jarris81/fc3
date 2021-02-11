@@ -121,6 +121,8 @@ class CloseGripper(BaseController):
         #align axis with block
         ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
 
+        #ctrl_set.addObjective(C.feature(ry.FS.accumulatedCollisions, [], [1e1]), ry.OT.eq)
+
         return ctrl_set
 
 
@@ -267,7 +269,7 @@ class PlaceOn(BaseController):
 
         # block should be over block_placed_on
         ctrl_set.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.1]),
+            C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.11]),
             ry.OT.sos, 0.005)
         # should have z-axis in same direction
         ctrl_set.addObjective(
@@ -277,10 +279,10 @@ class PlaceOn(BaseController):
         ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
         # not working between objects
-        ctrl_set.addObjective(C.feature(ry.FS.accumulatedCollisions, [], [1e1]), ry.OT.ineq)
+        #ctrl_set.addObjective(C.feature(ry.FS.accumulatedCollisions, [], [1e1]), ry.OT.eq)
 
         # ctrl_set.addObjective(
-        #     C.feature(ry.FS.distance, ["b2", "b1"], [1e1], []),
+        #     C.feature(ry.FS.distance, ["b2", "b1"], [1e1], [0.5]),
         #     ry.OT.ineq, -1)
 
 

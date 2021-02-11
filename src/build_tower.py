@@ -59,7 +59,9 @@ def build_tower(verbose=False):
     goal_controller = get_goal_controller(C, goal)
 
     # check if plan is feasible in current config
-    komo_feasy = check_feasibility(C, controller_tuples, steps_per_keyframe=1, vis=False, goal=goal_controller)
+    komo_feasy = check_feasibility(C, controller_tuples, steps_per_keyframe=1, vis=True, goal=goal_controller)
+
+    return
 
     # get the robust plan, used in execution
     robust_plan = get_robust_system(C, komo_feasy, controller_tuples, goal_controller)
@@ -69,6 +71,10 @@ def build_tower(verbose=False):
     tau = .01
 
     isDone = False
+
+    # for name, x in robust_plan:
+    #     x.add_qControlObjective(2, 1e-3*np.math.sqrt(tau), C)
+    #     x.add_qControlObjective(1, 1e-1*np.math.sqrt(tau), C)
 
     # simulation loop
     for t in range(0, 10000):

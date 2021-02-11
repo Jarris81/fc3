@@ -5,7 +5,7 @@ import time as time
 def check_feasibility(C, controls, steps_per_keyframe=1, vis=False, goal=None):
     # check feasibility with komo switches
     komo = ry.KOMO()
-    komo.setModel(C, False)
+    komo.setModel(C, True)  # use swift collision engine
 
     if steps_per_keyframe == 1:
         komo.setTiming(len(controls), steps_per_keyframe, 5., 1)
@@ -16,6 +16,9 @@ def check_feasibility(C, controls, steps_per_keyframe=1, vis=False, goal=None):
         komo.add_qControlObjective([], 2)
         komo.addSquaredQuaternionNorms([], 3.)
 
+    # we dont want collision
+    komo.addObjective([], ry.FS.accumulatedCollisions, ["ALL"], ry.OT.eq, [1e1])
+
     #  new komo: get transient objectives from current, and immediate from next, and see if they are feasible
     for i in range(len(controls)):
 
@@ -23,7 +26,11 @@ def check_feasibility(C, controls, steps_per_keyframe=1, vis=False, goal=None):
         for o in controls[i][1].getObjectives():
             if o.get_OT() == ry.OT.sos:
                 f = o.feat()
+                #if steps_per_keyframe == 1:
                 komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C), o.get_OT(), f.getScale(), f.getTarget())
+                #komo.addObjective([i + 1], ry.FS.accumulatedCollisions, ["ALL"], ry.OT.ineq, [1e2])
+                # else:
+                #     komo.addObjective([i + 1, i + 2], f.getFS(), f.getFrameNames(C), o.get_OT(), f.getScale(), f.getTarget())
 
         # check of we are not in the last switch, which is the switch from end to goal
         if i != len(controls) - 1:
@@ -31,7 +38,11 @@ def check_feasibility(C, controls, steps_per_keyframe=1, vis=False, goal=None):
             for o in controls[i+1][1].getObjectives():
                 if o.get_OT() == ry.OT.eq or o.get_OT() == ry.OT.ineq:
                     f = o.feat()
+                    #if steps_per_keyframe == 1:
                     #komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C), o.get_OT(), f.getScale(), f.getTarget())
+                    # else:
+                    #     komo.addObjective([i + 1, i + 2], f.getFS(), f.getFrameNames(C), o.get_OT(), f.getScale(),
+                    #                       f.getTarget())
             for ctrlCommand in controls[i + 1][1].getSymbolicCommands():
                 if not ctrlCommand.isCondition():
                     gripper, block = ctrlCommand.getFrameNames()
@@ -59,8 +70,9 @@ def check_feasibility(C, controls, steps_per_keyframe=1, vis=False, goal=None):
 
         time.sleep(5)
         report = komo.getReport()
-        time.sleep(10)
+        time.sleep(30)
 
-    report = komo.getReport()
+    print(komo.getConstraintViolations())
+
     return komo
 
