@@ -22,7 +22,7 @@ def setup_tower_env(num_blocks=1, block_size=(.1, .1, .1, 0.001)):
 
     positions = (
         (0.1, 0.2),
-        (0.3, 0.3),
+        (0.3, 0.8),
         (-0.1, -0.2)
     )
 

@@ -1,15 +1,13 @@
 from pyddl import Domain, Problem, State, Action, neg, planner
 import controllers as con
 import util.domain_tower as dt
-from src.util.setup_env import setup_tower_env
-import numpy as np
-import time
 import libry as ry
 
 """
 Simple planner to build a tower, which uses (simple) symbolic actions (STRIPS style)
 """
 # TODO: add block order
+
 
 def get_plan(verbose, control_actions, scene_obj):
 
@@ -22,11 +20,9 @@ def get_plan(verbose, control_actions, scene_obj):
     # also append free hand
     goal.append((dt.hand_empty, scene_obj[dt.type_gripper][0]))
 
-
     # normal initial conditions
     init_free_hand = (dt.hand_empty, scene_obj[dt.type_gripper][0])
     init_free_blocks = [(dt.block_free, block) for block in scene_obj[dt.type_block]]
-
 
     # extend all initial conditions
     init = []
@@ -41,7 +37,7 @@ def get_plan(verbose, control_actions, scene_obj):
         goal=goal
     )
 
-    #generate plan
+    # generate plan
     plan = planner(prob, verbose=verbose)
     if verbose:
         if plan is None:
@@ -60,7 +56,7 @@ def get_goal_controller(C, goal):
     for _, block, block_place_on in goal[:-1]:
 
         goal_feature.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.1]),
+            C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.11]),
             ry.OT.eq, -1)
         # should have z-axis in same direction
         goal_feature.addObjective(
@@ -69,10 +65,7 @@ def get_goal_controller(C, goal):
 
         goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", block), True)
 
-
-
     return goal_feature
-
 
 
 if __name__ == '__main__':

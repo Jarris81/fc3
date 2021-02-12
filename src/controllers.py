@@ -278,12 +278,4 @@ class PlaceOn(BaseController):
         # align axis with block
         ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
-        # not working between objects
-        #ctrl_set.addObjective(C.feature(ry.FS.accumulatedCollisions, [], [1e1]), ry.OT.eq)
-
-        # ctrl_set.addObjective(
-        #     C.feature(ry.FS.distance, ["b2", "b1"], [1e1], [0.5]),
-        #     ry.OT.ineq, -1)
-
-
         return ctrl_set

@@ -1,12 +1,11 @@
 import time
 import libry as ry
-import numpy as np
 
 import controllers as con
 import util.domain_tower as dt
 from testing.tower_planner import get_plan, get_goal_controller
 from util.setup_env import setup_tower_env
-from feasibility import check_feasibility
+from feasibility import check_switch_feasibility
 from robustness import  get_robust_system
 
 
@@ -59,10 +58,12 @@ def build_tower(verbose=False):
     goal_controller = get_goal_controller(C, goal)
 
     # check if plan is feasible in current config
-    komo_feasy = check_feasibility(C, controller_tuples, steps_per_keyframe=1, vis=True, goal=goal_controller)
+    is_feasible, komo_feasy = check_switch_feasibility(C, controller_tuples, goal_controller, vis=True, verbose=verbose)
 
-    return
-
+    if not is_feasible:
+        print("Plan is not feasible in current Scene!")
+        print("Aborting")
+        return
     # get the robust plan, used in execution
     robust_plan = get_robust_system(C, komo_feasy, controller_tuples, goal_controller)
 
@@ -116,7 +117,7 @@ def build_tower(verbose=False):
 
 if __name__ == '__main__':
 
-    build_tower()
+    build_tower(verbose=True)
 
 
 
