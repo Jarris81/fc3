@@ -95,31 +95,14 @@ class CloseGripper(BaseController):
         gripper_center = gripper + "Center"
         block = sym2frame['B']
 
-        # ctrl_set.addObjective(
-        #     C.feature(
-        #         ry.FS.positionRel,
-        #         [gripper_center, block],
-        #         [1e1] * 3,
-        #         [.0, 0., .05]),
-        #     ry.OT.eq,
-        #     -1)
-        # # align axis with block
-        # ctrl_set.addObjective(
-        #     C.feature(
-        #         ry.FS.vectorZDiff,
-        #         [gripper, block],
-        #         [1e1]),
-        #     ry.OT.eq,
-        #     -1)
-
-        gripper_start_pos = C.frame(gripper).getPosition()
-
-        #  move close to block
+        #  block needs to be close to block
         ctrl_set.addObjective(
             C.feature(ry.FS.distance, [block, gripper_center], [1e0]),
             ry.OT.eq, -1)
-        #align axis with block
+        # condition, nothing is in hand of gripper
+        ctrl_set.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
         ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
+
 
         #ctrl_set.addObjective(C.feature(ry.FS.accumulatedCollisions, [], [1e1]), ry.OT.eq)
 
@@ -152,6 +135,10 @@ class OpenGripper(BaseController):
                           (dt.block_free, "b")
                       ),
                       unique=True)
+
+    def get_reverse_action(self, all_objects):
+        pass
+
 
     def get_grounded_control_set(self, C, frames):
         ctrl_set = ry.CtrlSet()

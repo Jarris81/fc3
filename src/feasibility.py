@@ -46,7 +46,7 @@ def check_switch_feasibility(C, controls, goal, vis=False, gnuplot=False, tolera
     # get the report, which which generates the z.costReport file, which we can read
     komo.getReport(gnuplot)
     df_transient = pd.read_csv("z.costReport", index_col=None)
-    df_transient.name = "transient features"
+    df_transient.name = "Transient features:"
 
     # next, check for immediate constraints, and check if any are violated (by hand)
     controls_and_goal = list(controls)
