@@ -5,14 +5,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def check_switch_feasibility(C, controls, goal, vis=False, gnuplot=False, tolerance=0.1, verbose=False):
+def check_switch_chain_feasibility(C, controls, goal, vis=False, gnuplot=False, tolerance=0.1, verbose=False):
 
     # plan is feasible until proven otherwise
     plan_is_feasible = True
 
+    C_copy = ry.Config()
+    C_copy.copy(C)
+
     # check feasibility with komo switches
     komo = ry.KOMO()
-    komo.setModel(C, True)  # use swift collision engine
+    komo.setModel(C_copy, True)  # use swift collision engine
     komo.setTiming(len(controls), 1, 5., 1)
 
     # setup control cost
@@ -20,6 +23,9 @@ def check_switch_feasibility(C, controls, goal, vis=False, gnuplot=False, tolera
     komo.addSquaredQuaternionNorms([], 3.)
     # we dont want collision
     komo.addObjective([], ry.FS.accumulatedCollisions, ["ALL"], ry.OT.eq, [1e1])
+
+
+    gripper_hold = None
 
     # build a komo in which we only show controller siwtches
     for i, (name, controller) in enumerate(controls):
@@ -34,11 +40,16 @@ def check_switch_feasibility(C, controls, goal, vis=False, gnuplot=False, tolera
             if not ctrlCommand.isCondition():
                 gripper, block = ctrlCommand.getFrameNames()
                 if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
+                    gripper_hold = (block, i)
                     # TODO: find out when the object is released again, make a switch then, not hardcode
-                    komo.addSwitch_stable(i, i + 2, "world", gripper, block)
+                    #komo.addSwitch_stable(i, i + 2, "world", gripper, block)
+
                 elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
                     # TODO: find out when the object is released again, make a switch then, not hardcode
+                    komo.addSwitch_stable(gripper_hold[1], i, "world", gripper, block)
                     komo.addSwitch_stable(i, -1, gripper, "world", block)
+
+                    gripper_hold = None
 
     # solve or optime the given komo objectives
     komo.optimize()
@@ -48,7 +59,7 @@ def check_switch_feasibility(C, controls, goal, vis=False, gnuplot=False, tolera
     df_transient = pd.read_csv("z.costReport", index_col=None)
     df_transient.name = "Transient features:"
 
-    # next, check for immediate constraints, and check if any are violated (by hand)
+    # next, check for immediate constraints, and check if any are violated
     controls_and_goal = list(controls)
     controls_and_goal.append(("goal", goal))
 
@@ -100,3 +111,36 @@ def check_switch_feasibility(C, controls, goal, vis=False, gnuplot=False, tolera
         komo.view_close()
 
     return plan_is_feasible, komo
+
+
+def check_switch_tree_feasibility(C, controls, goal, vis=False, gnuplot=False, tolerance=0.1, verbose=False):
+
+    # same as above, just from the last state.
+    komo = ry.KOMO()
+    C_copy = C.copy()
+    komo.setModel(C_copy, True)  # use swift collision engine
+    komo.setTiming(1, 1, 5., 1)
+    # apply all immediate conditions of first controller
+    for o in controls[0].getObjectives():
+        if o.get_OT() == ry.OT.eq or o.get_OT() == ry.OT.ineq:
+            f = o.feat()
+            komo.addObjective(1, f.getFS(), f.getFrameNames(C), o.get_OT(), f.getScale(), f.getTarget())
+
+    for ctrlCommand in controls[0].getSymbolicCommands():
+        if ctrlCommand.isCondition():
+            gripper, block = ctrlCommand.getFrameNames()
+            if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
+                komo.addSwitch_stable(0, -1, "world", gripper, block)
+
+            elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
+                komo.addSwitch_stable(0, -1, gripper, "world", block)
+
+    komo.optimize()
+
+    frames_state = 0  # needs to be initialized somehow
+    frames_state = komo.getPathFrames(frames_state)
+
+    C_copy.setFrameState(frames_state[0])
+
+    komo.view(False, "Init Check")
+

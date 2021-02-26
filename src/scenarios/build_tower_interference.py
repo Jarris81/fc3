@@ -6,7 +6,7 @@ import controllers as con
 import util.domain_tower as dt
 from testing.tower_planner import get_plan, get_goal_controller
 from util.setup_env import setup_tower_env
-from feasibility import check_switch_feasibility
+from feasibility import check_switch_chain_feasibility
 from robustness import get_robust_system
 
 
@@ -60,7 +60,7 @@ def build_tower(verbose=False, interference=False):
     goal_controller = get_goal_controller(C, goal)
 
     # check if plan is feasible in current config
-    is_feasible, komo_feasy = check_switch_feasibility(C, controller_tuples, goal_controller, vis=False, verbose=False)
+    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, vis=False, verbose=False)
 
     if not is_feasible:
         print("Plan is not feasible in current Scene!")
