@@ -56,7 +56,7 @@ def get_goal_controller(C, goal):
     for _, block, block_place_on in goal[:-1]:
 
         goal_feature.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.11]),
+            C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.105]),
             ry.OT.eq, -1)
         # should have z-axis in same direction
         goal_feature.addObjective(

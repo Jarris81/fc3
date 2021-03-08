@@ -97,7 +97,7 @@ class CloseGripper(BaseController):
 
         #  block needs to be close to block
         ctrl_set.addObjective(
-            C.feature(ry.FS.distance, [block, gripper_center], [1e0]),
+            C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
             ry.OT.eq, -1)
         # condition, nothing is in hand of gripper
         ctrl_set.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
@@ -106,7 +106,7 @@ class CloseGripper(BaseController):
 
         #ctrl_set.addObjective(C.feature(ry.FS.accumulatedCollisions, [], [1e1]), ry.OT.eq)
 
-        return ctrl_set
+        return [ctrl_set]
 
 
 class OpenGripper(BaseController):
@@ -160,7 +160,7 @@ class OpenGripper(BaseController):
         ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
         ctrl_set.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
 
-        return ctrl_set
+        return [ctrl_set]
 
 
 class ApproachBlock(BaseController):
@@ -195,25 +195,41 @@ class ApproachBlock(BaseController):
                       unique=True)
 
     def get_grounded_control_set(self, C, frames):
-        ctrl_set = ry.CtrlSet()
+
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         gripper = sym2frame['G']
         gripper_center = gripper + "Center"
         block = sym2frame['B']
 
+        control_sets = []
+
+        align_over = ry.CtrlSet()
         # move close to block
-        ctrl_set.addObjective(
-            C.feature(ry.FS.positionRel, [gripper_center, block], [1e1] * 3, [.0, 0., .05]),
+        align_over.addObjective(
+            C.feature(ry.FS.positionRel, [gripper_center, block], [1e1] * 3, [.0, 0., .15]),
             ry.OT.sos, 0.005)
         # align axis with block
-        ctrl_set.addObjective(
+        align_over.addObjective(
             C.feature(ry.FS.vectorZDiff, [gripper, block], [1e1]),
             ry.OT.sos, 0.01)
 
+        move_close = ry.CtrlSet()
+        move_close.addObjective(
+            C.feature(ry.FS.positionRel, [gripper_center, block], [1e1] * 3, [.0, 0., .15]),
+            ry.OT.ineq, -1)
+        move_close.addObjective(
+            C.feature(ry.FS.vectorZDiff, [gripper, block], [1e1]),
+            ry.OT.sos, 0.01)
+        move_close.addObjective(
+            C.feature(ry.FS.positionRel, [gripper_center, block], [1e1] * 3, [.0, 0., .05]),
+            ry.OT.sos, 0.005)
 
+        control_sets.extend((align_over, move_close))
 
-        return ctrl_set
+        #control_sets.extend((align_over,))
+
+        return control_sets
 
 
 class PlaceOn(BaseController):
@@ -256,7 +272,7 @@ class PlaceOn(BaseController):
 
         # block should be over block_placed_on
         ctrl_set.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.11]),
+            C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.105]),
             ry.OT.sos, 0.005)
         # should have z-axis in same direction
         ctrl_set.addObjective(
@@ -265,4 +281,4 @@ class PlaceOn(BaseController):
         # align axis with block
         ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
-        return ctrl_set
+        return [ctrl_set]

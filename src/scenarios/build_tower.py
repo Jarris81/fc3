@@ -54,14 +54,16 @@ def build_tower(verbose=False, interference=False):
     name2con = {x.name: x for x in actions}  # dict
     for grounded_action in plan:
         obj_frames = grounded_action.sig[1:]
-        controller = name2con[grounded_action.sig[0]]  # the actual controller
-        controller_tuples.append((grounded_action, controller.get_grounded_control_set(C, obj_frames)))
+        action = name2con[grounded_action.sig[0]]  # the actual controller
+        for i, controller in enumerate(action.get_grounded_control_set(C, obj_frames)):
+            controller_tuples.append((f"{action.name}_{i}", controller))
 
     # get goal controller, with only immediate conditions features (needed for feasibility)
     goal_controller = get_goal_controller(C, goal)
 
     # check if plan is feasible in current config
-    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, verbose=verbose)
+    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, verbose=False)
+
 
     if not is_feasible:
         print("Plan is not feasible in current Scene!")
@@ -69,7 +71,9 @@ def build_tower(verbose=False, interference=False):
         return
 
     # get the robust plan, used in execution
-    robust_plan = get_robust_system(C, komo_feasy, controller_tuples, goal_controller)
+    robust_plan = get_robust_system(C, komo_feasy, controller_tuples, goal_controller, verbose=verbose)
+
+    #return
 
     for name, x in robust_plan:
         pass  # TODO when adding control objectives to Placing the object on other block, for some reason it does not\
