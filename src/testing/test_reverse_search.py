@@ -1,6 +1,6 @@
 from pyddl import Domain, Problem, State, Action, neg, backwards_planner
 import util.domain_tower as dt
-import controllers as con
+import actions as con
 
 actions = [
         con.ApproachBlock(),

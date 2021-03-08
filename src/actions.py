@@ -57,112 +57,6 @@ class BaseController:
         self.sym2frame = {sym: frames[i] for i, sym in enumerate(self.symbols.keys())}
 
 
-class CloseGripper(BaseController):
-
-    def __init__(self):
-        super().__init__(__class__.__name__)
-
-        self.symbols = {
-            "G": dt.type_gripper,
-            "B": dt.type_block,
-        }
-
-        self.params = tuple({v: k for k, v in self.symbols.items()}.items())
-
-    def get_simple_action(self, all_objects=None):
-        return Action(self.name,
-                      parameters=(
-                          (dt.type_gripper, "g"),
-                          (dt.type_block, "b"),
-                      ),
-                      preconditions=(
-                          (dt.focus, "b"),
-                          (dt.hand_empty, "g"),
-                          (dt.block_free, "b"),
-                      ),
-                      effects=(
-                          (dt.in_hand, "b", "g"),
-                          neg((dt.hand_empty, "g")),
-                          neg((dt.block_free, "b"))
-                      ),
-                      unique=True)
-
-    def get_grounded_control_set(self, C, frames):
-        ctrl_set = ry.CtrlSet()
-        sym2frame = _get_sym2frame(self.symbols, frames)
-
-        gripper = sym2frame['G']
-        gripper_center = gripper + "Center"
-        block = sym2frame['B']
-
-        #  block needs to be close to block
-        ctrl_set.addObjective(
-            C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
-            ry.OT.eq, -1)
-        # condition, nothing is in hand of gripper
-        ctrl_set.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
-        ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
-
-
-        #ctrl_set.addObjective(C.feature(ry.FS.accumulatedCollisions, [], [1e1]), ry.OT.eq)
-
-        return [ctrl_set]
-
-
-class OpenGripper(BaseController):
-
-    def __init__(self):
-        super().__init__(__class__.__name__)
-
-        self.symbols = {
-            "G": dt.type_gripper,
-            "B": dt.type_block,
-        }
-
-    def get_simple_action(self, all_objects=None):
-        return Action(self.name,
-                      parameters=(
-                          (dt.type_gripper, "g"),
-                          (dt.type_block, "b")
-                      ),
-                      preconditions=(
-                          (dt.focus, "b"),
-                          (dt.in_hand, "b", "g")
-                      ),
-                      effects=(
-                          neg((dt.in_hand, "b", "g")),
-                          (dt.hand_empty, "g"),
-                          (dt.block_free, "b")
-                      ),
-                      unique=True)
-
-    def get_reverse_action(self, all_objects):
-        pass
-
-
-    def get_grounded_control_set(self, C, frames):
-        ctrl_set = ry.CtrlSet()
-        sym2frame = _get_sym2frame(self.symbols, frames)
-
-        gripper = sym2frame['G']
-        block = sym2frame['B']
-        gripper_center = gripper + "Center"
-
-
-        # ctrl_set.addObjective(
-        #     C.feature(ry.FS.insideBox, [block, "R_gripperPregrasp"], [1e0]),
-        #     ry.OT.eq, -1)
-
-        ctrl_set.addObjective(
-            C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
-            ry.OT.eq, -1)
-
-        ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
-        ctrl_set.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
-
-        return [ctrl_set]
-
-
 class ApproachBlock(BaseController):
 
     def __init__(self):
@@ -175,7 +69,7 @@ class ApproachBlock(BaseController):
 
     def get_simple_action(self, all_objects=None):
         # special case, where we need to unset focus on other objects
-        unset_params_focus, unset_effects_focus = _get_unset_effects(dt.focus, all_objects, dt.type_block)
+        #unset_params_focus, unset_effects_focus = _get_unset_effects(dt.focus, all_objects, dt.type_block)
 
         # Need
 
@@ -183,14 +77,14 @@ class ApproachBlock(BaseController):
                       parameters=(
                           (dt.type_gripper, "g"),
                           (dt.type_block, "b"),
-                          *unset_params_focus,
                       ),
                       preconditions=(
                           (dt.hand_empty, "g"),
+                          (dt.block_free, "b")
                       ),
                       effects=(
-                          (dt.focus, "b"),
-                          *unset_effects_focus,
+                          neg((dt.hand_empty, "g")),
+                          (dt.in_hand, "b", "g"),
                       ),
                       unique=True)
 
@@ -225,11 +119,17 @@ class ApproachBlock(BaseController):
             C.feature(ry.FS.positionRel, [gripper_center, block], [1e1] * 3, [.0, 0., .05]),
             ry.OT.sos, 0.005)
 
-        control_sets.extend((align_over, move_close))
+        #  block needs to be close to block
+        ctrl_set = ry.CtrlSet()
+        ctrl_set.addObjective(
+            C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
+            ry.OT.eq, -1)
+        # condition, nothing is in hand of gripper
+        ctrl_set.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
+        ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
 
-        #control_sets.extend((align_over,))
-
-        return control_sets
+        # return tuple of controllers
+        return align_over, move_close, ctrl_set
 
 
 class PlaceOn(BaseController):
@@ -251,18 +151,19 @@ class PlaceOn(BaseController):
                           (dt.type_block, "b_placed")
                       ),
                       preconditions=(
-                          (dt.focus, "b"),
                           (dt.in_hand, "b", "g"),
                           (dt.block_free, "b_placed")
                       ),
                       effects=(
                           (dt.b_on_b, "b", "b_placed"),
                           neg((dt.block_free, "b_placed")),
+                          neg((dt.in_hand, "b", "g")),
+                          (dt.hand_empty, "g"),
                       ),
                       unique=True)
 
     def get_grounded_control_set(self, C, frames):
-        ctrl_set = ry.CtrlSet()
+
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         gripper = sym2frame['G']
@@ -270,15 +171,25 @@ class PlaceOn(BaseController):
         block = sym2frame['B']
         block_place_on = sym2frame['B_place_on']
 
+        place_on_block = ry.CtrlSet()
         # block should be over block_placed_on
-        ctrl_set.addObjective(
+        place_on_block.addObjective(
             C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.105]),
             ry.OT.sos, 0.005)
         # should have z-axis in same direction
-        ctrl_set.addObjective(
+        place_on_block.addObjective(
             C.feature(ry.FS.scalarProductZZ, [block, block_place_on], [1e1], [1]),
             ry.OT.sos, 0.005)
         # align axis with block
-        ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
+        place_on_block.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
-        return [ctrl_set]
+        # open gripper
+        open_gripper = ry.CtrlSet()
+        open_gripper.addObjective(
+            C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
+            ry.OT.eq, -1)
+
+        open_gripper.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
+        open_gripper.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
+
+        return [place_on_block, open_gripper]

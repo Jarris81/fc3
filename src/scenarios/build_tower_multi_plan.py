@@ -2,7 +2,7 @@ import time
 import libry as ry
 import numpy as np
 
-import controllers as con
+import actions as con
 import util.domain_tower as dt
 from testing.tower_planner import get_plan, get_goal_controller
 from util.setup_env import setup_tower_env

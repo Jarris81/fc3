@@ -1,10 +1,9 @@
-
 import sys
 import time
 import libry as ry
 
 
-import controllers as con
+import actions
 import util.domain_tower as dt
 from testing.tower_planner import get_plan, get_goal_controller
 from util.setup_env import setup_tower_env
@@ -20,11 +19,11 @@ Build a tower with the provided plan
 def build_tower(verbose=False, interference=False):
 
     # get all actions needed to build a tower
-    actions = [
-        con.ApproachBlock(),
-        con.PlaceOn(),
-        con.CloseGripper(),
-        con.OpenGripper()
+    action_list = [
+        actions.ApproachBlock(),
+        actions.PlaceOn(),
+        # actions.CloseGripper(),
+        # actions.OpenGripper()
     ]
 
     # setup config and get frame names
@@ -37,7 +36,7 @@ def build_tower(verbose=False, interference=False):
         dt.type_gripper: (gripper_name,)
     }
     # get plan and goal
-    plan, goal = get_plan(verbose, actions, scene_objects)
+    plan, goal = get_plan(verbose, action_list, scene_objects)
 
     # if there is a plan, print it out, otherwise leave
     if plan:
@@ -51,10 +50,12 @@ def build_tower(verbose=False, interference=False):
 
     # convert simple actions to tuple with grounded action and CtrlSet
     controller_tuples = []
-    name2con = {x.name: x for x in actions}  # dict
-    for grounded_action in plan:
+    name2con = {x.name: x for x in action_list}  # dict
+    for j, grounded_action in enumerate(plan):
         obj_frames = grounded_action.sig[1:]
         action = name2con[grounded_action.sig[0]]  # the actual controller
+        # if j == 1 or j == 5:
+        #     continue
         for i, controller in enumerate(action.get_grounded_control_set(C, obj_frames)):
             controller_tuples.append((f"{action.name}_{i}", controller))
 
@@ -151,15 +152,15 @@ def build_tower(verbose=False, interference=False):
 
 if __name__ == '__main__':
 
-    interference = False
-    verbose = False
+    add_interference = False
+    add_verbose = False
 
     if "verbose" in sys.argv:
         verbose = True
     if "interference" in sys.argv:
         interference = True
 
-    build_tower(verbose=verbose, interference=interference)
+    build_tower(verbose=add_verbose, interference=add_interference)
 
 
 

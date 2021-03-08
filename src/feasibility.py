@@ -26,7 +26,7 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
 
     # init the grippers, and check when they are carrying an object
     # get all Grippers in the scene
-    num_grippers = 2  # TODO get gripper names from C
+    num_grippers = 2  # TODO get gripper names from C and see who holds initially
     gripper_hold = {"R_gripper": (0, None), "L_gripper": (0, None)}
 
     # build a komo in which we only show controller switches

@@ -1,5 +1,5 @@
 from pyddl import Domain, Problem, State, Action, neg, planner
-import controllers as con
+import actions
 import util.domain_tower as dt
 import libry as ry
 
@@ -19,6 +19,8 @@ def get_plan(verbose, control_actions, scene_obj):
             for i in range(len(scene_obj[dt.type_block]) - 1)]
     # also append free hand
     goal.append((dt.hand_empty, scene_obj[dt.type_gripper][0]))
+
+    print(goal)
 
     # normal initial conditions
     init_free_hand = (dt.hand_empty, scene_obj[dt.type_gripper][0])
@@ -77,10 +79,10 @@ if __name__ == '__main__':
                       help="don't print statistics to stdout")
 
     actions = [
-        con.ApproachBlock(),
-        con.PlaceOn(),
-        con.CloseGripper(),
-        con.OpenGripper()
+        actions.ApproachBlock(),
+        actions.PlaceOn(),
+        #actions.CloseGripper(),
+        #actions.OpenGripper()
     ]
 
     objects = {
