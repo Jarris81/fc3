@@ -94,7 +94,7 @@ def get_implicit_objectives(C, komo_feasy, current, follow, step, vis=False, ver
     return implicit_objectives_list, implicit_sym_commands_list
 
 
-def get_robust_system(C, komo_feasy, controllers, goal_controller):
+def get_robust_system(C, komo_feasy, controllers, goal_controller, verbose=False):
 
     robust_controller_chain = []
 
@@ -104,8 +104,8 @@ def get_robust_system(C, komo_feasy, controllers, goal_controller):
             action_next = goal_controller
         else:
             action_next = robust_controller_chain[-1][1]
-
-        print(f"Implicit Features for {name}:")
+        if verbose:
+            print(f"Implicit Features for {name}:")
         implicit_features, implicit_scs = get_implicit_objectives(C, komo_feasy, ctrlset, action_next, i + 2)
 
         # add implicit objectives to current controller as transient objectives

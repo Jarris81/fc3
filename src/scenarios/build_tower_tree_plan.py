@@ -11,8 +11,10 @@ from robustness import get_robust_system
 
 
 """
-Build a tower with the provided plan. During execution, a block is placed to its original position, which should show 
-interference in the real world.
+Build a tower with the provided plan. 
+- During execution, a block is placed to its original position, which should show 
+interference in the real world. 
+- we want to show that we 
 """
 
 
@@ -50,7 +52,7 @@ def build_tower(verbose=False, interference=False):
 
     # convert simple actions to tuple with grounded action and CtrlSet
     controller_tuples = []
-    name2con = {x.name: x for x in actions} #  dict
+    name2con = {x.name: x for x in actions}  # dict
     for grounded_action in plan:
         obj_frames = grounded_action.sig[1:]
         controller = name2con[grounded_action.sig[0]]  # the actual controller
@@ -59,13 +61,17 @@ def build_tower(verbose=False, interference=False):
     # get goal controller, with only immediate conditions features (needed for feasibility)
     goal_controller = get_goal_controller(C, goal)
 
-    # check if plan is feasible in current config
-    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, vis=False, verbose=False)
+    # add a new controller sequence, which
+    controller_tuples_2 = controller_tuples.copy()
+    # add some new controller to the new list
 
-    if not is_feasible:
-        print("Plan is not feasible in current Scene!")
-        print("Aborting")
-        return
+    # check if plan is feasible in current config
+    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, vis=False)
+
+    # if not is_feasible:
+    #     print("Plan is not feasible in current Scene!")
+    #     print("Aborting")
+    #     return
 
     # get the robust plan, used in execution
     robust_plan = get_robust_system(C, komo_feasy, controller_tuples, goal_controller)
@@ -74,47 +80,55 @@ def build_tower(verbose=False, interference=False):
     C.view()
     tau = .01
 
-    isDone = False
-
+    # add control cost and collision objectives to each controller
     for name, x in robust_plan:
         pass
         #x.add_qControlObjective(2, 1e-3*np.math.sqrt(tau), C)
         #x.add_qControlObjective(1, 1e-1*np.math.sqrt(tau), C)
         #x.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.eq)
 
-    # simulation loop
+    # create a new action, which only releases the block b1. With this, we can show, that the when interference
+    # happens with b2 at i=1 (when holding b1), we can still complete the plan
+    new_action = con.OpenGripper()
+    new_action_grounded = new_action.get_simple_action(scene_objects).ground("R_gripper", "b1")
+    obj_frames = new_action_grounded.sig[1:]
+    controller = name2con[new_action_grounded.sig[0]]  # the actual controller
+    new_controller = controller.get_grounded_control_set(C, obj_frames)
+    # add to end of the robust plan
+    robust_plan.append((new_action_grounded, new_controller))
 
     # setup for interference
-    ori = C.frame("b2").getPosition()
-    ori[1] = ori[1]+0.05
+    original_position = C.frame("b2").getPosition()
+    original_position[1] = original_position[1]+0.05
     interference_counter = 0
     has_interfered = False
 
-    # simulation variables
-    all_controllers_unfeasible = True
+    # has finished the plan
+    is_done = False
 
+    # simulation loop
     for t in range(0, 10000):
         # create a new solver everytime
         ctrl = ry.CtrlSolver(C, tau, 2)
 
         # check if goal has been reached
         if goal_controller.canBeInitiated(C):
-            isDone = True
+            is_done = True
             break
 
-        # reset, to check if at least one controller can be initiated
-        all_controllers_unfeasible = True
+        #
+        is_any_controllers_feasible = False
 
         # iterate over each controller, check which can be started first
         for i, (name, c) in enumerate(robust_plan):
             if c.canBeInitiated(C):
                 ctrl.set(c)
-                all_controllers_unfeasible = False
+                is_any_controllers_feasible = True
                 if i == 1 and interference and not has_interfered:  # 3 works, 1 doesnt
                     interference_counter += 1
                     if interference_counter == 50:
                         block = C.frame("b2")
-                        block.setPosition(ori)
+                        block.setPosition(original_position)
                         has_interfered = True
                 if verbose:
                     print(f"Initiating: {name}")
@@ -124,7 +138,7 @@ def build_tower(verbose=False, interference=False):
                 if verbose:
                     print(f"Cannot be initiated: {name}")
 
-        if all_controllers_unfeasible and verbose:
+        if not is_any_controllers_feasible and verbose:
             print("No controller can be initiated!")
 
         ctrl.update(C)
@@ -134,7 +148,7 @@ def build_tower(verbose=False, interference=False):
         coll = C.getCollisions(0)
         time.sleep(tau)
 
-    if isDone:
+    if is_done:
         print("Plan was finished!")
     else:
         print("Time ran out!")
@@ -144,7 +158,7 @@ def build_tower(verbose=False, interference=False):
 
 if __name__ == '__main__':
 
-    build_tower(verbose=True, interference=True)
+    build_tower(verbose=False, interference=True)
 
 
 

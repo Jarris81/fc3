@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def check_switch_chain_feasibility(C, controls, goal, vis=False, gnuplot=False, tolerance=0.1, verbose=False):
+def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=False):
 
     # plan is feasible until proven otherwise
     plan_is_feasible = True
@@ -24,10 +24,12 @@ def check_switch_chain_feasibility(C, controls, goal, vis=False, gnuplot=False, 
     # we dont want collision
     komo.addObjective([], ry.FS.accumulatedCollisions, ["ALL"], ry.OT.eq, [1e1])
 
+    # init the grippers, and check when they are carrying an object
+    # get all Grippers in the scene
+    num_grippers = 2  # TODO get gripper names from C
+    gripper_hold = {"R_gripper": (0, None), "L_gripper": (0, None)}
 
-    gripper_hold = None
-
-    # build a komo in which we only show controller siwtches
+    # build a komo in which we only show controller switches
     for i, (name, controller) in enumerate(controls):
 
         # get the sos objectives of current controller
@@ -40,22 +42,23 @@ def check_switch_chain_feasibility(C, controls, goal, vis=False, gnuplot=False, 
             if not ctrlCommand.isCondition():
                 gripper, block = ctrlCommand.getFrameNames()
                 if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
-                    gripper_hold = (block, i)
+                    # make stable switch from
+                    gripper_hold[gripper] = (i, block)
                     # TODO: find out when the object is released again, make a switch then, not hardcode
                     #komo.addSwitch_stable(i, i + 2, "world", gripper, block)
 
                 elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
                     # TODO: find out when the object is released again, make a switch then, not hardcode
-                    komo.addSwitch_stable(gripper_hold[1], i, "world", gripper, block)
+                    komo.addSwitch_stable(gripper_hold[gripper][0], i, "world", gripper, block)
                     komo.addSwitch_stable(i, -1, gripper, "world", block)
 
-                    gripper_hold = None
+                    gripper_hold[gripper] = (i, None)
 
     # solve or optime the given komo objectives
     komo.optimize()
 
     # get the report, which which generates the z.costReport file, which we can read
-    komo.getReport(gnuplot)
+    komo.getReport(verbose)
     df_transient = pd.read_csv("z.costReport", index_col=None)
     df_transient.name = "Transient features:"
 
@@ -96,7 +99,7 @@ def check_switch_chain_feasibility(C, controls, goal, vis=False, gnuplot=False, 
                 print(f'{df.name} {features[i_col]} at switch #{i_row} is not feasible!')
 
     # Visualize some results
-    if vis:
+    if verbose:
         # create a figure with two plot
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 20))
         df_transient.plot(ax=ax1, title="Transient Features")

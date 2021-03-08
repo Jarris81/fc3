@@ -1,6 +1,8 @@
+
+import sys
 import time
 import libry as ry
-import numpy as np
+
 
 import controllers as con
 import util.domain_tower as dt
@@ -59,28 +61,37 @@ def build_tower(verbose=False, interference=False):
     goal_controller = get_goal_controller(C, goal)
 
     # check if plan is feasible in current config
-    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, vis=True, verbose=False)
+    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, verbose=verbose)
 
+    if not is_feasible:
+        print("Plan is not feasible in current Scene!")
+        print("Aborting")
+        return
 
-    #return
-    # if not is_feasible:
-    #     print("Plan is not feasible in current Scene!")
-    #     print("Aborting")
-    #     return
     # get the robust plan, used in execution
     robust_plan = get_robust_system(C, komo_feasy, controller_tuples, goal_controller)
 
-    # Start simulation of plan here
-    C.view()
-    tau = .01
-
-    isDone = False
-
     for name, x in robust_plan:
-        pass
+        pass  # TODO when adding control objectives to Placing the object on other block, for some reason it does not\
+        # TODO converge and therefore Opengripper can not be initiated
         #x.add_qControlObjective(2, 1e-3*np.math.sqrt(tau), C)
         #x.add_qControlObjective(1, 1e-1*np.math.sqrt(tau), C)
         #x.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.eq)
+
+    # Start simulation of plan here
+    C.view()
+
+    # simulation variables
+    all_controllers_unfeasible = True
+    is_done = False
+    tau = .01
+
+    # setup for interference
+    ori = C.frame("b2").getPosition()
+    ori[1] = ori[1] + 0.05 # change the position a little
+    interference_counter = 0
+    # say where we want intereference
+    has_interfered = {1: False, 3: False}
 
     # simulation loop
     for t in range(0, 10000):
@@ -90,13 +101,24 @@ def build_tower(verbose=False, interference=False):
 
         # check if goal has been reached
         if goal_controller.canBeInitiated(C):
-            isDone = True
+            is_done = True
             break
+
+        # reset, to check if at least one controller can be initiated
+        all_controllers_unfeasible = True
 
         # iterate over each controller, check which can be started first
         for i, (name, c) in enumerate(robust_plan):
             if c.canBeInitiated(C):
                 ctrl.set(c)
+                all_controllers_unfeasible = False
+                if interference and i in has_interfered and not has_interfered[i]:  # 3 works, 1 doesnt
+                    interference_counter += 1
+                    if interference_counter == 50:
+                        block = C.frame("b2")
+                        block.setPosition(ori)
+                        has_interfered[i] = True
+                        interference_counter = 0
                 if verbose:
                     print(f"Initiating: {name}")
                 break
@@ -104,6 +126,10 @@ def build_tower(verbose=False, interference=False):
                 if verbose:
                     print(f"Cannot be initiated: {name}")
 
+        if all_controllers_unfeasible and verbose:
+            print("No controller can be initiated!")
+
+        # update simulation/ make a step
         ctrl.update(C)
         q = ctrl.solve(C)
         C.setJointState(q)
@@ -111,7 +137,7 @@ def build_tower(verbose=False, interference=False):
         coll = C.getCollisions(0)
         time.sleep(tau)
 
-    if isDone:
+    if is_done:
         print("Plan was finished!")
     else:
         print("time ran out!")
@@ -121,7 +147,15 @@ def build_tower(verbose=False, interference=False):
 
 if __name__ == '__main__':
 
-    build_tower(verbose=True)
+    interference = False
+    verbose = False
+
+    if "verbose" in sys.argv:
+        verbose = True
+    if "interference" in sys.argv:
+        interference = True
+
+    build_tower(verbose=verbose, interference=interference)
 
 
 
