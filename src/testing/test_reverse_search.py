@@ -5,8 +5,6 @@ import actions as con
 actions = [
         con.ApproachBlock(),
         con.PlaceOn(),
-        con.CloseGripper(),
-        con.OpenGripper()
     ]
 
 # setup config and get frame names

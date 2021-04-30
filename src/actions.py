@@ -24,7 +24,7 @@ def _get_sym2frame(symbols, frames):
 # def get_komo(C, ctrlset):
 
 
-class BaseController:
+class BaseAction:
 
     def __init__(self, name):
         self.name = name
@@ -57,7 +57,7 @@ class BaseController:
         self.sym2frame = {sym: frames[i] for i, sym in enumerate(self.symbols.keys())}
 
 
-class ApproachBlock(BaseController):
+class ApproachBlock(BaseAction):
 
     def __init__(self):
         super().__init__(__class__.__name__)
@@ -132,7 +132,7 @@ class ApproachBlock(BaseController):
         return align_over, move_close, ctrl_set
 
 
-class PlaceOn(BaseController):
+class PlaceOn(BaseAction):
 
     def __init__(self):
         super().__init__(__class__.__name__)
@@ -155,9 +155,9 @@ class PlaceOn(BaseController):
                           (dt.block_free, "b_placed")
                       ),
                       effects=(
-                          (dt.b_on_b, "b", "b_placed"),
-                          neg((dt.block_free, "b_placed")),
                           neg((dt.in_hand, "b", "g")),
+                          neg((dt.block_free, "b_placed")),
+                          (dt.b_on_b, "b", "b_placed"),
                           (dt.hand_empty, "g"),
                       ),
                       unique=True)
@@ -169,16 +169,16 @@ class PlaceOn(BaseController):
         gripper = sym2frame['G']
         gripper_center = gripper + "Center"
         block = sym2frame['B']
-        block_place_on = sym2frame['B_place_on']
+        block_placed_on = sym2frame['B_place_on']
 
         place_on_block = ry.CtrlSet()
         # block should be over block_placed_on
         place_on_block.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.105]),
+            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e1], [0, 0, 0.105]),
             ry.OT.sos, 0.005)
         # should have z-axis in same direction
         place_on_block.addObjective(
-            C.feature(ry.FS.scalarProductZZ, [block, block_place_on], [1e1], [1]),
+            C.feature(ry.FS.scalarProductZZ, [block, block_placed_on], [1e1], [1]),
             ry.OT.sos, 0.005)
         # align axis with block
         place_on_block.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)

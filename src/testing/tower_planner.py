@@ -27,7 +27,7 @@ def get_plan(verbose, control_actions, scene_obj):
     init_free_blocks = [(dt.block_free, block) for block in scene_obj[dt.type_block]]
 
     # extend all initial conditions
-    init = []
+    init = list()
     init.append(init_free_hand)
     init.extend(init_free_blocks)
 
@@ -81,8 +81,6 @@ if __name__ == '__main__':
     actions = [
         actions.ApproachBlock(),
         actions.PlaceOn(),
-        #actions.CloseGripper(),
-        #actions.OpenGripper()
     ]
 
     objects = {
