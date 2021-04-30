@@ -1,5 +1,6 @@
 import libry as ry
 from pyddl import Action, neg
+import predicates as pred
 from objective import Objective
 import util.domain_tower as dt
 import itertools as it
@@ -18,10 +19,7 @@ def _get_unset_effects(predicate, all_objects, obj_type):
 
 
 def _get_sym2frame(symbols, frames):
-    return {sym: frames[i] for i, sym in enumerate(symbols.keys())}
-
-
-# def get_komo(C, ctrlset):
+    return {sym: frames[i] for i, sym in enumerate(symbols)}
 
 
 class BaseAction:
@@ -31,6 +29,10 @@ class BaseAction:
         self.symbols = None
         self.ctrl_set = None
         self.sym2frame = None
+        self.symbols_types = None
+        self.preconditions = None
+        self.add_effects = None
+        self.delete_effects = None
 
         self.objectives = []
 
@@ -49,8 +51,14 @@ class BaseAction:
             print(objective.objective2symbol())
 
     def get_simple_action(self, all_objects=None):
-        # This needs to be implemented for each controller
-        print(f"This function needs to be implemented! {self.__name__}")
+        # special case, where we need to unset focus on other objects
+
+        return Action(self.name,
+                      parameters=tuple(zip(self.symbols_types.values(), self.symbols_types.keys())),
+                      preconditions=[x.get_predicate() for x in self.preconditions],
+                      effects=[neg(x.get_predicate()) for x in self.delete_effects] +
+                              [y.get_predicate() for y in self.add_effects],
+                      unique=True)
 
     def get_grounded_control_set(self, C, frames):
         self.ctrl_set = ry.CtrlSet()
@@ -62,35 +70,40 @@ class ApproachBlock(BaseAction):
     def __init__(self):
         super().__init__(__class__.__name__)
 
-        self.symbols = {
-            "G": dt.type_gripper,
-            "B": dt.type_block,
+        self.gripper_sym = "G"
+        self.block_sym = "B"
+
+        self.symbols_types = {
+            self.gripper_sym: dt.type_gripper,
+            self.block_sym: dt.type_block,
         }
 
-    def get_simple_action(self, all_objects=None):
-        # special case, where we need to unset focus on other objects
-        #unset_params_focus, unset_effects_focus = _get_unset_effects(dt.focus, all_objects, dt.type_block)
+        self.symbols = self.symbols_types.keys()
 
-        # Need
+        self.preconditions = [
+            pred.HandEmpty(self.gripper_sym),
+            pred.BlockFree(self.block_sym)
+        ]
 
-        return Action(self.name,
-                      parameters=(
-                          (dt.type_gripper, "g"),
-                          (dt.type_block, "b"),
-                      ),
-                      preconditions=(
-                          (dt.hand_empty, "g"),
-                          (dt.block_free, "b")
-                      ),
-                      effects=(
-                          neg((dt.hand_empty, "g")),
-                          (dt.in_hand, "b", "g"),
-                      ),
-                      unique=True)
+        self.add_effects = [
+            pred.InHand(self.gripper_sym, self.block_sym)
+        ]
+
+        self.delete_effects = [
+            self.preconditions[0]
+        ]
 
     def get_grounded_control_set(self, C, frames):
-
         sym2frame = _get_sym2frame(self.symbols, frames)
+
+        holding_predicates = set(self.preconditions).difference(set(self.delete_effects))
+        print(holding_predicates)
+
+        # for all preconditions, get the feature as OT eq
+        for predicate in self.preconditions:
+            predicate.ground_predicate(**sym2frame)
+            print(predicate.get_grounded_predicate())
+            print(predicate.features(C))
 
         gripper = sym2frame['G']
         gripper_center = gripper + "Center"
@@ -137,33 +150,31 @@ class PlaceOn(BaseAction):
     def __init__(self):
         super().__init__(__class__.__name__)
 
-        self.symbols = {
-            "G": dt.type_gripper,
-            "B": dt.type_block,
-            "B_place_on": dt.type_block
+        self.gripper_sym = "G"
+        self.block_sym = "B"
+        self.block_placed_on = "B_placed"
+
+        self.symbols_types = {
+            self.gripper_sym: dt.type_gripper,
+            self.block_sym: dt.type_block,
+            self.block_placed_on: dt.type_block
         }
 
-    def get_simple_action(self, all_objects=None):
-        return Action(self.name,
-                      parameters=(
-                          (dt.type_gripper, "g"),
-                          (dt.type_block, "b"),
-                          (dt.type_block, "b_placed")
-                      ),
-                      preconditions=(
-                          (dt.in_hand, "b", "g"),
-                          (dt.block_free, "b_placed")
-                      ),
-                      effects=(
-                          neg((dt.in_hand, "b", "g")),
-                          neg((dt.block_free, "b_placed")),
-                          (dt.b_on_b, "b", "b_placed"),
-                          (dt.hand_empty, "g"),
-                      ),
-                      unique=True)
+        self.symbols = self.symbols_types.keys()
+
+        self.preconditions = [
+            pred.InHand(self.gripper_sym, self.block_sym),
+            pred.BlockFree(self.block_placed_on)
+        ]
+
+        self.add_effects = [
+            pred.BlockOnBlock(self.block_sym, self.block_placed_on),
+            pred.HandEmpty(self.gripper_sym)
+        ]
+
+        self.delete_effects = self.preconditions
 
     def get_grounded_control_set(self, C, frames):
-
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         gripper = sym2frame['G']

@@ -24,8 +24,6 @@ def build_tower(verbose=False, interference=False):
     actions = [
         con.ApproachBlock(),
         con.PlaceOn(),
-        con.CloseGripper(),
-        con.OpenGripper()
     ]
 
     # setup config and get frame names
@@ -66,7 +64,7 @@ def build_tower(verbose=False, interference=False):
     # add some new controller to the new list
 
     # check if plan is feasible in current config
-    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, vis=False)
+    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, verbose=True)
 
     # if not is_feasible:
     #     print("Plan is not feasible in current Scene!")

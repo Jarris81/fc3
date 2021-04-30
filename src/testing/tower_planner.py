@@ -1,7 +1,9 @@
 from pyddl import Domain, Problem, State, Action, neg, planner
 import actions
+import predicates as pred
 import util.domain_tower as dt
 import libry as ry
+
 
 """
 Simple planner to build a tower, which uses (simple) symbolic actions (STRIPS style)
@@ -14,23 +16,35 @@ def get_plan(verbose, control_actions, scene_obj):
     # get simple action from all controllers
     domain = Domain((x.get_simple_action(scene_obj) for x in control_actions))
 
-    # goal is for now numerical order of block placed on each other, unless specified otherwise
-    goal = [(dt.b_on_b, scene_obj[dt.type_block][i], scene_obj[dt.type_block][i + 1])\
-            for i in range(len(scene_obj[dt.type_block]) - 1)]
-    # also append free hand
-    goal.append((dt.hand_empty, scene_obj[dt.type_gripper][0]))
+    # initial conditions
+    init = list()
+
+    # empty hand
+    init_hand_empty = pred.HandEmpty("G")
+    init_hand_empty.ground_predicate(G=scene_obj[dt.type_gripper][0])
+    init.append(init_hand_empty.get_grounded_predicate())
+
+    # free blocks
+    for block in scene_obj[dt.type_block]:
+        free_block = pred.BlockFree("B")
+        free_block.ground_predicate(B=block)
+        init.append(free_block.get_grounded_predicate())
+
+    # normal goal predicates
+    goal = list()
+
+    # hand should be free
+    goal_hand_empty = pred.HandEmpty("G")
+    goal_hand_empty.ground_predicate(G=scene_obj[dt.type_gripper][0])
+    goal.append(goal_hand_empty.get_grounded_predicate())
+
+    # blocks on blocks
+    for i in range(len(scene_obj[dt.type_block]) - 1):
+        block_on_block = pred.BlockOnBlock("B", "B_placed")
+        block_on_block.ground_predicate(B=scene_obj[dt.type_block][i], B_placed=scene_obj[dt.type_block][i+1])
+        goal.append(block_on_block.get_grounded_predicate())
 
     print(goal)
-
-    # normal initial conditions
-    init_free_hand = (dt.hand_empty, scene_obj[dt.type_gripper][0])
-    init_free_blocks = [(dt.block_free, block) for block in scene_obj[dt.type_block]]
-
-    # extend all initial conditions
-    init = list()
-    init.append(init_free_hand)
-    init.extend(init_free_blocks)
-
     # define problem here
     prob = Problem(
         domain,
@@ -54,8 +68,10 @@ def get_plan(verbose, control_actions, scene_obj):
 def get_goal_controller(C, goal):
     goal_feature = ry.CtrlSet()
 
+    goals_block_on_block = [x for x in goal if x[0] == pred.BlockOnBlock.__name__]
+
     # cut out last goal, which was free hand
-    for _, block, block_place_on in goal[:-1]:
+    for _, block, block_place_on in goals_block_on_block:
 
         goal_feature.addObjective(
             C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.105]),
@@ -78,7 +94,7 @@ if __name__ == '__main__':
                       action='store_false', dest='verbose', default=True,
                       help="don't print statistics to stdout")
 
-    actions = [
+    action_list = [
         actions.ApproachBlock(),
         actions.PlaceOn(),
     ]
@@ -90,6 +106,6 @@ if __name__ == '__main__':
 
     # Parse arguments
     opts, args = parser.parse_args()
-    get_plan(opts.verbose, actions, objects)
+    get_plan(opts.verbose, action_list, objects)
 
 

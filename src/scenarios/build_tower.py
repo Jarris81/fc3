@@ -22,8 +22,6 @@ def build_tower(verbose=False, interference=False):
     action_list = [
         actions.ApproachBlock(),
         actions.PlaceOn(),
-        # actions.CloseGripper(),
-        # actions.OpenGripper()
     ]
 
     # setup config and get frame names
@@ -156,9 +154,9 @@ if __name__ == '__main__':
     add_verbose = False
 
     if "verbose" in sys.argv:
-        verbose = True
+        add_verbose = True
     if "interference" in sys.argv:
-        interference = True
+        add_interference = True
 
     build_tower(verbose=add_verbose, interference=add_interference)
 

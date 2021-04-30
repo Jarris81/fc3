@@ -81,7 +81,7 @@ class InHand(BasePredicate):
         gripper = self.sym2frame[self.gripper_sym]
         gripper_center = gripper + "Center"
         return [
-            C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
+            C.feature(ry.FS.distance, [block, gripper_center], [1], [2]),
         ]
 
     def is_feasible(self, C, *objects):
@@ -103,7 +103,7 @@ class InHand(BasePredicate):
         return self._all_features_feasible(C)
 
 
-class HandFree(BasePredicate):
+class HandEmpty(BasePredicate):
 
     def __init__(self, gripper_sym):
         super().__init__()
@@ -120,6 +120,9 @@ class HandFree(BasePredicate):
                 print(frameName)
                 return False
         return True
+
+    def features(self, C):
+         return
 
 
 class BlockFree(BasePredicate):

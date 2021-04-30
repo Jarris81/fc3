@@ -23,14 +23,14 @@ objects = {
 inhand = predicates.InHand("G", "B1")
 collisionfree = predicates.CollisionFree()
 bonb = predicates.BlockOnBlock("B", "B_placed_on")
-freehand = predicates.HandFree("G")
+handempty = predicates.HandEmpty("G")
 freeblock = predicates.BlockFree("B")
 
 preds = [
     inhand,
     collisionfree,
     bonb,
-    freehand,
+    handempty,
     freeblock
 ]
 
@@ -39,12 +39,14 @@ _, C, block_names = setup_tower_env(3)  # 3 blocks in scene
 inhand.ground_predicate(G="R_gripper", B1="b1")
 bonb.ground_predicate(B="b1", B_placed_on="b2")
 collisionfree.ground_predicate()
-freehand.ground_predicate(G="R_gripper")
+handempty.ground_predicate(G="R_gripper")
 freeblock.ground_predicate(B="b1")
 
+print(handempty.features(C))
+print(inhand.features(C)[0].eval(C))
+
+
 C.view()
-
-
 
 # check if the predicate is feasible
 
