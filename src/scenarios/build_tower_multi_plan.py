@@ -8,6 +8,7 @@ from testing.tower_planner import get_plan, get_goal_controller
 from util.setup_env import setup_tower_env
 from feasibility import check_switch_chain_feasibility
 from robustness import get_robust_system
+from robustness import get_robust_system_2
 
 
 """
@@ -20,12 +21,12 @@ interference in the real world.
 
 def build_tower(verbose=False, interference=False):
 
+    verbose = True
+
     # get all actions needed to build a tower
-    actions = [
-        con.ApproachBlock(),
+    action_list = [
+        con.GrabBlock(),
         con.PlaceOn(),
-        con.CloseGripper(),
-        con.OpenGripper()
     ]
 
     # setup config and get frame names
@@ -37,8 +38,11 @@ def build_tower(verbose=False, interference=False):
         dt.type_block: block_names,
         dt.type_gripper: (gripper_name,)
     }
+
+    all_frames = set(block_names + [gripper_name])
+
     # get plan and goal
-    plan, goal = get_plan(verbose, actions, scene_objects)
+    plan, goal = get_plan(verbose, action_list, scene_objects)
 
     # if there is a plan, print it out, otherwise leave
     if plan:
@@ -52,11 +56,14 @@ def build_tower(verbose=False, interference=False):
 
     # convert simple actions to tuple with grounded action and CtrlSet
     controller_tuples = []
-    name2con = {x.name: x for x in actions}  # dict
-    for grounded_action in plan:
-        obj_frames = grounded_action.sig[1:]
-        controller = name2con[grounded_action.sig[0]]  # the actual controller
-        controller_tuples.append((grounded_action, controller.get_grounded_control_set(C, obj_frames)))
+    name2con = {x.name: x for x in action_list}  # dict
+    for j, grounded_action in enumerate(plan):
+        relevant_frames = grounded_action.sig[1:]
+        action = name2con[grounded_action.sig[0]]  # the actual controller
+        # if j == 1 or j == 5:
+        #     continue
+        for i, controller in enumerate(action.get_grounded_control_set(C, relevant_frames, all_frames)):
+            controller_tuples.append((f"{action.name}_{i}", controller))
 
     # get goal controller, with only immediate conditions features (needed for feasibility)
     goal_controller = get_goal_controller(C, goal)
@@ -65,19 +72,18 @@ def build_tower(verbose=False, interference=False):
     controller_tuples_2 = controller_tuples.copy()
     # add some new controller to the new list
 
-
-
-
     # check if plan is feasible in current config
-    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, vis=False, verbose=False)
+    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, verbose=False)
 
-    # if not is_feasible:
-    #     print("Plan is not feasible in current Scene!")
-    #     print("Aborting")
-    #     return
+    if not is_feasible:
+        print("Plan is not feasible in current Scene!")
+        print("Aborting")
+        return
 
     # get the robust plan, used in execution
-    robust_plan = get_robust_system(C, komo_feasy, controller_tuples, goal_controller)
+    robust_plan = get_robust_system_2(C, controller_tuples, goal_controller, verbose=True)
+
+    #return
 
     # Start simulation of plan here
     C.view()
@@ -93,14 +99,14 @@ def build_tower(verbose=False, interference=False):
 
     # create a new action, which only releases the block b1. With this, we can show, that the when interference
     # happens with b2 at i=1 (when holding b1), we can still complete the plan
-    new_action = con.OpenGripper()
-    new_action_grounded = new_action.get_simple_action(scene_objects).ground("R_gripper", "b1")
-    obj_frames = new_action_grounded.sig[1:]
-    controller = name2con[new_action_grounded.sig[0]]  # the actual controller
-    new_controller = controller.get_grounded_control_set(C, obj_frames)
-
-    # add to end of the robust plan
-    robust_plan.append((new_action_grounded, new_controller))
+    # new_action = con.OpenGripper()
+    # new_action_grounded = new_action.get_simple_action(scene_objects).ground("R_gripper", "b1")
+    # obj_frames = new_action_grounded.sig[1:]
+    # controller = name2con[new_action_grounded.sig[0]]  # the actual controller
+    # new_controller = controller.get_grounded_control_set(C, obj_frames)
+    #
+    # # add to end of the robust plan
+    # robust_plan.append((new_action_grounded, new_controller))
 
     # simulation loop
 
@@ -109,7 +115,6 @@ def build_tower(verbose=False, interference=False):
     original_position[1] = original_position[1]+0.05
     interference_counter = 0
     has_interfered = False
-
 
 
     for t in range(0, 10000):

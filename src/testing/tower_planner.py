@@ -95,7 +95,7 @@ if __name__ == '__main__':
                       help="don't print statistics to stdout")
 
     action_list = [
-        actions.ApproachBlock(),
+        actions.GrabBlock(),
         actions.PlaceOn(),
     ]
 

@@ -4,7 +4,7 @@ from util.setup_env import setup_tower_env
 
 if __name__ == '__main__':
 
-    R, C, _ = setup_tower_env(2)
+    R, C, _ = setup_tower_env(3)
 
     #C.setJointState(q)
     #C.computeCollisions()
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     komo.addObjective([1], ry.FS.positionDiff, ["R_gripperCenter", "b1"], ry.OT.sos, [1e1]*3)
 
     # gripper should z axis should align with block (top grasp)
-    komo.addObjective([], ry.FS.vectorZDiff, ["R_gripper", "b1"], ry.OT.sos, [1e2])
+    komo.addObjective([1], ry.FS.vectorZDiff, ["R_gripper", "b1"], ry.OT.sos, [1e2])
 
     #
     komo.addObjective([], ry.FS.distance, ["R_gripper", "b1"], ry.OT.ineq, [1e1])
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     komo.view_play(.2, False)
 
     time.sleep(5)
-    report = komo.getReport()
+    report = komo.getReport(True)
 
 
 

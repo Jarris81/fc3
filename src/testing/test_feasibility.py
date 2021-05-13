@@ -17,10 +17,10 @@ if __name__ == '__main__':
 
     komo = ry.KOMO()
     komo.setModel(C, False)
-    komo.setTiming(3., 10, 5., 1)  # DIFFERENT
+    komo.setTiming(3., 1, 5., 1)  # DIFFERENT
 
     komo.add_qControlObjective([], 1, 1e-1)  # DIFFERENT
-    #komo.addSquaredQuaternionNorms([], 3.)
+    komo.addSquaredQuaternionNorms([], 3.)
 
     # grasp
     komo.addSwitch_stable(1., 2., "table", "R_gripper", "b1")
@@ -30,20 +30,20 @@ if __name__ == '__main__':
 
     # lift up
     #komo.addSwitch_stable(2., 3., "R_gripper", "R_gripper", "b1")
-    komo.addObjective([1.5], ry.FS.position, ["R_gripper"], ry.OT.eq, [1e2], [0, 0.2, 1])
+    komo.addObjective([1.5], ry.FS.position, ["R_gripper"], ry.OT.eq, [1e1], [0, 0.2, 1])
     komo.addObjective([1.5], ry.FS.vectorZ, ["R_gripper"], ry.OT.eq, [1e2], [0., 0., 1.])
 
     # place
     komo.addSwitch_stable(2., -1., "R_gripper", "table", "b1")
-    komo.addObjective([2.], ry.FS.positionDiff, ["b1", "table"], ry.OT.eq, [1e2], [0.2, 0, .08])
-    komo.addObjective([2.], ry.FS.vectorZ, ["R_gripper"], ry.OT.eq, [1e2], [0., 0., 1.])
+    komo.addObjective([2.], ry.FS.positionDiff, ["b1", "table"], ry.OT.eq, [1e1], [0.2, 0, .08])
+    komo.addObjective([2.], ry.FS.vectorZ, ["R_gripper"], ry.OT.eq, [1e1], [0., 0., 1.])
 
     komo.optimize()
     komo.view(False, "result")
     print("constraints:", komo.getConstraintViolations())
     print("costs:", komo.getCosts())
-    komo.getReport()
+    komo.getReport(True)
 
-    komo.view_play(0.5, False)
+    komo.view_play(1, False)
 
     time.sleep(5)

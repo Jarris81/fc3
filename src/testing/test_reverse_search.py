@@ -3,7 +3,7 @@ import util.domain_tower as dt
 import actions as con
 
 actions = [
-        con.ApproachBlock(),
+        con.GrabBlock(),
         con.PlaceOn(),
     ]
 

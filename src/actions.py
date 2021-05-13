@@ -22,6 +22,24 @@ def _get_sym2frame(symbols, frames):
     return {sym: frames[i] for i, sym in enumerate(symbols)}
 
 
+def _get_grab_controller(C, gripper, grabing_object, grabbing=True):
+    gripper_center = gripper + "Center"
+    grab = ry.CtrlSet()
+    gripper_preGrasp = gripper + "Pregrasp"
+    # grab.addObjective(
+    #     C.feature(ry.FS.distance, [grabing_object, gripper_center], [1e1]),
+    #     ry.OT.eq, -1)
+    grab.addObjective(
+        C.feature(ry.FS.insideBox, [grabing_object, gripper_preGrasp], [1e0]),
+        ry.OT.eq, -1)
+
+    # condition, nothing is in hand of gripper
+    grab.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, grabing_object), grabbing)
+    grab.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, grabing_object), not grabbing)
+
+    return grab
+
+
 class BaseAction:
 
     def __init__(self, name):
@@ -60,12 +78,12 @@ class BaseAction:
                               [y.get_predicate() for y in self.add_effects],
                       unique=True)
 
-    def get_grounded_control_set(self, C, frames):
+    def get_grounded_control_set(self, C, relevant_frames, other_frames):
         self.ctrl_set = ry.CtrlSet()
-        self.sym2frame = {sym: frames[i] for i, sym in enumerate(self.symbols.keys())}
+        self.sym2frame = {sym: relevant_frames[i] for i, sym in enumerate(self.symbols.keys())}
 
 
-class ApproachBlock(BaseAction):
+class GrabBlock(BaseAction):
 
     def __init__(self):
         super().__init__(__class__.__name__)
@@ -93,28 +111,78 @@ class ApproachBlock(BaseAction):
             self.preconditions[0]
         ]
 
-    def get_grounded_control_set(self, C, frames):
-        sym2frame = _get_sym2frame(self.symbols, frames)
+        self.delete_effects = self.preconditions
 
+    def get_grounded_control_set(self, C, relevant_frames, all_frames):
+        sym2frame = _get_sym2frame(self.symbols, relevant_frames)
+
+        run_ctrl_set = ry.CtrlSet()
+        print(self.name)
         holding_predicates = set(self.preconditions).difference(set(self.delete_effects))
-        print(holding_predicates)
+        print(f"{holding_predicates=}")
 
-        # for all preconditions, get the feature as OT eq
+        print(self.name)
+        print("preconditions")
+
+        #for all preconditions, get the feature as OT eq or ineq?
         for predicate in self.preconditions:
             predicate.ground_predicate(**sym2frame)
             print(predicate.get_grounded_predicate())
-            print(predicate.features(C))
+            for feature in predicate.features(C, all_frames):
+                if feature.getFS() == ry.FS.pairCollision_negScalar:
+                    run_ctrl_set.addObjective(feature, ry.OT.ineq, -1)
+                else:
+                    run_ctrl_set.addObjective(feature, ry.OT.eq, -1)
+            for symbolic_command in predicate.symbolic_commands(C, all_frames):
+                pass
+                #run_ctrl_set.addSymbolicCommand(*symbolic_command[:-1], True)
+        print("effects")
 
-        gripper = sym2frame['G']
+        for predicate in self.add_effects:
+            predicate.ground_predicate(**sym2frame)
+            print(predicate.get_grounded_predicate())
+            for feature in predicate.features(C, all_frames):
+                if feature.getFS() == ry.FS.pairCollision_negScalar:
+                    run_ctrl_set.addObjective(feature, ry.OT.ineq, -1)
+                else:
+                    run_ctrl_set.addObjective(feature, ry.OT.sos, 0.005)
+            for symbolic_command in predicate.symbolic_commands(C, all_frames):
+                pass
+                #run_ctrl_set.addSymbolicCommand(*symbolic_command[:-1], False)
+
+                print(*symbolic_command[:-1])
+
+        for x in run_ctrl_set.getObjectives():
+            print(x.feat().getFS(), x.feat().getFrameNames(C), x.get_OT())
+
+        for x in run_ctrl_set.getSymbolicCommands():
+            print(x.getCommand())
+        gripper = sym2frame[self.gripper_sym]
         gripper_center = gripper + "Center"
-        block = sym2frame['B']
+        block = sym2frame[self.block_sym]
 
-        control_sets = []
+        # run_ctrl_set.addObjective(
+        #     C.feature(ry.FS.vectorZDiff, [gripper, block], [1e1]),
+        #     ry.OT.sos, 0.01)
+        # run_ctrl_set.addObjective(
+        #     C.feature(ry.FS.positionRel, [gripper_center, block], [1e1] * 3, [.0, 0., .05]),
+        #     ry.OT.sos, 0.005)
+        #
+        #run_ctrl_set.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
+        #run_ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
+
+        grab = _get_grab_controller(C, gripper, block, True)
+
+        #return [run_ctrl_set, grab]
+
+        gripper = sym2frame[self.gripper_sym]
+        gripper_center = gripper + "Center"
+        block = sym2frame[self.block_sym]
 
         align_over = ry.CtrlSet()
         # move close to block
         align_over.addObjective(
-            C.feature(ry.FS.positionRel, [gripper_center, block], [1e1] * 3, [.0, 0., .15]),
+            C.feature(ry.FS.positionRel, [gripper_center, block], [1e1] * 3, [.0, 0., .05]),
             ry.OT.sos, 0.005)
         # align axis with block
         align_over.addObjective(
@@ -133,16 +201,16 @@ class ApproachBlock(BaseAction):
             ry.OT.sos, 0.005)
 
         #  block needs to be close to block
-        ctrl_set = ry.CtrlSet()
-        ctrl_set.addObjective(
+        grab = ry.CtrlSet()
+        grab.addObjective(
             C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
             ry.OT.eq, -1)
         # condition, nothing is in hand of gripper
-        ctrl_set.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
-        ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
+        grab.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
+        grab.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
 
         # return tuple of controllers
-        return align_over, move_close, ctrl_set
+        return align_over, grab
 
 
 class PlaceOn(BaseAction):
@@ -152,37 +220,103 @@ class PlaceOn(BaseAction):
 
         self.gripper_sym = "G"
         self.block_sym = "B"
-        self.block_placed_on = "B_placed"
+        self.block_placed_sym = "B_placed"
 
         self.symbols_types = {
             self.gripper_sym: dt.type_gripper,
             self.block_sym: dt.type_block,
-            self.block_placed_on: dt.type_block
+            self.block_placed_sym: dt.type_block
         }
 
         self.symbols = self.symbols_types.keys()
 
         self.preconditions = [
             pred.InHand(self.gripper_sym, self.block_sym),
-            pred.BlockFree(self.block_placed_on)
+            pred.BlockFree(self.block_placed_sym)
         ]
 
         self.add_effects = [
-            pred.BlockOnBlock(self.block_sym, self.block_placed_on),
+            pred.BlockOnBlock(self.block_sym, self.block_placed_sym),
+            pred.BlockFree(self.block_sym),
             pred.HandEmpty(self.gripper_sym)
         ]
 
         self.delete_effects = self.preconditions
 
-    def get_grounded_control_set(self, C, frames):
-        sym2frame = _get_sym2frame(self.symbols, frames)
+    # def get_grounded_control_set(self, C, relevant_frames, all_frames):
+    #     sym2frame = _get_sym2frame(self.symbols, relevant_frames)
+    #
+    #     run_ctrl_set = ry.CtrlSet()
+    #     print(self.name)
+    #     holding_predicates = set(self.preconditions).difference(set(self.delete_effects))
+    #     print(f"{holding_predicates=}")
+    #
+    #     print(self.name)
+    #     print("preconditions")
+    #
+    #     #for all preconditions, get the feature as OT eq or ineq?
+    #     for predicate in holding_predicates:
+    #         predicate.ground_predicate(**sym2frame)
+    #         print(predicate.get_grounded_predicate())
+    #         for feature in predicate.features(C, all_frames):
+    #             if feature.getFS() == ry.FS.pairCollision_negScalar:
+    #                 run_ctrl_set.addObjective(feature, ry.OT.ineq, -1)
+    #             else:
+    #                 run_ctrl_set.addObjective(feature, ry.OT.eq, -1)
+    #         for symbolic_command in predicate.symbolic_commands(C, all_frames):
+    #             pass
+    #             #run_ctrl_set.addSymbolicCommand(*symbolic_command[:-1], True)
+    #     print("effects")
+    #
+    #     for predicate in self.add_effects:
+    #         predicate.ground_predicate(**sym2frame)
+    #         print(predicate.get_grounded_predicate())
+    #         for feature in predicate.features(C, all_frames):
+    #             if feature.getFS() == ry.FS.pairCollision_negScalar:
+    #                 run_ctrl_set.addObjective(feature, ry.OT.ineq, -1)
+    #             else:
+    #                 run_ctrl_set.addObjective(feature, ry.OT.sos, 0.005)
+    #         for symbolic_command in predicate.symbolic_commands(C, all_frames):
+    #             pass
+    #             #run_ctrl_set.addSymbolicCommand(*symbolic_command[:-1], False)
+    #
+    #             print(*symbolic_command[:-1])
+    #
+    #     for x in run_ctrl_set.getObjectives():
+    #         print(x.feat().getFS(), x.feat().getFrameNames(C), x.get_OT())
+    #
+    #     for x in run_ctrl_set.getSymbolicCommands():
+    #         print(x.getCommand())
+    #     gripper = sym2frame[self.gripper_sym]
+    #     gripper_center = gripper + "Center"
+    #     block = sym2frame[self.block_sym]
+    #
+    #     # run_ctrl_set.addObjective(
+    #     #     C.feature(ry.FS.vectorZDiff, [gripper, block], [1e1]),
+    #     #     ry.OT.sos, 0.01)
+    #     # run_ctrl_set.addObjective(
+    #     #     C.feature(ry.FS.positionRel, [gripper_center, block], [1e1] * 3, [.0, 0., .05]),
+    #     #     ry.OT.sos, 0.005)
+    #     #
+    #     #run_ctrl_set.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
+    #     #run_ctrl_set.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
+    #
+    #     grab = _get_grab_controller(C, gripper, block, False)
+    #
+    #     return [run_ctrl_set, grab]
 
-        gripper = sym2frame['G']
+    def get_grounded_control_set(self, C, relevant_frames, other_frames):
+        sym2frame = _get_sym2frame(self.symbols, relevant_frames)
+
+        gripper = sym2frame[self.gripper_sym]
         gripper_center = gripper + "Center"
-        block = sym2frame['B']
-        block_placed_on = sym2frame['B_place_on']
+        block = sym2frame[self.block_sym]
+        block_placed_on = sym2frame['B_placed']
 
         place_on_block = ry.CtrlSet()
+        place_on_block.addObjective(
+            C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
+            ry.OT.eq, -1)
         # block should be over block_placed_on
         place_on_block.addObjective(
             C.feature(ry.FS.positionRel, [block, block_placed_on], [1e1], [0, 0, 0.105]),
@@ -204,3 +338,73 @@ class PlaceOn(BaseAction):
         open_gripper.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
 
         return [place_on_block, open_gripper]
+
+
+class PlaceSide(BaseAction):
+
+    def __init__(self):
+        super().__init__(__class__.__name__)
+
+        self.gripper_sym = "G"
+        self.block_sym = "B"
+        self.block_placed_sym = "B_placed"
+
+        self.symbols_types = {
+            self.gripper_sym: dt.type_gripper,
+            self.block_sym: dt.type_block,
+            self.block_placed_sym: dt.type_block
+        }
+
+        self.symbols = self.symbols_types.keys()
+
+        self.preconditions = [
+            pred.BlockOnBlock(self.block_sym, self.block_placed_sym),
+            pred.InHand(self.gripper_sym, self.block_sym),
+            pred.BlockFree(self.block_placed_sym)
+        ]
+
+        self.add_effects = [
+            pred.BlockOnBlock(self.block_sym, self.block_placed_sym),
+            pred.BlockFree(self.block_sym),
+            pred.HandEmpty(self.gripper_sym)
+        ]
+
+        self.delete_effects = self.preconditions
+
+
+    def get_grounded_control_set(self, C, relevant_frames, other_frames):
+        sym2frame = _get_sym2frame(self.symbols, relevant_frames)
+
+        gripper = sym2frame[self.gripper_sym]
+        gripper_center = gripper + "Center"
+        block = sym2frame[self.block_sym]
+        block_placed_on = sym2frame['B_placed']
+
+        place_on_block = ry.CtrlSet()
+        place_on_block.addObjective(
+            C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
+            ry.OT.eq, -1)
+        # block should be over block_placed_on
+        place_on_block.addObjective(
+            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e1], [0, 0, 0.105]),
+            ry.OT.sos, 0.005)
+        # should have z-axis in same direction
+        place_on_block.addObjective(
+            C.feature(ry.FS.scalarProductZZ, [block, block_placed_on], [1e1], [1]),
+            ry.OT.sos, 0.005)
+        # align axis with block
+        place_on_block.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
+
+        # open gripper
+        open_gripper = ry.CtrlSet()
+        open_gripper.addObjective(
+            C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
+            ry.OT.eq, -1)
+
+        open_gripper.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
+        open_gripper.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
+
+        return [place_on_block, open_gripper]
+
+
+

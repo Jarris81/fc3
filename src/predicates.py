@@ -13,7 +13,7 @@ class BasePredicate:
     def ground_predicate(self, **sym2frames):
         self.sym2frame = sym2frames
 
-    def is_feasible(self, C, *objects):
+    def is_feasible(self, C, all_frames):
         if self.sym2frame is None:
             print(f"{self.name} has not been grounded!")
             return None
@@ -31,15 +31,23 @@ class BasePredicate:
         predicate = self.get_predicate()
         return tuple([predicate[0]] + [self.sym2frame[x] for x in predicate[1:]])
 
-    def features(self, C):
+    def features(self, C, all_frames):
         if self.sym2frame is None:
             print(f"{self.name} has not been grounded!")
             return None
         return []
 
-    def _all_features_feasible(self, C):
+    def symbolic_commands(self, C, all_frames):
+        if self.sym2frame is None:
+            print(f"{self.name} has not been grounded!")
+            return None
+        return []
 
-        errors = [feat.eval(C)[0] for feat in self.features(C)]
+    def _all_features_feasible(self, C, all_frames):
+
+        errors = [feat.eval(C)[0] for feat in self.features(C, all_frames)]
+
+        print(errors)
 
         return all([np.sqrt(np.dot(error, error)) < 0.1 for error in errors])
 
@@ -74,19 +82,23 @@ class InHand(BasePredicate):
     def get_predicate(self):
         return self.name, self.gripper_sym, self.block_sym
 
-    def features(self, C):
-        super().features(C)
+    def features(self, C, all_frames):
+        super().features(C, all_frames)
 
         block = self.sym2frame[self.block_sym]
         gripper = self.sym2frame[self.gripper_sym]
         gripper_center = gripper + "Center"
+        gripper_preGrasp = gripper + "Pregrasp"
         return [
-            C.feature(ry.FS.distance, [block, gripper_center], [1], [2]),
+            C.feature(ry.FS.insideBox, [block, gripper_preGrasp], [1e1]),
         ]
+        # return [
+        #     C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
+        # ]
 
-    def is_feasible(self, C, *objects):
+    def is_feasible(self, C, all_frames):
         # call super to make sure predicate has been has grounded
-        super().is_feasible(C)
+        super().is_feasible(C, all_frames)
 
         # get names
         gripper_name = self.sym2frame[self.gripper_sym]
@@ -100,7 +112,11 @@ class InHand(BasePredicate):
             return False
 
         # check if all the features are ok
-        return self._all_features_feasible(C)
+        return self._all_features_feasible(C, all_frames)
+
+    def symbolic_commands(self, C, all_frames):
+        commands = [(ry.SC.CLOSE_GRIPPER, (self.sym2frame[self.gripper_sym], self.sym2frame[self.block_sym]), True)]
+        return commands
 
 
 class HandEmpty(BasePredicate):
@@ -112,17 +128,29 @@ class HandEmpty(BasePredicate):
     def get_predicate(self):
         return self.name, self.gripper_sym
 
-    def is_feasible(self, C, *objects):
-        # need to check if no object has the gripper as parent
-        for frameName in objects:
-            frame = C.frame(frameName)
-            if "parent" in frame.info() and frame.info()["parent"] == self.sym2frame[self.gripper_sym]:
-                print(frameName)
-                return False
-        return True
+    def features(self, C, all_frames):
+        all_frames = set(all_frames)
+        rel_frames = {self.sym2frame[self.gripper_sym]}
+        other_frames = all_frames.difference(rel_frames)
+        features = []
+        gripper_frame = self.sym2frame[self.gripper_sym]
+        gripper_center_frame = gripper_frame + "Center"
+        gripper_pre_grasp_frame = gripper_frame + "Pregrasp"
+        for frame in other_frames:
+            features.append(
+                C.feature(ry.FS.pairCollision_negScalar, [frame, gripper_pre_grasp_frame], [1e1])
+            )
+        return []
+        #return features
 
-    def features(self, C):
-         return
+    def symbolic_commands(self, C, all_frames):
+        commands = []
+        all_frames = set(all_frames)
+        rel_frames = {self.sym2frame[self.gripper_sym]}
+        other_frames = all_frames.difference(rel_frames)
+        for object in other_frames:
+            commands.append((ry.SC.OPEN_GRIPPER, (self.sym2frame[self.gripper_sym], object), True))
+        return commands
 
 
 class BlockFree(BasePredicate):
@@ -130,24 +158,28 @@ class BlockFree(BasePredicate):
     def __init__(self, block_sym):
         super().__init__()
         self.block_sym = block_sym
+        self.rel_symbols = [self.block_sym]
 
     def get_predicate(self):
 
         return self.name, self.block_sym
 
-    def is_feasible(self, C, *objects):
-        # build for each pair of block the reverse predicate, and check if they are all true
-        objects = set(objects)
-        block = self.sym2frame[self.block_sym]
+    def features(self, C, all_frames):
 
-        objects.remove(block)
+        features = []
+        block_frame = self.sym2frame[self.block_sym]
 
-        all_pairs = list(itertools.product([block], objects))
+        all_frames = set(all_frames)
+        rel_frames = {block_frame}
+        other_frames = all_frames.difference(rel_frames)
+        block_place_box_frame = block_frame + "_place_box"
+        for frame in other_frames:
+            if not "gripper" in frame:
+                features.append(
+                    C.feature(ry.FS.pairCollision_negScalar, [frame, block_place_box_frame], [1e0])
+                )
 
-        opposite_predicates = [BlockOnBlock("B", "B2") for _ in range(len(all_pairs))]
-        [pred.ground_predicate(B=x[1], B2=x[0]) for pred, x in zip(opposite_predicates, all_pairs)]
-
-        return not any([x.is_feasible(C, objects) for x in opposite_predicates])
+        return features
 
 
 class BlockOnBlock(BasePredicate):
@@ -160,9 +192,9 @@ class BlockOnBlock(BasePredicate):
     def get_predicate(self):
         return self.name, self.block_sym, self.block_placed_on_sym
 
-    def features(self, C):
+    def features(self, C, all_frames):
 
-        super().features(C)
+        super().features(C, all_frames)
 
         block = self.sym2frame[self.block_sym]
         block_placed_on = self.sym2frame[self.block_placed_on_sym]
@@ -172,11 +204,11 @@ class BlockOnBlock(BasePredicate):
             C.feature(ry.FS.scalarProductZZ, [block, block_placed_on], [1e1], [1]),
         ]
 
-    def is_feasible(self, C, *objects):
+    def is_feasible(self, C, all_frames):
         # call super to make sure predicate has been grounded
-        super().is_feasible(C)
+        super().is_feasible(C, all_frames)
 
-        return self._all_features_feasible(C)
+        return self._all_features_feasible(C, all_frames)
 
 
 

@@ -18,9 +18,11 @@ Build a tower with the provided plan
 
 def build_tower(verbose=False, interference=False):
 
+    verbose = True
+
     # get all actions needed to build a tower
     action_list = [
-        actions.ApproachBlock(),
+        actions.GrabBlock(),
         actions.PlaceOn(),
     ]
 
@@ -33,12 +35,17 @@ def build_tower(verbose=False, interference=False):
         dt.type_block: block_names,
         dt.type_gripper: (gripper_name,)
     }
+
+    all_frames = set(block_names + [gripper_name])
+
+    print(f"{scene_objects.values()=}")
     # get plan and goal
     plan, goal = get_plan(verbose, action_list, scene_objects)
 
     # if there is a plan, print it out, otherwise leave
     if plan:
         if verbose:
+            print()
             print("Found the following plan:")
             for action in plan:
                 print(action)
@@ -50,18 +57,19 @@ def build_tower(verbose=False, interference=False):
     controller_tuples = []
     name2con = {x.name: x for x in action_list}  # dict
     for j, grounded_action in enumerate(plan):
-        obj_frames = grounded_action.sig[1:]
+        relevant_frames = grounded_action.sig[1:]
         action = name2con[grounded_action.sig[0]]  # the actual controller
         # if j == 1 or j == 5:
         #     continue
-        for i, controller in enumerate(action.get_grounded_control_set(C, obj_frames)):
+        for i, controller in enumerate(action.get_grounded_control_set(C, relevant_frames, all_frames)):
             controller_tuples.append((f"{action.name}_{i}", controller))
 
     # get goal controller, with only immediate conditions features (needed for feasibility)
     goal_controller = get_goal_controller(C, goal)
 
+
     # check if plan is feasible in current config
-    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, verbose=False)
+    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, verbose=True)
 
 
     if not is_feasible:
@@ -69,8 +77,10 @@ def build_tower(verbose=False, interference=False):
         print("Aborting")
         return
 
+    #return
+
     # get the robust plan, used in execution
-    robust_plan = get_robust_system(C, komo_feasy, controller_tuples, goal_controller, verbose=verbose)
+    robust_plan = get_robust_system(C, komo_feasy, controller_tuples, goal_controller, verbose=False)
 
     #return
 

@@ -22,7 +22,7 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
     komo.add_qControlObjective([], 1, 1e-1)  # DIFFERENT
     komo.addSquaredQuaternionNorms([], 3.)
     # we dont want collision
-    komo.addObjective([], ry.FS.accumulatedCollisions, ["ALL"], ry.OT.eq, [1e1])
+    #komo.addObjective([], ry.FS.accumulatedCollisions, ["ALL"], ry.OT.eq, [1e1])
 
     # init the grippers, and check when they are carrying an object
     # get all Grippers in the scene
@@ -81,11 +81,20 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
         # for the first switch, we can just use the initial frame state, therefore no need to set one from komo
         if i != 0:
             C_copy.setFrameState(frames_state[i-1])
+        info = C_copy.frame("b1").info()
+        if "parent" in info:
+            print("parent is:")
+            print(info["parent"])
+        print(name)
+        print(control.canBeInitiated(C_copy))
         for o in control.getObjectives():
             if o.get_OT() == ry.OT.eq or o.get_OT() == ry.OT.ineq:
                 f = o.feat()
                 error = f.eval(C_copy)[0]
                 mse = np.sqrt(np.dot(error, error))
+                if f.getFS() == ry.FS.pairCollision_negScalar:
+                    mse = error
+                    print(error)
                 description = f.description(C_copy)  # get the name
                 df_immediate.loc[i, description] = mse  # set the mean squared error for switch
 
@@ -96,6 +105,7 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
         for i_row, i_col in np.argwhere(mse > tolerance):
             plan_is_feasible = False
             if verbose:
+                #print(mse[i_row, i_col])
                 print(f'{df.name} {features[i_col]} at switch #{i_row} is not feasible!')
 
     # Visualize some results

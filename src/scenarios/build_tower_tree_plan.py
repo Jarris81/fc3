@@ -22,7 +22,7 @@ def build_tower(verbose=False, interference=False):
 
     # get all actions needed to build a tower
     actions = [
-        con.ApproachBlock(),
+        con.GrabBlock(),
         con.PlaceOn(),
     ]
 
