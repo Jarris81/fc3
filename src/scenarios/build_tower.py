@@ -69,7 +69,7 @@ def build_tower(verbose=False, interference=False):
 
 
     # check if plan is feasible in current config
-    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, verbose=True)
+    is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, verbose=False)
 
 
     if not is_feasible:

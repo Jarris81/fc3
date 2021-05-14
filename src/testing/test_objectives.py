@@ -2,6 +2,7 @@ import libry as ry
 import time
 from util.setup_env import setup_tower_env
 
+
 if __name__ == '__main__':
 
     R, C, _ = setup_tower_env(3)

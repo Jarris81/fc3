@@ -1,4 +1,4 @@
-from pyddl import Domain, Problem, State, Action, neg, planner
+from pyddl import Domain, Problem, State, Action, neg, planner, backwards_planner
 import actions
 import predicates as pred
 import util.domain_tower as dt
@@ -11,7 +11,7 @@ Simple planner to build a tower, which uses (simple) symbolic actions (STRIPS st
 # TODO: add block order
 
 
-def get_plan(verbose, control_actions, scene_obj):
+def get_plan(verbose, control_actions, scene_obj, forward=False):
 
     # get simple action from all controllers
     domain = Domain((x.get_simple_action(scene_obj) for x in control_actions))
@@ -54,7 +54,14 @@ def get_plan(verbose, control_actions, scene_obj):
     )
 
     # generate plan
-    plan = planner(prob, verbose=verbose)
+    if forward:
+        plan = planner(prob, verbose=verbose)
+    else:
+        action_plan, state_plan, __ = backwards_planner(prob, goal=goal, action_tree=False, verbose=True)
+        plan, state_plan, G = backwards_planner(prob, goal=goal, action_tree=True, max_diff=2,
+                                                       root_state_plan=state_plan, verbose=True)
+        # need to reverse plan
+        plan = plan[::-1]
     if verbose:
         if plan is None:
             print('No Plan!')
@@ -74,7 +81,7 @@ def get_goal_controller(C, goal):
     for _, block, block_place_on in goals_block_on_block:
 
         goal_feature.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.105]),
+            C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.1005]),
             ry.OT.eq, -1)
         # should have z-axis in same direction
         goal_feature.addObjective(

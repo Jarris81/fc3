@@ -123,7 +123,7 @@ class GrabBlock(BaseAction):
 
         print(self.name)
         print("preconditions")
-
+        
         #for all preconditions, get the feature as OT eq or ineq?
         for predicate in self.preconditions:
             predicate.ground_predicate(**sym2frame)
@@ -319,7 +319,7 @@ class PlaceOn(BaseAction):
             ry.OT.eq, -1)
         # block should be over block_placed_on
         place_on_block.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e1], [0, 0, 0.105]),
+            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e1], [0, 0, 0.1005]),
             ry.OT.sos, 0.005)
         # should have z-axis in same direction
         place_on_block.addObjective(
@@ -347,53 +347,48 @@ class PlaceSide(BaseAction):
 
         self.gripper_sym = "G"
         self.block_sym = "B"
-        self.block_placed_sym = "B_placed"
 
         self.symbols_types = {
             self.gripper_sym: dt.type_gripper,
             self.block_sym: dt.type_block,
-            self.block_placed_sym: dt.type_block
         }
 
         self.symbols = self.symbols_types.keys()
 
         self.preconditions = [
-            pred.BlockOnBlock(self.block_sym, self.block_placed_sym),
             pred.InHand(self.gripper_sym, self.block_sym),
-            pred.BlockFree(self.block_placed_sym)
         ]
 
         self.add_effects = [
-            pred.BlockOnBlock(self.block_sym, self.block_placed_sym),
             pred.BlockFree(self.block_sym),
             pred.HandEmpty(self.gripper_sym)
         ]
 
         self.delete_effects = self.preconditions
 
-
     def get_grounded_control_set(self, C, relevant_frames, other_frames):
+
+        free_place = (0, 0, 0.71)
         sym2frame = _get_sym2frame(self.symbols, relevant_frames)
 
         gripper = sym2frame[self.gripper_sym]
         gripper_center = gripper + "Center"
         block = sym2frame[self.block_sym]
-        block_placed_on = sym2frame['B_placed']
 
-        place_on_block = ry.CtrlSet()
-        place_on_block.addObjective(
+        place_block_side = ry.CtrlSet()
+        place_block_side.addObjective(
             C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
             ry.OT.eq, -1)
         # block should be over block_placed_on
-        place_on_block.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e1], [0, 0, 0.105]),
+        place_block_side.addObjective(
+            C.feature(ry.FS.position, [block], [1e1], free_place),
             ry.OT.sos, 0.005)
         # should have z-axis in same direction
-        place_on_block.addObjective(
-            C.feature(ry.FS.scalarProductZZ, [block, block_placed_on], [1e1], [1]),
-            ry.OT.sos, 0.005)
+        # place_on_block.addObjective(
+        #     C.feature(ry.FS.scalarProductZZ, [block, block_placed_on], [1e1], [1]),
+        #     ry.OT.sos, 0.005)
         # align axis with block
-        place_on_block.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
+        place_block_side.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
         # open gripper
         open_gripper = ry.CtrlSet()
@@ -401,10 +396,14 @@ class PlaceSide(BaseAction):
             C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
             ry.OT.eq, -1)
 
+        open_gripper.addObjective(
+            C.feature(ry.FS.position, [block], [1e1], free_place),
+            ry.OT.eq, -1)
+
         open_gripper.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
         open_gripper.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
 
-        return [place_on_block, open_gripper]
+        return [place_block_side, open_gripper]
 
 
 

@@ -81,7 +81,7 @@ def build_tower(verbose=False, interference=False):
         return
 
     # get the robust plan, used in execution
-    robust_plan = get_robust_system_2(C, controller_tuples, goal_controller, verbose=True)
+    robust_plan = get_robust_system_2(C, controller_tuples, goal_controller, verbose=False)
 
     #return
 
@@ -109,6 +109,10 @@ def build_tower(verbose=False, interference=False):
     # robust_plan.append((new_action_grounded, new_controller))
 
     # simulation loop
+    place_side = con.PlaceSide()
+    place_side_controllers = place_side.get_grounded_control_set(C, (gripper_name, "b1"), all_frames)
+
+    robust_plan.extend([(f"place_side_{i}", controller) for i, controller in enumerate(reversed(place_side_controllers))])
 
     # setup for interference
     original_position = C.frame("b2").getPosition()
