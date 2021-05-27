@@ -1,15 +1,14 @@
 import sys
 import time
 import libry as ry
-
+import numpy as np
 
 import actions
 import util.domain_tower as dt
 from testing.tower_planner import get_plan, get_goal_controller
 from util.setup_env import setup_tower_env
 from feasibility import check_switch_chain_feasibility
-from robustness import get_robust_system
-
+from robustness import get_robust_chain
 
 """
 Build a tower with the provided plan
@@ -17,7 +16,6 @@ Build a tower with the provided plan
 
 
 def build_tower(verbose=False, interference=False):
-
     verbose = True
 
     # get all actions needed to build a tower
@@ -36,11 +34,8 @@ def build_tower(verbose=False, interference=False):
         dt.type_gripper: (gripper_name,)
     }
 
-    all_frames = set(block_names + [gripper_name])
-
-    print(f"{scene_objects.values()=}")
     # get plan and goal
-    plan, goal = get_plan(verbose, action_list, scene_objects)
+    plan, goal, _, _ = get_plan(verbose, action_list, scene_objects)
 
     # if there is a plan, print it out, otherwise leave
     if plan:
@@ -61,35 +56,28 @@ def build_tower(verbose=False, interference=False):
         action = name2con[grounded_action.sig[0]]  # the actual controller
         # if j == 1 or j == 5:
         #     continue
-        for i, controller in enumerate(action.get_grounded_control_set(C, relevant_frames, all_frames)):
+        for i, controller in enumerate(action.get_grounded_control_set(C, relevant_frames)):
             controller_tuples.append((f"{action.name}_{i}", controller))
 
     # get goal controller, with only immediate conditions features (needed for feasibility)
     goal_controller = get_goal_controller(C, goal)
 
-
     # check if plan is feasible in current config
     is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, verbose=False)
-
 
     if not is_feasible:
         print("Plan is not feasible in current Scene!")
         print("Aborting")
         return
 
-    #return
+    # return
 
     # get the robust plan, used in execution
-    robust_plan = get_robust_system(C, komo_feasy, controller_tuples, goal_controller, verbose=False)
+    robust_plan = get_robust_chain(C, controller_tuples, goal_controller, verbose=False)
 
-    #return
+    robust_plan = robust_plan[::-1]
 
-    for name, x in robust_plan:
-        pass  # TODO when adding control objectives to Placing the object on other block, for some reason it does not\
-        # TODO converge and therefore Opengripper can not be initiated
-        #x.add_qControlObjective(2, 1e-3*np.math.sqrt(tau), C)
-        #x.add_qControlObjective(1, 1e-1*np.math.sqrt(tau), C)
-        #x.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.eq)
+    # return
 
     # Start simulation of plan here
     C.view()
@@ -99,9 +87,18 @@ def build_tower(verbose=False, interference=False):
     is_done = False
     tau = .01
 
+    for name, x in robust_plan:
+        pass  # TODO when adding control objectives to Placing the object on other block, for some reason it does not\
+        # TODO converge and therefore Opengripper can not be initiated
+        x.add_qControlObjective(2, 1e-3 * np.math.sqrt(tau), C)
+        x.add_qControlObjective(1, 1e-1 * np.math.sqrt(tau), C)
+        # x.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.eq)
+
+    goal_controller.add_qControlObjective(2, 1e-3 * np.math.sqrt(tau), C)
+    goal_controller.add_qControlObjective(1, 1e-1 * np.math.sqrt(tau), C)
     # setup for interference
     ori = C.frame("b2").getPosition()
-    ori[1] = ori[1] + 0.05 # change the position a little
+    ori[1] = ori[1] + 0.05  # change the position a little
     interference_counter = 0
     # say where we want intereference
     has_interfered = {1: False, 3: False}
@@ -134,6 +131,7 @@ def build_tower(verbose=False, interference=False):
                         interference_counter = 0
                 if verbose:
                     print(f"Initiating: {name}")
+                # leave loop, since we have a controller we can use
                 break
             else:
                 if verbose:
@@ -169,10 +167,3 @@ if __name__ == '__main__':
         add_interference = True
 
     build_tower(verbose=add_verbose, interference=add_interference)
-
-
-
-
-
-
-

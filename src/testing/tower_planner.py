@@ -14,7 +14,7 @@ Simple planner to build a tower, which uses (simple) symbolic actions (STRIPS st
 def get_plan(verbose, control_actions, scene_obj, forward=False):
 
     # get simple action from all controllers
-    domain = Domain((x.get_simple_action(scene_obj) for x in control_actions))
+    domain = Domain((x.get_simple_action() for x in control_actions))
 
     # initial conditions
     init = list()
@@ -53,12 +53,15 @@ def get_plan(verbose, control_actions, scene_obj, forward=False):
         goal=goal
     )
 
+    G = None
+    state_plan = None
+
     # generate plan
     if forward:
         plan = planner(prob, verbose=verbose)
     else:
         action_plan, state_plan, __ = backwards_planner(prob, goal=goal, action_tree=False, verbose=True)
-        plan, state_plan, G = backwards_planner(prob, goal=goal, action_tree=True, max_diff=2,
+        plan, state_plan, G = backwards_planner(prob, goal=goal, action_tree=True, max_diff=1,
                                                        root_state_plan=state_plan, verbose=True)
         # need to reverse plan
         plan = plan[::-1]
@@ -69,7 +72,7 @@ def get_plan(verbose, control_actions, scene_obj, forward=False):
             for action in plan:
                 print(action)
 
-    return plan, goal
+    return plan, goal, state_plan, G
 
 
 def get_goal_controller(C, goal):
@@ -81,12 +84,12 @@ def get_goal_controller(C, goal):
     for _, block, block_place_on in goals_block_on_block:
 
         goal_feature.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.1005]),
+            C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, 0.1]),
             ry.OT.eq, -1)
         # should have z-axis in same direction
-        goal_feature.addObjective(
-            C.feature(ry.FS.scalarProductZZ, [block, block_place_on], [1e1], [1]),
-            ry.OT.eq, -1)
+        # goal_feature.addObjective(
+        #     C.feature(ry.FS.scalarProductZZ, [block, block_place_on], [1e-1], [1]),
+        #     ry.OT.eq, -1)
 
         goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", block), True)
 

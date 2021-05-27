@@ -7,7 +7,7 @@ import util.domain_tower as dt
 from testing.tower_planner import get_plan, get_goal_controller
 from util.setup_env import setup_tower_env
 from feasibility import check_switch_chain_feasibility
-from robustness import get_robust_system
+from robustness import get_robust_chain
 
 
 """
@@ -72,7 +72,7 @@ def build_tower(verbose=False, interference=False):
     #     return
 
     # get the robust plan, used in execution
-    robust_plan = get_robust_system(C, komo_feasy, controller_tuples, goal_controller)
+    robust_plan = get_robust_chain(C, komo_feasy, controller_tuples, goal_controller)
 
     # Start simulation of plan here
     C.view()
