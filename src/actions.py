@@ -198,7 +198,7 @@ class PlaceOn(BaseAction):
             ry.OT.eq, -1)
         # block should be over block_placed_on
         place_on_block.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e2], [0, 0, 0.1]),
+            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e2]*3, [0., 0., .1]),
             ry.OT.sos, 0.005)
         # should have z-axis in same direction
         place_on_block.addObjective(
@@ -247,7 +247,7 @@ class PlaceSide(BaseAction):
 
     def get_grounded_control_set(self, C, frames):
 
-        free_place = (0, 0, 0.71)
+        free_place = (0., 0., 0.71)
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         gripper = sym2frame[self.gripper_sym]
@@ -260,7 +260,7 @@ class PlaceSide(BaseAction):
             ry.OT.eq, -1)
         # block should be placed on table, doesnt matter where in x-y plane
         place_block_side.addObjective(
-            C.feature(ry.FS.position, [block], [1e-1, 1e-1, 1e1], free_place),
+            C.feature(ry.FS.position, [block], [1e1], free_place),
             ry.OT.sos, 0.005)
 
         # place_block_side.addObjective(

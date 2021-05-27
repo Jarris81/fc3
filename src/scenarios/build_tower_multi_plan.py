@@ -145,12 +145,7 @@ def build_tower(verbose=False, interference=False):
 
 
 
-        ctrl.update(C)
-        q = ctrl.solve(C)
-        C.setJointState(q)
-        C.computeCollisions()
-        #coll = C.getCollisions(0)
-        time.sleep(tau)
+
 
         if not is_any_controllers_feasible and verbose:
             print("No controller can be initiated!")
@@ -177,6 +172,13 @@ def build_tower(verbose=False, interference=False):
                     print(plan)
                     robust_plan = plan[::-1]
                     break
+
+        ctrl.update(C)
+        q = ctrl.solve(C)
+        C.setJointState(q)
+        C.computeCollisions()
+        # coll = C.getCollisions(0)
+        time.sleep(tau)
 
 
 

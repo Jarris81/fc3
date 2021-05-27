@@ -21,8 +21,8 @@ def setup_tower_env(num_blocks=1, block_size=(.1, .1, .1, 0.001)):
              [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
 
     positions = (
-        (-0.2, 0.1),
-        (-0.1, -0.4), #0.8 for infeasible
+        (0.1, 0.2),
+        (0.3, 0.3),  # 0.8 for infeasible
         (-0.1, -0.2)
     )
 
@@ -48,15 +48,6 @@ def setup_tower_env(num_blocks=1, block_size=(.1, .1, .1, 0.001)):
         block.setColor(color[o])
         block.setShape(ry.ST.ssBox, size=block_size)  # 0.001
         block.setContact(1)
-
-        # # add a collision box, over block to see if block is free
-        # place_box = C.addFrame(f"{name}_place_box", parent=name)
-        # pos_place_box = (*pos_xy, block_size[2]*3/2+0.66)
-        # place_box.setPosition(pos_place_box)
-        # place_box.setShape(ry.ST.ssBox, size=block_size)
-        # place_box.setQuaternion([1, 0, 0, 0])
-        # place_box.setColor([1, 1, 1, 0.5])  # last value is alpha
-        # place_box.setContact(0)
 
     return R, C, block_names
 

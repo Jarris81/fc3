@@ -18,13 +18,11 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
 
     C_copy = ry.Config()
     C_copy.copy(C)
-    C_copy.setFrameState(C.getFrameState())
 
-    # C_copy.view()
-    # b1 = C_copy.frame("b1")
-    # print(b1.info())
-    # time.sleep(3)
-    # C_copy.view_close()
+    if verbose:
+        C_copy.view()
+        time.sleep(3)
+        C_copy.view_close()
 
     # check feasibility with komo switches
 
@@ -48,23 +46,23 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
         print(block.info())
         if "parent" in block.info() and block.info()["parent"] == "R_gripper":
             # quick hack: take block out of frame, and add grab control
-            C_copy.attach("world", block_name)
-            gripper = "R_gripper"
-            gripper_center = gripper + "Center"
-
-            #  block needs to be close to block
-            grab = ry.CtrlSet()
-            grab.addObjective(
-                C.feature(ry.FS.distance, [block_name, gripper_center], [1e1]),
-                ry.OT.eq, -1)
-            # condition, nothing is in hand of gripper
-            grab.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block_name), True)
-            grab.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block_name), False)
+            # C.attach("world", block_name)
+            # gripper = "R_gripper"
+            # gripper_center = gripper + "Center"
+            #
+            # #  block needs to be close to block
+            # grab = ry.CtrlSet()
+            # grab.addObjective(
+            #     C.feature(ry.FS.distance, [block_name, gripper_center], [1e1]),
+            #     ry.OT.eq, -1)
+            # # condition, nothing is in hand of gripper
+            # grab.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block_name), True)
+            # grab.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block_name), False)
 
             #controls.insert(0, ("grab1",grab))
-            controls = controls[2:]
-            holding_list[block_name] = [False]
-            holding[block_name] = False
+            #controls = controls[2:]
+            holding_list[block_name] = [True]
+            holding[block_name] = True
         else:
             holding_list[block_name] = [False]
             holding[block_name] = False
@@ -75,17 +73,20 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
     komo.setModel(C_copy, False)  # use swift collision engine
     komo.setTiming(len(controls), 1, 5., 1)
 
+    # komo.add_qControlObjective([], 1, 1e-1)  # DIFFERENT
+    # komo.addSquaredQuaternionNorms([], 3.)
+
     # build a komo in which we only show controller switches
     for i, (name, controller) in enumerate(controls):
 
-        # get the sos objectives of current controller
-        for o in controller.getObjectives():
-            f = o.feat()
-            des = f.description(C_copy)
-            if "qItself" in des:
-                continue
-            if o.get_OT() == ry.OT.sos:
-                komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_copy), o.get_OT(), f.getScale(), f.getTarget())
+        # # get the sos objectives of current controller
+        # for o in controller.getObjectives():
+        #     f = o.feat()
+        #     des = f.description(C_copy)
+        #     # if "qItself" in des:
+        #     #     continue
+        #     if o.get_OT() == ry.OT.sos:
+        #         komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_copy), o.get_OT(), f.getScale(), f.getTarget())
 
         for ctrlCommand in controller.getSymbolicCommands():
             gripper, block = ctrlCommand.getFrameNames()
@@ -98,30 +99,6 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
         #append blocks
         for block in holding:
             holding_list[block].append(holding[block])
-        # for ctrlCommand in controller.getSymbolicCommands():
-        #     if not ctrlCommand.isCondition():
-        #         gripper, block = ctrlCommand.getFrameNames()
-        #         if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
-        #             # make stable switch from
-        #             gripper_hold[gripper] = (i, block)
-        #             if block == "b1":
-        #                 # open
-        #                 holding[block] = True
-        #                 #b1_switches.append((i, True))
-        #             # TODO: find out when the object is released again, make a switch then, not hardcode
-        #             #komo.addSwitch_stable(i, i + 2, "world", gripper, block)
-        #
-        #         elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
-        #             # TODO: find out when the object is released again, make a switch then, not hardcode
-        #             if block == "b1":
-        #                 holding[block] = False
-        #             else:
-        #                 # grab
-        #                 komo.addSwitch_stable(gripper_hold[gripper][0], i, "world", gripper, block)
-        #                 # open
-        #                 komo.addSwitch_stable(i, -1, gripper, "world", block)
-        #
-        #             gripper_hold[gripper] = (i, None)
 
     # go over every switch for each block
 
@@ -142,37 +119,35 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
             last_hold = hold
         for j, (grab, start, end) in enumerate(holding_duration):
             gripper = "R_gripper"
-            if not grab and j == 0:
+            if j == 0:
                 continue
             if grab:
                 # grab
                 if end == len(controls):
-                    komo.addSwitch_stable(start, -1, "table", gripper, block)
+                    komo.addSwitch_stable(start, -1, "world", gripper, block)
                 else:
-                    komo.addSwitch_stable(start, end, "table", gripper, block)
+                    print(f"{end=}")
+                    komo.addSwitch_stable(start, end, "world", gripper, block)
             elif not grab:
                 # open
                 if end == len(controls):
-                    komo.addSwitch_stable(start, -1, gripper, "table", block)
+                    komo.addSwitch_stable(start, -1, gripper, "world", block)
                 else:
-                    komo.addSwitch_stable(start, end, gripper, "table", block)
+                    print(start)
+                    komo.addSwitch_stable(start, end, gripper, "world", block)
 
-        print(controls[-2][0])
-        _get_ctrlset_description(C_copy, controls[-2][1])
-        print()
-        print(holding_duration)
-        print()
-        print(controls[-2][0])
-        _get_ctrlset_description(C_copy, controls[-1][1])
-        print(holding_duration)
-    # # add switches for b1 from switches recorded
-    # last_hold = b1_init_hold
-    # for switch in b1_switches:
-    #     if switch[1]  == last_hold:
-    #         continue
-    #     # grabbing object
-    #     elif switch[1] > last_hold:
+    # build a komo in which we only show controller switches
+    for i, (name, controller) in enumerate(controls):
 
+        # get the sos objectives of current controller
+        for o in controller.getObjectives():
+            f = o.feat()
+            if o.get_OT() == ry.OT.sos:
+                print(f.getFS())
+                print(f.getScale())
+                print(o.getOriginalTarget())
+                komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_copy), o.get_OT(), f.getScale(),
+                                  o.getOriginalTarget())
 
     # solve or optime the given komo objectives
     komo.optimize()
@@ -191,8 +166,8 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
     frames_state = 0  # needs to be initialized somehow
     frames_state = komo.getPathFrames(frames_state)
 
-    # create a pandas data frame to store cost error for switches
-    imm_objs = [o.feat().description(C_copy) for control in controls_and_goal for o in control[1].getObjectives()]
+    # create a pandas data frame to store cost error for switches with unique features
+    imm_objs = set([o.feat().description(C_copy) for control in controls_and_goal for o in control[1].getObjectives()])
     df_immediate = pd.DataFrame(data=np.zeros((len(controls_and_goal), len(imm_objs))), columns=imm_objs)
     df_immediate.name = "immediate features"
 
