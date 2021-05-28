@@ -194,7 +194,7 @@ class PlaceOn(BaseAction):
 
         place_on_block = ry.CtrlSet()
         place_on_block.addObjective(
-            C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
+            C.feature(ry.FS.distance, [block, gripper_center], [1e2]),
             ry.OT.eq, -1)
         # block should be over block_placed_on
         place_on_block.addObjective(
@@ -258,15 +258,17 @@ class PlaceSide(BaseAction):
         place_block_side.addObjective(
             C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
             ry.OT.eq, -1)
+
         # block should be placed on table, doesnt matter where in x-y plane
         place_block_side.addObjective(
-            C.feature(ry.FS.position, [block], [1e1], free_place),
+            C.feature(ry.FS.position, [block], [0, 0, 1e1], free_place),
             ry.OT.sos, 0.005)
 
         # place_block_side.addObjective(
         #     C.feature(ry.FS.scalarProductZZ, [block, "world"], [1e1], [1]),
         #     ry.OT.sos, 0.005)
 
+        # needs to be holding the block
         place_block_side.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
         # open gripper
@@ -274,6 +276,7 @@ class PlaceSide(BaseAction):
         open_gripper.addObjective(
             C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
             ry.OT.eq, -1)
+
         # necessary, so that the block is only released when on ground, and not mid-air
         open_gripper.addObjective(
             C.feature(ry.FS.position, [block], [0, 0, 1], free_place),

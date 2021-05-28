@@ -24,89 +24,56 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
         time.sleep(3)
         C_copy.view_close()
 
-    # check feasibility with komo switches
-
-
-    # setup control cost
-    #komo.add_qControlObjective([], 1, 1e-1)  # DIFFERENT
-    #komo.addSquaredQuaternionNorms([], 3.)
-    # we dont want collision
-    #komo.addObjective([], ry.FS.accumulatedCollisions, ["ALL"], ry.OT.eq, [1e1])
-
-    # init the grippers, and check when they are carrying an object
-    # get all Grippers in the scene
-    num_grippers = 2  # TODO get gripper names from C and see who holds initially
-    gripper_hold = {"R_gripper": (0, None), "L_gripper": (0, None)}
-
+    # TODO: get gripper and block names as input
+    gripper = "R_gripper"
 
     holding_list = {}
     holding = {}
     for block_name in ["b1", "b2", "b3"]:
         block = C_copy.frame(block_name)
-        print(block.info())
         if "parent" in block.info() and block.info()["parent"] == "R_gripper":
-            # quick hack: take block out of frame, and add grab control
-            # C.attach("world", block_name)
-            # gripper = "R_gripper"
-            # gripper_center = gripper + "Center"
-            #
-            # #  block needs to be close to block
-            # grab = ry.CtrlSet()
-            # grab.addObjective(
-            #     C.feature(ry.FS.distance, [block_name, gripper_center], [1e1]),
-            #     ry.OT.eq, -1)
-            # # condition, nothing is in hand of gripper
-            # grab.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block_name), True)
-            # grab.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block_name), False)
-
-            #controls.insert(0, ("grab1",grab))
-            #controls = controls[2:]
             holding_list[block_name] = [True]
             holding[block_name] = True
         else:
             holding_list[block_name] = [False]
             holding[block_name] = False
 
-    print([c[0] for c in controls])
-
     komo = ry.KOMO()
     komo.setModel(C_copy, False)  # use swift collision engine
     komo.setTiming(len(controls), 1, 5., 1)
 
-    # komo.add_qControlObjective([], 1, 1e-1)  # DIFFERENT
-    # komo.addSquaredQuaternionNorms([], 3.)
+    komo.add_qControlObjective([], 1, 1e-1)  # DIFFERENT
+    komo.addSquaredQuaternionNorms([], 3.)
 
     # build a komo in which we only show controller switches
     for i, (name, controller) in enumerate(controls):
 
-        # # get the sos objectives of current controller
-        # for o in controller.getObjectives():
-        #     f = o.feat()
-        #     des = f.description(C_copy)
-        #     # if "qItself" in des:
-        #     #     continue
-        #     if o.get_OT() == ry.OT.sos:
-        #         komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_copy), o.get_OT(), f.getScale(), f.getTarget())
+        # get the sos objectives of current controller
+        for o in controller.getObjectives():
+            f = o.feat()
+            # we dont care about control objectives
+            if o.get_OT() == ry.OT.sos and not "qItself" in f.description(C_copy):
+                komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_copy), o.get_OT(), f.getScale(),
+                                  o.getOriginalTarget())
 
         for ctrlCommand in controller.getSymbolicCommands():
             gripper, block = ctrlCommand.getFrameNames()
             if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
                 holding[block] = True
-                    #komo.addSwitch_stable(i, i + 2, "world", gripper, block)
             elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
                 holding[block] = False
 
-        #append blocks
+        # append blocks
         for block in holding:
             holding_list[block].append(holding[block])
 
     # go over every switch for each block
-
     for block in holding_list:
         hold_list = holding_list[block]
         holding_duration = [[hold_list[0], 0, 0]]
         last_hold = hold_list[0]
         for i, hold in enumerate(hold_list):
+            # specifying the first grab/release is redundant, since no switch
             if i == 0:
                 continue
             else:
@@ -118,7 +85,6 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
                     holding_duration.append([hold, holding_duration[-1][-1], 1 + holding_duration[-1][-1]])
             last_hold = hold
         for j, (grab, start, end) in enumerate(holding_duration):
-            gripper = "R_gripper"
             if j == 0:
                 continue
             if grab:
@@ -126,28 +92,13 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
                 if end == len(controls):
                     komo.addSwitch_stable(start, -1, "world", gripper, block)
                 else:
-                    print(f"{end=}")
                     komo.addSwitch_stable(start, end, "world", gripper, block)
-            elif not grab:
+            else:
                 # open
                 if end == len(controls):
                     komo.addSwitch_stable(start, -1, gripper, "world", block)
                 else:
-                    print(start)
                     komo.addSwitch_stable(start, end, gripper, "world", block)
-
-    # build a komo in which we only show controller switches
-    for i, (name, controller) in enumerate(controls):
-
-        # get the sos objectives of current controller
-        for o in controller.getObjectives():
-            f = o.feat()
-            if o.get_OT() == ry.OT.sos:
-                print(f.getFS())
-                print(f.getScale())
-                print(o.getOriginalTarget())
-                komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_copy), o.get_OT(), f.getScale(),
-                                  o.getOriginalTarget())
 
     # solve or optime the given komo objectives
     komo.optimize()
@@ -179,6 +130,7 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
         for o in control.getObjectives():
             if o.get_OT() == ry.OT.eq or o.get_OT() == ry.OT.ineq:
                 f = o.feat()
+                # TODO: check if this the right way for an error
                 error = f.eval(C_copy)[0]
                 mse = np.sqrt(np.dot(error, error))
                 if f.getFS() == ry.FS.pairCollision_negScalar:
@@ -193,7 +145,6 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
         for i_row, i_col in np.argwhere(mse > tolerance):
             plan_is_feasible = False
             if verbose:
-                #print(mse[i_row, i_col])
                 print(f'{df.name} {features[i_col]} at switch #{i_row} is not feasible!')
 
     # Visualize some results

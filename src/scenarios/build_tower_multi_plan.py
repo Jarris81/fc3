@@ -71,9 +71,9 @@ def build_tower(verbose=False, interference=False):
     # get goal controller, with only immediate conditions features (needed for feasibility)
     goal_controller = get_goal_controller(C, goal)
 
+    draw_search_graph(plan, state_plan, G)
 
-    draw_search_graph(plan,state_plan, G)
-    # get robust tree
+    # get robust tree/ set of chains
     robust_set_of_chains = get_robust_set_of_chains(C, G, state_plan, goal_controller, False)
 
     robust_plan = robust_set_of_chains[0]
@@ -87,22 +87,15 @@ def build_tower(verbose=False, interference=False):
         print("Aborting")
         return
 
-
-    #return
-
     # Start simulation of plan here
     C.view()
     tau = .01
-    isDone = False
-
-    # place_side = con.PlaceSide()
-    # place_side_controllers = place_side.get_grounded_control_set(C, (gripper_name, "b1"))
-    # robust_plan.extend([(f"{place_side.name}_{i}", controller) for i, controller in enumerate(reversed(place_side_controllers))])
+    is_done = False
 
     for name, x in robust_plan:
         pass
-        #x.add_qControlObjective(2, 1e-3*np.math.sqrt(tau), C)
-        #x.add_qControlObjective(1, 1e-1*np.math.sqrt(tau), C)
+        x.add_qControlObjective(2, 1e-5*np.math.sqrt(tau), C)
+        x.add_qControlObjective(1, 1e-3*np.math.sqrt(tau), C)
         #x.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.eq)
 
     # setup for interference
@@ -115,14 +108,12 @@ def build_tower(verbose=False, interference=False):
     for t in range(0, 10000):
         # create a new solver everytime
         ctrl = ry.CtrlSolver(C, tau, 2)
+        is_any_controllers_feasible = False
 
         # check if goal has been reached
         if goal_controller.canBeInitiated(C):
-            isDone = True
+            is_done = True
             break
-
-        #
-        is_any_controllers_feasible = False
 
         # iterate over each controller, check which can be started first
         for i, (name, c) in enumerate(robust_plan):
@@ -143,27 +134,20 @@ def build_tower(verbose=False, interference=False):
                 if verbose:
                     print(f"Cannot be initiated: {name}")
 
-
-
-
-
-        if not is_any_controllers_feasible and verbose:
+        # if no plan is feasible, check other plans
+        if not is_any_controllers_feasible:
             print("No controller can be initiated!")
             # lets switch the plan
 
             for plan in robust_set_of_chains[1:]:
-                print(plan)
                 is_initiated = False
                 is_feasible = False
                 for i, (name, c) in enumerate(plan[::-1]):
-                    print(name)
                     if c.canBeInitiated(C):
                         new_plan = plan
-                        print(new_plan)
                         is_feasible, komo_feasy = check_switch_chain_feasibility(C, new_plan, goal_controller,
                                                                                  verbose=True)
                         is_initiated = True
-                        #is_feasible = True
                         break
                     else:
                         print(f"{name} cannot be initiated!")
@@ -180,10 +164,7 @@ def build_tower(verbose=False, interference=False):
         # coll = C.getCollisions(0)
         time.sleep(tau)
 
-
-
-
-    if isDone:
+    if is_done:
         print("Plan was finished!")
     else:
         print("Time ran out!")

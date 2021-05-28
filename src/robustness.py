@@ -2,7 +2,6 @@ import libry as ry
 import time
 import numpy as np
 import networkx as nx
-import matplotlib.pyplot as plt
 
 def is_equal_feature(f1, f2, C):
     """
@@ -159,8 +158,8 @@ def get_robust_chain(C, controllers, goal_controller, verbose=True):
         komo.setTiming(1, 1, 5., 1)
 
         # setup control cost
-        # komo.add_qControlObjective([], 1, 1e-1)
-        # komo.addSquaredQuaternionNorms([], 3.)
+        komo.add_qControlObjective([], 1, 1e-1)
+        komo.addSquaredQuaternionNorms([], 3.)
 
         for o in ctrlset.getObjectives():
             #if o.get_OT() == ry.OT.sos:
@@ -282,8 +281,7 @@ def get_robust_set_of_chains(C, tree, state_plan, goal_controller, verbose=False
     for edge, implicit_controller in implicit_chain:
         implicit_ctrlsets[edge].append(implicit_controller)
 
-    set_of_chains = []
-    set_of_chains.append(implicit_chain)
+    set_of_chains = [implicit_chain]
     # go over every leaf path, and build implicit conditions for each
     for path in get_leaf_paths(tree):
         #path = get_leaf_paths(tree)[8]
@@ -315,22 +313,3 @@ def get_robust_set_of_chains(C, tree, state_plan, goal_controller, verbose=False
     nx.set_edge_attributes(tree, implicit_ctrlsets, "implicit_ctrlsets")
 
     return set_of_chains
-    # print(implicit_ctrlsets.keys())
-    # print([edge for edge, path in implicit_ctrlsets.items() if len(path) is 0])
-    # print(len(nx.edges(tree)))
-    # print(nx.edges(tree))
-    # assert len([path for path in implicit_ctrlsets.values() if len(path) is not 0]) == len(nx.edges(tree))
-    #
-    # # nx.draw(tree, with_labels=True)
-    # # plt.show()
-    # #
-    # # nx.draw(tree_copy, with_labels=True)
-    # # plt.show()
-    #
-    # # test, to see:
-    # impli = nx.get_edge_attributes(tree, 'implicit_ctrlsets')
-    # chain = []
-    # for edge in reversed(ori_edge_plan):
-    #     for i, impli_ctrlset in enumerate(impli[edge]):
-    #         chain.append((i, impli_ctrlset))
-    # return chain
