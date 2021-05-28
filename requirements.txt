@@ -1,4 +1,8 @@
 pyddl
 
-numpy~=1.19.4
-setuptools~=50.3.0
+numpy~=1.20.3
+setuptools~=57.0.0
+networkx~=2.5.1
+pydot~=1.4.2
+matplotlib~=3.4.2
+pandas~=1.2.4

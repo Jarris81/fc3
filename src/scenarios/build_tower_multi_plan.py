@@ -8,7 +8,7 @@ import util.domain_tower as dt
 from testing.tower_planner import get_plan, get_goal_controller
 from util.setup_env import setup_tower_env
 from feasibility import check_switch_chain_feasibility
-from robustness import get_robust_chain, get_robust_set_of_chains
+from robustness import get_robust_set_of_chains
 from util.visualize_search import draw_search_graph
 
 
@@ -21,8 +21,6 @@ interference in the real world.
 
 
 def build_tower(verbose=False, interference=False):
-
-    verbose = True
 
     # get all actions needed to build a tower
     action_list = [
@@ -41,7 +39,7 @@ def build_tower(verbose=False, interference=False):
         dt.type_gripper: (gripper_name,)
     }
 
-    # get plan and goal
+    # get plan, goal, state plan and the search tree
     plan, goal, state_plan, G = get_plan(verbose, action_list, scene_objects)
 
     # if there is a plan, print it out, otherwise leave
@@ -52,30 +50,34 @@ def build_tower(verbose=False, interference=False):
                 print(action)
     else:
         print("No plan found!")
+        print("Aborting")
         return
 
-    name2con = {x.name: x for x in action_list}  # dict
+    # setup controlsets
 
+    name2con = {x.name: x for x in action_list}
     grounded_actions = nx.get_edge_attributes(G, "action")
     grounded_ctrlsets = dict()
+
     for edge in G.edges():
         grounded_action = grounded_actions[edge]
-        print(edge, grounded_actions[edge])
         relevant_frames = grounded_action.sig[1:]
         controller = name2con[grounded_action.sig[0]]  # the actual controller
-
         grounded_ctrlsets[edge] = controller.get_grounded_control_set(C, relevant_frames)
 
+    # each edge (action) gets and ctrlset
     nx.set_edge_attributes(G, grounded_ctrlsets, "ctrlset")
 
     # get goal controller, with only immediate conditions features (needed for feasibility)
     goal_controller = get_goal_controller(C, goal)
 
+    # draw the action tree
     draw_search_graph(plan, state_plan, G)
 
     # get robust tree/ set of chains
     robust_set_of_chains = get_robust_set_of_chains(C, G, state_plan, goal_controller, False)
 
+    # first plan we want to execute
     robust_plan = robust_set_of_chains[0]
 
     # check if plan is feasible in current config
@@ -93,10 +95,10 @@ def build_tower(verbose=False, interference=False):
     is_done = False
 
     for name, x in robust_plan:
-        pass
-        x.add_qControlObjective(2, 1e-5*np.math.sqrt(tau), C)
-        x.add_qControlObjective(1, 1e-3*np.math.sqrt(tau), C)
-        #x.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.eq)
+        x.add_qControlObjective(2, 1e-5*np.sqrt(tau), C)  # TODO this will make some actions unfeasible (PlaceSide)
+        x.add_qControlObjective(1, 1e-3*np.sqrt(tau), C)
+        # TODO enabling contact will run into local minima, solved with MPC (Leap Controller from Marc)
+        # x.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.eq)
 
     # setup for interference
     original_position = C.frame("b2").getPosition()
@@ -104,11 +106,17 @@ def build_tower(verbose=False, interference=False):
     interference_counter = 0
     has_interfered = False
 
+    feasy_check_rate = 50  # every 50 steps check for feasibility
+    feasy_counter = 49
+
+    is_plan_feasible = False
+
     # simulation loop
     for t in range(0, 10000):
         # create a new solver everytime
         ctrl = ry.CtrlSolver(C, tau, 2)
         is_any_controllers_feasible = False
+
 
         # check if goal has been reached
         if goal_controller.canBeInitiated(C):
@@ -120,6 +128,18 @@ def build_tower(verbose=False, interference=False):
             if c.canBeInitiated(C):
                 ctrl.set(c)
                 is_any_controllers_feasible = True
+                # check feasibility of chain
+                feasy_counter += 1
+                if feasy_counter == feasy_check_rate:
+                    feasy_counter = 0
+                    # check rest of chain for feasibility
+                    residual_plan = robust_plan[i::-1]
+                    print(residual_plan)
+                    is_plan_feasible, _ = check_switch_chain_feasibility(C, residual_plan, goal_controller,
+                                                                         verbose=True)
+                    print(is_plan_feasible)
+
+                # TODO: move this outside
                 if i == 1 and interference and not has_interfered:  # 3 works, 1 doesnt
                     interference_counter += 1
                     if interference_counter == 50:
@@ -135,7 +155,7 @@ def build_tower(verbose=False, interference=False):
                     print(f"Cannot be initiated: {name}")
 
         # if no plan is feasible, check other plans
-        if not is_any_controllers_feasible:
+        if not is_any_controllers_feasible or not is_plan_feasible:
             print("No controller can be initiated!")
             # lets switch the plan
 
@@ -174,11 +194,4 @@ def build_tower(verbose=False, interference=False):
 
 if __name__ == '__main__':
 
-    build_tower(verbose=False, interference=True)
-
-
-
-
-
-
-
+    build_tower(verbose=True, interference=True)

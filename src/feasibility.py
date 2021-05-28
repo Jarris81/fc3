@@ -16,13 +16,8 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
     # plan is feasible until proven otherwise
     plan_is_feasible = True
 
-    C_copy = ry.Config()
-    C_copy.copy(C)
-
-    if verbose:
-        C_copy.view()
-        time.sleep(3)
-        C_copy.view_close()
+    C_temp = ry.Config()
+    C_temp.copy(C)
 
     # TODO: get gripper and block names as input
     gripper = "R_gripper"
@@ -30,8 +25,8 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
     holding_list = {}
     holding = {}
     for block_name in ["b1", "b2", "b3"]:
-        block = C_copy.frame(block_name)
-        if "parent" in block.info() and block.info()["parent"] == "R_gripper":
+        block = C_temp.frame(block_name)
+        if "parent" in block.info() and block.info()["parent"] == gripper:
             holding_list[block_name] = [True]
             holding[block_name] = True
         else:
@@ -39,7 +34,7 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
             holding[block_name] = False
 
     komo = ry.KOMO()
-    komo.setModel(C_copy, False)  # use swift collision engine
+    komo.setModel(C_temp, False)  # use swift collision engine
     komo.setTiming(len(controls), 1, 5., 1)
 
     komo.add_qControlObjective([], 1, 1e-1)  # DIFFERENT
@@ -52,8 +47,8 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
         for o in controller.getObjectives():
             f = o.feat()
             # we dont care about control objectives
-            if o.get_OT() == ry.OT.sos and not "qItself" in f.description(C_copy):
-                komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_copy), o.get_OT(), f.getScale(),
+            if o.get_OT() == ry.OT.sos and "qItself" not in f.description(C_temp):
+                komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_temp), o.get_OT(), f.getScale(),
                                   o.getOriginalTarget())
 
         for ctrlCommand in controller.getSymbolicCommands():
@@ -112,13 +107,13 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
     controls_and_goal = list(controls)
     controls_and_goal.append(("goal", goal))
 
-    C_copy = ry.Config()
-    C_copy.copy(C)
+    C_temp = ry.Config()
+    C_temp.copy(C)
     frames_state = 0  # needs to be initialized somehow
     frames_state = komo.getPathFrames(frames_state)
 
     # create a pandas data frame to store cost error for switches with unique features
-    imm_objs = set([o.feat().description(C_copy) for control in controls_and_goal for o in control[1].getObjectives()])
+    imm_objs = set([o.feat().description(C_temp) for control in controls_and_goal for o in control[1].getObjectives()])
     df_immediate = pd.DataFrame(data=np.zeros((len(controls_and_goal), len(imm_objs))), columns=imm_objs)
     df_immediate.name = "immediate features"
 
@@ -126,16 +121,16 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
     for i, (name, control) in enumerate(controls_and_goal):
         # for the first switch, we can just use the initial frame state, therefore no need to set one from komo
         if i != 0:
-            C_copy.setFrameState(frames_state[i-1])
+            C_temp.setFrameState(frames_state[i-1])
         for o in control.getObjectives():
             if o.get_OT() == ry.OT.eq or o.get_OT() == ry.OT.ineq:
                 f = o.feat()
                 # TODO: check if this the right way for an error
-                error = f.eval(C_copy)[0]
+                error = f.eval(C_temp)[0]
                 mse = np.sqrt(np.dot(error, error))
                 if f.getFS() == ry.FS.pairCollision_negScalar:
                     mse = error
-                description = f.description(C_copy)  # get the name
+                description = f.description(C_temp)  # get the name
                 df_immediate.loc[i, description] = mse  # set the mean squared error for switch
 
     for df in [df_transient, df_immediate]:
