@@ -94,11 +94,13 @@ def build_tower(verbose=False, interference=False):
     tau = .01
     is_done = False
 
-    for name, x in robust_plan:
-        x.add_qControlObjective(2, 1e-5*np.sqrt(tau), C)  # TODO this will make some actions unfeasible (PlaceSide)
-        x.add_qControlObjective(1, 1e-3*np.sqrt(tau), C)
-        # TODO enabling contact will run into local minima, solved with MPC (Leap Controller from Marc)
-        # x.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.eq)
+    for name, x in nx.get_edge_attributes(G, "implicit_ctrlsets").items():
+        for y in x:
+            pass
+            y.add_qControlObjective(2, 1e-5*np.sqrt(tau), C)  # TODO this will make some actions unfeasible (PlaceSide)
+            y.add_qControlObjective(1, 1e-3*np.sqrt(tau), C)
+            # TODO enabling contact will run into local minima, solved with MPC (Leap Controller from Marc)
+            # y.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.eq)
 
     # setup for interference
     original_position = C.frame("b2").getPosition()
@@ -107,7 +109,7 @@ def build_tower(verbose=False, interference=False):
     has_interfered = False
 
     feasy_check_rate = 50  # every 50 steps check for feasibility
-    feasy_counter = 49
+    feasy_counter = feasy_check_rate - 1  # -1 to make sure, in first iteration we are making check
 
     is_plan_feasible = False
 
@@ -116,7 +118,6 @@ def build_tower(verbose=False, interference=False):
         # create a new solver everytime
         ctrl = ry.CtrlSolver(C, tau, 2)
         is_any_controllers_feasible = False
-
 
         # check if goal has been reached
         if goal_controller.canBeInitiated(C):
@@ -136,7 +137,7 @@ def build_tower(verbose=False, interference=False):
                     residual_plan = robust_plan[i::-1]
                     print(residual_plan)
                     is_plan_feasible, _ = check_switch_chain_feasibility(C, residual_plan, goal_controller,
-                                                                         verbose=True)
+                                                                         verbose=False)
                     print(is_plan_feasible)
 
                 # TODO: move this outside
@@ -166,7 +167,7 @@ def build_tower(verbose=False, interference=False):
                     if c.canBeInitiated(C):
                         new_plan = plan
                         is_feasible, komo_feasy = check_switch_chain_feasibility(C, new_plan, goal_controller,
-                                                                                 verbose=True)
+                                                                                 verbose=False)
                         is_initiated = True
                         break
                     else:

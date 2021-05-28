@@ -264,9 +264,9 @@ class PlaceSide(BaseAction):
             C.feature(ry.FS.position, [block], [0, 0, 1e1], free_place),
             ry.OT.sos, 0.005)
 
-        # place_block_side.addObjective(
-        #     C.feature(ry.FS.scalarProductZZ, [block, "world"], [1e1], [1]),
-        #     ry.OT.sos, 0.005)
+        place_block_side.addObjective(
+            C.feature(ry.FS.scalarProductZZ, [block, "world"], [1e1], [1]),
+            ry.OT.sos, 0.005)
 
         # needs to be holding the block
         place_block_side.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
