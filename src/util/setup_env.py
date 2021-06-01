@@ -32,12 +32,11 @@ def setup_tower_env(num_blocks=1, block_size=(.1, .1, .1, 0.001)):
     for o in range(num_blocks):
         name = f"b{o+1}"
 
-        block = C.addFrame(name)
-        # block = C.addFrame(name, "R_gripper")
+        block = R.addFrame(name)
         block_names.append(name)
 
         pos_xy = positions[o]
-        pos_block = (*pos_xy, block_size[2]/2+0.66)
+        pos_block = (*pos_xy, block_size[2]/2+0.65)
 
         # quick hack to see if predicate is feasible
         # if o == 0:
@@ -46,9 +45,16 @@ def setup_tower_env(num_blocks=1, block_size=(.1, .1, .1, 0.001)):
         block.setPosition(pos_block)
         block.setQuaternion([1, 0, 0, 0])
         block.setColor(color[o])
+        block.setMass(1)
         block.setShape(ry.ST.ssBox, size=block_size)  # 0.001
         block.setContact(1)
 
-    return R, C, block_names
+    # setup configuration (what robot knows)
+    C = ry.Config()
+    C.copy(R)
+
+    S = R.simulation(ry.SimulatorEngine.bullet, True)
+
+    return R, C, S, block_names
 
 

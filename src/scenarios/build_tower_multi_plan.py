@@ -1,8 +1,8 @@
 import time
 import libry as ry
 import numpy as np
-
 import networkx as nx
+
 import actions as con
 import util.domain_tower as dt
 from testing.tower_planner import get_plan, get_goal_controller
@@ -10,6 +10,7 @@ from util.setup_env import setup_tower_env
 from feasibility import check_switch_chain_feasibility
 from robustness import get_robust_set_of_chains
 from util.visualize_search import draw_search_graph
+from RLGS import RLGS
 
 
 """
@@ -193,6 +194,35 @@ def build_tower(verbose=False, interference=False):
     time.sleep(10)
 
 
+def get_obj_info(S, object_names):
+
+    obj_infos = {}
+
+    for block in object_names:
+        info = {"pos": S.getGroundTruthPosition(block),
+                "size": S.getGroundTruthSize(block),
+                "rot_max": S.getGroundTruthRotationMatrix(block)}
+        obj_infos[block] = info
+
+    return obj_infos
+
+
 if __name__ == '__main__':
 
-    build_tower(verbose=True, interference=True)
+    #build_tower(verbose=True, interference=True)
+
+    R, C, S, block_names = setup_tower_env(3)
+
+    robot = RLGS(C)
+    robot.setup_tower(block_names)
+
+    tau = 0.01
+
+    #R.view()
+    for t in range(1000):
+
+        #robot.cheat_update_obj(get_obj_info(S, block_names))
+        q = robot.step(t, tau)
+        S.step(q, tau, ry.ControlMode.position)
+
+        time.sleep(tau)
