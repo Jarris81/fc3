@@ -218,11 +218,16 @@ if __name__ == '__main__':
 
     tau = 0.01
 
-    #R.view()
     for t in range(1000):
 
         #robot.cheat_update_obj(get_obj_info(S, block_names))
         q = robot.step(t, tau)
         S.step(q, tau, ry.ControlMode.position)
+
+        # we need info from the simulation (or later real robot) if grasping worked
+        # gripper_action = robot.get_gripper_action()
+        # if gripper_action:
+        #     if gripper_action[0]:
+        #         S.getGripperIsGrasping(gripper_action[1])
 
         time.sleep(tau)

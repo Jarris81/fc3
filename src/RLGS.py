@@ -1,6 +1,7 @@
 from scipy.spatial.transform.rotation import Rotation
 import libry as ry
 import networkx as nx
+import numpy as np
 
 import util.domain_tower as dt
 from actions import GrabBlock, PlaceOn, PlaceSide
@@ -35,6 +36,7 @@ class RLGS:
         self.is_done = False
         self.feasy_check_rate = 50  # every 50 steps check for feasibility
         self.C.view()
+        self.gripper_action = None
 
     def setup_tower(self, block_names):
         # get all actions needed to build a tower
@@ -98,6 +100,16 @@ class RLGS:
         is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller, verbose=False)
         self.active_robust_reverse_plan = first_plan[::-1]
 
+        tau = 0.01
+        for name, x in nx.get_edge_attributes(G, "implicit_ctrlsets").items():
+            for y in x:
+                pass
+                y.add_qControlObjective(2, 1e-5 * np.sqrt(tau),
+                                        self.C)  # TODO this will make some actions unfeasible (PlaceSide)
+                y.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
+                # TODO enabling contact will run into local minima, solved with MPC (Leap Controller from Marc)
+                y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.eq)
+
         if not is_feasible:
             print("Plan is not feasible in current Scene!")
             print("Aborting")
@@ -105,6 +117,11 @@ class RLGS:
 
     def is_done(self):
         return self.is_done
+
+    def get_gripper_action(self):
+
+        return self.gripper_action
+
 
     def step(self, t, tau):
 
@@ -119,6 +136,17 @@ class RLGS:
             if c.canBeInitiated(self.C):
                 ctrl.set(c)
                 is_any_controller_feasible = True
+
+                self.gripper_action = None
+                # check if we grabbing something
+                for ctrlCommand in c.getSymbolicCommands():
+                    if not ctrlCommand.isCondition():
+                        gripper, block = ctrlCommand.getFrameNames()
+                        if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
+                            self.gripper_action = (True, gripper, block)
+                        elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
+                            self.gripper_action = (False, gripper, block)
+
                 # check feasibility of chain
                 if not t % self.feasy_check_rate:
                     # check rest of chain for feasibility
