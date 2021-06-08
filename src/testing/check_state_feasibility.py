@@ -1,9 +1,7 @@
-import graphviz
-import testing.tower_planner as planner
 import libry as ry
 import actions
 import predicates
-import util.domain_tower as dt
+import util.constants as dt
 import time
 from util.setup_env import setup_tower_env
 

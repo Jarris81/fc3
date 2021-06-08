@@ -1,7 +1,7 @@
 import pyddl
 import actions as con
 
-import util.domain_tower as dt
+import util.constants as dt
 
 # test, by seing if right plan comes. Basically, we need to invert actions
 

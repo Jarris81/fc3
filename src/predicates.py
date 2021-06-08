@@ -1,4 +1,4 @@
-import util.domain_tower as dt
+import util.constants as dt
 import libry as ry
 import numpy as np
 import itertools
@@ -134,7 +134,6 @@ class HandEmpty(BasePredicate):
         other_frames = all_frames.difference(rel_frames)
         features = []
         gripper_frame = self.sym2frame[self.gripper_sym]
-        gripper_center_frame = gripper_frame + "Center"
         gripper_pre_grasp_frame = gripper_frame + "Pregrasp"
         for frame in other_frames:
             features.append(
@@ -211,4 +210,21 @@ class BlockOnBlock(BasePredicate):
         return self._all_features_feasible(C, all_frames)
 
 
+class BlockAtGoal(BasePredicate):
+    def __init__(self, block_sym):
+        super().__init__()
+        self.block_sym = block_sym
+
+    def get_predicate(self):
+        return self.name, self.block_sym
+
+
+class BlockIsClose(BasePredicate):
+
+    def __init__(self, block_sym):
+        super().__init__()
+        self.block_sym = block_sym
+
+    def get_predicate(self):
+        return self.name, self.block_sym
 

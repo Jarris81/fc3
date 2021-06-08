@@ -4,6 +4,7 @@ Logic space for planner
 # Object types
 type_gripper = "gripper"
 type_block = "block"
+type_stick = "stick"
 
 # logic states predicates
 in_hand = "in_hand"  # a block is in hand (block, gripper)

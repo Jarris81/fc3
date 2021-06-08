@@ -4,8 +4,8 @@ import libry as ry
 import numpy as np
 
 import actions
-import util.domain_tower as dt
-from testing.tower_planner import get_plan, get_goal_controller
+import util.constants as dt
+from planners import get_tower_plan, get_tower_goal_controller
 from util.setup_env import setup_tower_env
 from feasibility import check_switch_chain_feasibility
 from robustness import get_robust_chain
@@ -35,7 +35,7 @@ def build_tower(verbose=False, interference=False):
     }
 
     # get plan and goal
-    plan, goal, _, _ = get_plan(verbose, action_list, scene_objects)
+    plan, goal, _, _ = get_tower_plan(verbose, action_list, scene_objects)
 
     # if there is a plan, print it out, otherwise leave
     if plan:
@@ -60,7 +60,7 @@ def build_tower(verbose=False, interference=False):
             controller_tuples.append((f"{action.name}_{i}", controller))
 
     # get goal controller, with only immediate conditions features (needed for feasibility)
-    goal_controller = get_goal_controller(C, goal)
+    goal_controller = get_tower_goal_controller(C, goal)
 
     # check if plan is feasible in current config
     is_feasible, komo_feasy = check_switch_chain_feasibility(C, controller_tuples, goal_controller, verbose=False)

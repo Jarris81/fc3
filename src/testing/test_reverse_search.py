@@ -1,5 +1,5 @@
 from pyddl import Domain, Problem, State, Action, neg, backwards_planner
-import util.domain_tower as dt
+import util.constants as dt
 import actions as con
 
 actions = [

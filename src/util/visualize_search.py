@@ -2,7 +2,7 @@ import networkx as nx
 import pydot
 import matplotlib.pyplot as plt
 
-def draw_search_graph(plan, state_plan, G):
+def draw_search_graph(plan, state_plan, G, filename="action_tree.png"):
     #get all edges in plan
 
     #colors = ["r" if x in plan_id else "b" for x in G.nodes]
@@ -45,5 +45,5 @@ def draw_search_graph(plan, state_plan, G):
 
         node.set("label", node.get_attributes()["state"])
 
-    graph.write_png("action_tree.png")
+    graph.write_png(filename)
     #pyg.write_png('output.png')

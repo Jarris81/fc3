@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from util.constants import type_block
+
 
 def _get_ctrlset_description(C, ctrlset):
     for o in ctrlset.getObjectives():
@@ -11,7 +13,7 @@ def _get_ctrlset_description(C, ctrlset):
         print(f"{f.getFS()}, {f.getFrameNames(C)}, {o.get_OT()}, {f.getScale()}")
 
 
-def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=False):
+def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0.1, verbose=False):
 
     # plan is feasible until proven otherwise
     plan_is_feasible = True
@@ -24,7 +26,7 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
 
     holding_list = {}
     holding = {}
-    for block_name in ["b1", "b2", "b3"]:
+    for block_name in scene_objects[type_block]:
         block = C_temp.frame(block_name)
         if "parent" in block.info() and block.info()["parent"] == gripper:
             holding_list[block_name] = [True]
@@ -145,7 +147,7 @@ def check_switch_chain_feasibility(C, controls, goal, tolerance=0.1, verbose=Fal
     # Visualize some results
     if verbose:
         # create a figure with two plot
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 20))
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
         df_transient.plot(ax=ax1, title="Transient Features")
         df_immediate.plot(ax=ax2, title="Immediate Features")
         plt.show()

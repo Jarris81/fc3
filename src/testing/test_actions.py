@@ -4,7 +4,7 @@ from util.setup_env import setup_tower_env
 from actions import GrabBlock, PlaceSide, PlaceOn
 from predicates import BlockOnBlock
 
-from testing.tower_planner import get_goal_controller
+from planners import get_tower_goal_controller
 
 from robustness import get_robust_system_2
 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     b_on_b.ground_predicate(B="b1", B_2="b2")
 
 
-    goal_controller = get_goal_controller(C,  [b_on_b.get_grounded_predicate()])
+    goal_controller = get_tower_goal_controller(C, [b_on_b.get_grounded_predicate()])
 
     robust_plan = get_robust_system_2(C, controller_tuples, goal_controller, False)
 

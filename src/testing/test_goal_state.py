@@ -1,8 +1,8 @@
 import libry as ry
-from testing.tower_planner import get_plan, get_goal_controller
+from planners import get_tower_goal_controller
 from util.setup_env import setup_tower_env
 import predicates as pred
-import util.domain_tower as dt
+import util.constants as dt
 
 
 _, C, block_names = setup_tower_env(3)  # 3 blocks in scene
@@ -31,7 +31,7 @@ for i in range(len(scene_obj[dt.type_block]) - 1):
 
 print(goal)
 
-goal_controller = get_goal_controller(C, goal)
+goal_controller = get_tower_goal_controller(C, goal)
 
 C_copy = ry.Config()
 C_copy.copy(C)

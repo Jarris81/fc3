@@ -1,7 +1,7 @@
 import libry as ry
 from pyddl import Action, neg
 from objective import Objective
-import util.domain_tower as dt
+import util.constants as dt
 import itertools as it
 
 
