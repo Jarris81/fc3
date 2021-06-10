@@ -20,8 +20,7 @@ class RLGS:
                  show_plts=False):
 
         # what the robot knows
-        self.C = ry.Config()
-        self.C.copy(C)
+        self.C = C
         self.use_feasy = use_feasy
         self.use_robust = use_robust
         self.use_multi = use_multi
@@ -32,11 +31,11 @@ class RLGS:
         self.robust_set_of_chains = []
         self.active_robust_reverse_plan = []
         self.goal_controller = ry.CtrlSet()
+        self.no_plan_feasible = False
 
         # stuff for execution
         self.is_done = False
         self.feasy_check_rate = 50  # every 50 steps check for feasibility
-        self.C.view()
         self.gripper_action = None
 
     def setup(self, action_list, planner, scene_objects):
@@ -79,7 +78,7 @@ class RLGS:
 
         # get robust tree/ set of chains
         self.robust_set_of_chains = get_robust_set_of_chains(self.C, action_tree, state_plan, self.goal_controller,
-                                                             True)
+                                                             self.verbose)
 
         # first plan we want to execute
         first_plan = self.robust_set_of_chains[0]
@@ -92,13 +91,12 @@ class RLGS:
         tau = 0.01
         for name, x in nx.get_edge_attributes(action_tree, "implicit_ctrlsets").items():
             for y in x:
-                pass
+                #pass
                 y.add_qControlObjective(2, 1e-5 * np.sqrt(tau),
                                         self.C)  # TODO this will make some actions unfeasible (PlaceSide)
                 y.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
                 # TODO enabling contact will run into local minima, solved with MPC (Leap Controller from Marc)
-                # TODO, throws errors! RuntimeError: /home/jason/git/thesis_2020/rai/rai/Geo/pairCollision.cpp:PairCollision:78(-2) CHECK_GE failed: 'rai::sign(distance) * scalarProduct(normal, p1-p2)'=-nan '-1e-10'=-1e-10 --
-                y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e1]), ry.OT.ineq)
+                y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.ineq)
 
         if not is_feasible:
             print("Plan is not feasible in current Scene!")
@@ -111,6 +109,9 @@ class RLGS:
     def is_goal_fulfilled(self):
         return self.goal_controller.canBeInitiated(self.C)
 
+    def is_no_plan_feasible(self):
+        return self.no_plan_feasible
+
     def get_gripper_action(self):
 
         return self.gripper_action
@@ -120,27 +121,19 @@ class RLGS:
         # create a new solver every step (not ideal)
         ctrl = ry.CtrlSolver(self.C, tau, 2)
         is_any_controller_feasible = False
-        is_current_plan_feasible = True
-        is_any_plan_feasible = True
+        is_current_plan_feasible = False
         self.gripper_action = None
+
+        current_controller_index = 0
 
         # iterate over each controller, check which can be started first
         for i, (name, c) in enumerate(self.active_robust_reverse_plan):
             if c.canBeInitiated(self.C):
                 ctrl.set(c)
                 is_any_controller_feasible = True
+                is_current_plan_feasible = True
+                current_controller_index = i
 
-                # check if we grabbing something
-                for ctrlCommand in c.getSymbolicCommands():
-                    if not ctrlCommand.isCondition():
-                        self.gripper_action = ctrlCommand
-
-                # check feasibility of chain
-                if not t % self.feasy_check_rate:
-                    # check rest of chain for feasibility
-                    residual_plan = self.active_robust_reverse_plan[i::-1]
-                    is_plan_feasible, _ = check_switch_chain_feasibility(self.C, residual_plan, self.goal_controller,
-                                                                         self.scene_objects, verbose=False)
                 if self.verbose:
                     print(f"Initiating: {name}")
                 # leave loop, we have the controller
@@ -149,9 +142,17 @@ class RLGS:
                 if self.verbose or True:
                     print(f"Cannot be initiated: {name}")
 
+        # check feasibility of chain
+        if not t % self.feasy_check_rate:
+            # check rest of chain for feasibility
+            residual_plan = self.active_robust_reverse_plan[current_controller_index::-1]
+            is_current_plan_feasible, _ = check_switch_chain_feasibility(self.C, residual_plan,
+                                                                         self.goal_controller,
+                                                                         self.scene_objects, verbose=False)
+
         # if current plan is not feasible, check other plans
-        if not is_any_controller_feasible or not is_current_plan_feasible:
-            print("No controller can be initiated!")
+        if (not is_any_controller_feasible or not is_current_plan_feasible) and not t % self.feasy_check_rate:
+            print("No controller can be initiated or current plan is not feasible!")
 
             # lets switch the plan
             for plan in self.robust_set_of_chains[1:]:
@@ -161,7 +162,8 @@ class RLGS:
                     if c.canBeInitiated(self.C):
                         new_plan = plan
                         is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, new_plan, self.goal_controller,
-                                                                                 self.scene_objects, verbose=False)
+                                                                                 self.scene_objects,
+                                                                                 verbose=self.verbose)
                         is_initiated = True
                         break
                     elif self.verbose:
@@ -171,13 +173,16 @@ class RLGS:
                     print(plan)
                     self.active_robust_reverse_plan = plan[::-1]
                     break
+                else:
+                    self.no_plan_feasible = True
+                    self.active_robust_reverse_plan = []
 
         ctrl.update(self.C)
         q = ctrl.solve(self.C)
         self.C.setJointState(q)
 
         # TODO add info is feasibility failed
-        return q
+        return q,
 
     def cheat_update_obj(self, object_infos):
         for obj_name, obj_info in object_infos.items():

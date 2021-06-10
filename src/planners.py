@@ -192,6 +192,12 @@ class PickAndPlacePlanner:
 
         return goal_feature
 
+class HandOverPlaner:
+
+    def __init__(self, verbose=False):
+
+        self.verbose = verbose
+        self.goal = []
 
 if __name__ == '__main__':
     from optparse import OptionParser

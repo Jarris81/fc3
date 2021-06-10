@@ -133,25 +133,28 @@ class GrabBlock(BaseAction):
         align_over.addObjective(
             C.feature(ry.FS.positionRel, [gripper_center, block], [1e2], [0, 0, height_block]),
             ry.OT.sos, 0.005)
+        align_over.addObjective(
+            C.feature(ry.FS.vectorZDiff, [block, gripper], [1e2]),
+            ry.OT.sos, 0.005)
 
         cage_block = ry.CtrlSet()
         cage_block.addObjective(
-            C.feature(ry.FS.positionRel, [gripper_center, block], [1e2], [0, 0, height_block]),
-            ry.OT.ineq, -1)
+            C.feature(ry.FS.positionRel, [gripper_center, block], [1e1, 1e1, 0]),
+            ry.OT.eq, -1)
         # move close to block
         cage_block.addObjective(
             C.feature(ry.FS.positionDiff, [gripper_center, block], [1e2]),
             ry.OT.sos, 0.005)
         # align axis with block
-        cage_block.addObjective(
-            C.feature(ry.FS.vectorZDiff, [block, gripper], [1e1]),
-            ry.OT.sos, 0.01)
+        # cage_block.addObjective(
+        #     C.feature(ry.FS.vectorZDiff, [block, gripper], [1e1]),
+        #     ry.OT.eq, -1)
+        # cage_block.addObjective(
+        #     C.feature(ry.FS.scalarProductYZ, [block, gripper], [1e2]),
+        #     ry.OT.eq, -1)
         cage_block.addObjective(
             C.feature(ry.FS.scalarProductYZ, [block, gripper], [1e2]),
-            ry.OT.sos, 0.01)
-        cage_block.addObjective(
-            C.feature(ry.FS.scalarProductYZ, [block, gripper], [1e1]),
-            ry.OT.sos, 0.01)
+            ry.OT.eq, -1)
 
         #  block needs to be close to block
         grab = ry.CtrlSet()
@@ -235,7 +238,7 @@ class PlaceOn(BaseAction):
         # open gripper
         open_gripper = ry.CtrlSet()
         open_gripper.addObjective(
-            C.feature(ry.FS.distance, [gripper_center, block], [1e2]),
+            C.feature(ry.FS.distance, [gripper_center, block], [1e1]),
             ry.OT.eq, -1)
 
         open_gripper.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
@@ -271,7 +274,8 @@ class PlaceSide(BaseAction):
         self.delete_effects = self.preconditions
 
     def get_grounded_control_set(self, C, frames):
-        free_place = (0., 0., 0.71)
+        free_place = (0.5, 0.1, 0.68)
+        table_pos = (-0.2, -0.2, 0)
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         gripper = sym2frame[self.gripper_sym]
@@ -285,11 +289,11 @@ class PlaceSide(BaseAction):
 
         # block should be placed on table, doesnt matter where in x-y plane
         place_block_side.addObjective(
-            C.feature(ry.FS.position, [block], [0, 0, 1e1], free_place),
+            C.feature(ry.FS.position, [block], [1e3], free_place),
             ry.OT.sos, 0.005)
 
         place_block_side.addObjective(
-            C.feature(ry.FS.scalarProductZZ, [block, "world"], [1e1], [1]),
+            C.feature(ry.FS.scalarProductZZ, [block, "table"], [1e1], [1]),
             ry.OT.sos, 0.005)
 
         # needs to be holding the block
@@ -297,17 +301,17 @@ class PlaceSide(BaseAction):
 
         # open gripper
         open_gripper = ry.CtrlSet()
-        open_gripper.addObjective(
-            C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
-            ry.OT.eq, -1)
+        # open_gripper.addObjective(
+        #     C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
+        #     ry.OT.eq, -1)
 
         # necessary, so that the block is only released when on ground, and not mid-air
         open_gripper.addObjective(
-            C.feature(ry.FS.position, [block], [0, 0, 1], free_place),
+            C.feature(ry.FS.position, [block], [1e0], free_place),
             ry.OT.eq, -1)
-        open_gripper.addObjective(
-            C.feature(ry.FS.scalarProductZZ, [block, "world"], [1e1], [1]),
-            ry.OT.eq, -1)
+        # open_gripper.addObjective(
+        #     C.feature(ry.FS.scalarProductZZ, [block, "world"], [1e1], [1]),
+        #     ry.OT.eq, -1)
 
         open_gripper.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
         open_gripper.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)

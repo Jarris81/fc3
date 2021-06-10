@@ -51,12 +51,12 @@ def setup_tower_env(num_blocks=3, block_size=(.06, .06, .06, 0.001)):
         block.setShape(ry.ST.box, size=block_size[:-1])  # 0.001
         block.setContact(1)
 
-    S = C.simulation(ry.SimulatorEngine.bullet, True)
-    return C, S, scene_objects
+    #S = C.simulation(ry.SimulatorEngine.bullet, True)
+    return C, scene_objects
 
 
 def setup_pick_and_place_env(block_size=(.1, .1, .1, 0.001)):
-    C, S, scene_objects = setup_tower_env(1)
+    C, scene_objects = setup_tower_env(1)
 
     radius = 0.02
     stick_length = 0.5
@@ -80,6 +80,6 @@ def setup_pick_and_place_env(block_size=(.1, .1, .1, 0.001)):
     stick_handle.setShape(ry.ST.cylinder, size=[stick_handle_length, radius])  # 0.001
     stick_handle.setContact(1)
 
-    S = C.simulation(ry.SimulatorEngine.bullet, True)
+    #S = C.simulation(ry.SimulatorEngine.bullet, True)
 
-    return C, S, scene_objects
+    return C, scene_objects

@@ -225,7 +225,6 @@ def get_robust_chain(C, controllers, goal_controller, verbose=True):
                 print(implicit_sc.getCommand())  # TODO: add description
 
         if verbose:
-            pass
             komo.view(True, f"Implicit conditions check for {name}")
             #time.sleep(5)
             komo.view_close()
@@ -303,7 +302,7 @@ def get_robust_set_of_chains(C, tree, state_plan, goal_controller, verbose=False
         print("subgoal is:")
         for o in sub_goal.getObjectives():
             print(o.feat().description(C))
-        partial_implicit_chain = get_robust_chain(C, original_controllers, sub_goal, False)
+        partial_implicit_chain = get_robust_chain(C, original_controllers, sub_goal, verbose)
         for edge, implicit_controller in partial_implicit_chain:
             implicit_ctrlsets[edge].append(implicit_controller)
 

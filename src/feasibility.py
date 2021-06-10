@@ -155,7 +155,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
         # visualize the switches
         komo.view(False, "Feasibility Check")
         time.sleep(3)
-        komo.view_play(.2, False)
+        komo.view_play(.1, False)
         time.sleep(3)
         komo.view_close()
 
