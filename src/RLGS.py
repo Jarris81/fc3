@@ -84,19 +84,20 @@ class RLGS:
         first_plan = self.robust_set_of_chains[0]
 
         # check if plan is feasible in current config
-        is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller,
-                                                                 self.scene_objects, verbose=self.verbose)
+        # is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller,
+        #                                                          self.scene_objects, verbose=self.verbose)
+        is_feasible = True
         self.active_robust_reverse_plan = first_plan[::-1]
 
         tau = 0.01
         for name, x in nx.get_edge_attributes(action_tree, "implicit_ctrlsets").items():
             for y in x:
-                #pass
-                y.add_qControlObjective(2, 1e-5 * np.sqrt(tau),
-                                        self.C)  # TODO this will make some actions unfeasible (PlaceSide)
-                y.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
+                pass
+                #y.add_qControlObjective(2, 1e-5 * np.sqrt(tau),
+                #                        self.C)  # TODO this will make some actions unfeasible (PlaceSide)
+                #y.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
                 # TODO enabling contact will run into local minima, solved with MPC (Leap Controller from Marc)
-                y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.ineq)
+                #y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.ineq)
 
         if not is_feasible:
             print("Plan is not feasible in current Scene!")
@@ -107,7 +108,8 @@ class RLGS:
             return True
 
     def is_goal_fulfilled(self):
-        return self.goal_controller.canBeInitiated(self.C)
+        ctrl = ry.CtrlSolver(self.C, 0.1, 1)
+        return self.goal_controller.canBeInitiated(ctrl)
 
     def is_no_plan_feasible(self):
         return self.no_plan_feasible
@@ -118,6 +120,8 @@ class RLGS:
 
     def step(self, t, tau):
 
+        q_real = self.C.getJointState()
+
         # create a new solver every step (not ideal)
         ctrl = ry.CtrlSolver(self.C, tau, 2)
         is_any_controller_feasible = False
@@ -127,58 +131,59 @@ class RLGS:
         current_controller_index = 0
 
         # iterate over each controller, check which can be started first
-        for i, (name, c) in enumerate(self.active_robust_reverse_plan):
-            if c.canBeInitiated(self.C):
+        for i, (edge, name, c) in enumerate(self.active_robust_reverse_plan):
+            if c.canBeInitiated(ctrl):
+                if self.verbose or True:
+                    print(f"Initiating: {name}")
                 ctrl.set(c)
                 is_any_controller_feasible = True
                 is_current_plan_feasible = True
                 current_controller_index = i
 
-                if self.verbose:
-                    print(f"Initiating: {name}")
+
                 # leave loop, we have the controller
                 break
             else:
-                if self.verbose or True:
+                if self.verbose:
                     print(f"Cannot be initiated: {name}")
 
         # check feasibility of chain
-        if not t % self.feasy_check_rate:
-            # check rest of chain for feasibility
-            residual_plan = self.active_robust_reverse_plan[current_controller_index::-1]
-            is_current_plan_feasible, _ = check_switch_chain_feasibility(self.C, residual_plan,
-                                                                         self.goal_controller,
-                                                                         self.scene_objects, verbose=False)
+        # if not t % self.feasy_check_rate:
+        #     # check rest of chain for feasibility
+        #     residual_plan = self.active_robust_reverse_plan[current_controller_index::-1]
+        #     is_current_plan_feasible, _ = check_switch_chain_feasibility(self.C, residual_plan,
+        #                                                                  self.goal_controller,
+        #                                                                  self.scene_objects, verbose=False)
 
-        # if current plan is not feasible, check other plans
-        if (not is_any_controller_feasible or not is_current_plan_feasible) and not t % self.feasy_check_rate:
-            print("No controller can be initiated or current plan is not feasible!")
+        # # if current plan is not feasible, check other plans
+        # if (not is_any_controller_feasible or not is_current_plan_feasible) and not t % self.feasy_check_rate:
+        #     print("No controller can be initiated or current plan is not feasible!")
+        #
+        #     # lets switch the plan
+        #     for plan in self.robust_set_of_chains[1:]:
+        #         is_initiated = False
+        #         is_feasible = False
+        #         for i, (name, c) in enumerate(plan[::-1]):
+        #             if c.canBeInitiated(ctrl):
+        #                 new_plan = plan
+        #                 is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, new_plan, self.goal_controller,
+        #                                                                          self.scene_objects,
+        #                                                                          verbose=self.verbose)
+        #                 is_initiated = True
+        #                 break
+        #             elif self.verbose:
+        #                 print(f"{name} cannot be initiated!")
+        #         if is_initiated and is_feasible:
+        #             print("new plan found!")
+        #             print(plan)
+        #             self.active_robust_reverse_plan = plan[::-1]
+        #             break
+        #         else:
+        #             self.no_plan_feasible = True
+        #             self.active_robust_reverse_plan = []
 
-            # lets switch the plan
-            for plan in self.robust_set_of_chains[1:]:
-                is_initiated = False
-                is_feasible = False
-                for i, (name, c) in enumerate(plan[::-1]):
-                    if c.canBeInitiated(self.C):
-                        new_plan = plan
-                        is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, new_plan, self.goal_controller,
-                                                                                 self.scene_objects,
-                                                                                 verbose=self.verbose)
-                        is_initiated = True
-                        break
-                    elif self.verbose:
-                        print(f"{name} cannot be initiated!")
-                if is_initiated and is_feasible:
-                    print("new plan found!")
-                    print(plan)
-                    self.active_robust_reverse_plan = plan[::-1]
-                    break
-                else:
-                    self.no_plan_feasible = True
-                    self.active_robust_reverse_plan = []
-
-        ctrl.update(self.C)
-        q = ctrl.solve(self.C)
+        ctrl.update(q_real, [], self.C)
+        q = ctrl.solve()
         self.C.setJointState(q)
 
         # TODO add info is feasibility failed

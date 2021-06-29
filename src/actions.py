@@ -41,6 +41,10 @@ def _get_grab_controller(C, gripper, grabing_object, grabbing=True):
     return grab
 
 
+def add_action_name(name, controller_tuples):
+    return [(f"{name}_{x[0]}", x[1]) for x in controller_tuples]
+
+
 class BaseAction:
 
     def __init__(self, name):
@@ -84,7 +88,6 @@ class BaseAction:
         self.sym2frame = {sym: frames[i] for i, sym in enumerate(self.symbols.keys())}
 
     def get_name_for_controllers(self, controllers):
-
         return [(nameof(x), x) for x in controllers]
 
 
@@ -166,7 +169,11 @@ class GrabBlock(BaseAction):
         grab.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
 
         # return tuple of controllers
-        return [align_over, cage_block, grab]
+        controllers = [("align_over", align_over),
+                       ("cage_block", cage_block),
+                       ("grab", grab)]
+
+        return add_action_name(self.name, controllers)
 
 
 class PlaceOn(BaseAction):
@@ -217,13 +224,13 @@ class PlaceOn(BaseAction):
             C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e1]),
             ry.OT.sos, 0.005)
         align_over.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e2], [0., 0., dist*2]),
+            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e2], [0., 0., dist * 2]),
             ry.OT.sos, 0.005)
         align_over.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
         place_on_block = ry.CtrlSet()
         place_on_block.addObjective(
-            C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e2], [0., 0., dist*2]),
+            C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e2], [0., 0., dist * 2]),
             ry.OT.ineq, -1)
         place_on_block.addObjective(
             C.feature(ry.FS.positionRel, [block, block_placed_on], [1e2], [0., 0., dist]),
@@ -244,7 +251,13 @@ class PlaceOn(BaseAction):
         open_gripper.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
         open_gripper.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
 
-        return [align_over, place_on_block, open_gripper]
+        # return tuple of controllers
+        controllers = [align_over, place_on_block, open_gripper]
+        controller_names = ["align_over", "place_on_block", "open_gripper"]
+
+        controllers = list(zip(controller_names, controllers))
+
+        return add_action_name(self.name, controllers)
 
 
 class PlaceSide(BaseAction):
@@ -316,7 +329,13 @@ class PlaceSide(BaseAction):
         open_gripper.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
         open_gripper.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
 
-        return [place_block_side, open_gripper]
+        # return tuple of controllers
+        controllers = [place_block_side, open_gripper]
+        controller_names = ["place_block_side", "open_gripper"]
+
+        controllers = list(zip(controller_names, controllers))
+
+        return add_action_name(self.name, controllers)
 
 
 class PlacePosition(BaseAction):
@@ -510,3 +529,88 @@ class PullBlockStick(BaseAction):
 
         # return tuple of controllers
         return [move_to_block]
+
+
+class HandOver(BaseAction):
+
+    def __init__(self):
+        super().__init__(__class__.__name__)
+
+        self.gripper_1_sym = "G1"
+        self.gripper_2_sym = "G2"
+        self.block_sym = "B"
+
+        self.symbols_types = {
+            self.gripper_1_sym: dt.type_gripper,
+            self.gripper_2_sym: dt.type_gripper,
+            self.block_sym: dt.type_block,
+        }
+
+        self.symbols = self.symbols_types.keys()
+
+        self.preconditions = [
+            pred.InHand(self.gripper_1_sym, self.block_sym),
+            pred.HandEmpty(self.gripper_2_sym),
+        ]
+
+        self.add_effects = [
+            pred.InHand(self.gripper_2_sym, self.block_sym),
+            pred.HandEmpty(self.gripper_1_sym),
+        ]
+        # self.delete_effects = []
+
+        self.delete_effects = self.preconditions
+
+    def get_grounded_control_set(self, C, frames):
+        hand_over_pos_1 = [0, 0.0, 1.2]
+        sym2frame = _get_sym2frame(self.symbols, frames)
+
+        gripper_1 = sym2frame[self.gripper_1_sym]
+        gripper_1_center = gripper_1 + "Center"
+
+        gripper_2 = sym2frame[self.gripper_2_sym]
+        gripper_2_center = gripper_2 + "Center"
+
+        block = sym2frame[self.block_sym]
+
+        align_1 = ry.CtrlSet()
+
+        align_1.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_1, block), True)
+
+        align_1.addObjective(
+            C.feature(ry.FS.position, [block], [1e2], hand_over_pos_1),
+            ry.OT.sos, 0.005)
+        align_1.addObjective(
+            C.feature(ry.FS.vectorZ, [gripper_1], [1e1], [1, 1, 0]),
+            ry.OT.sos, 0.01)
+
+        align_2 = ry.CtrlSet()
+        align_2.addObjective(
+            C.feature(ry.FS.positionRel, [gripper_1, gripper_2], [1e1], [0, 0, -0.3]),
+            ry.OT.sos, 0.005)
+        align_2.addObjective(
+            C.feature(ry.FS.scalarProductZZ, [gripper_1, gripper_2], [1e2], [-1]),
+            ry.OT.sos, 0.005)
+        align_2.addObjective(
+            C.feature(ry.FS.scalarProductXX, [gripper_1, gripper_2], [1e2]),
+            ry.OT.sos, 0.005)
+        align_2.addObjective(
+            C.feature(ry.FS.position, [block], [1e1], hand_over_pos_1),
+            ry.OT.eq, -1)
+
+        cage = ry.CtrlSet()
+        cage.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_1, block), True)
+        # cage.addObjective(
+        #     C.feature(ry.FS.distance, [gripper_1, gripper_2], [1e1], [0.25]),
+        #     ry.OT.ineq, -1)
+        cage.addObjective(
+            C.feature(ry.FS.position, [block], [1e1], hand_over_pos_1),
+            ry.OT.eq, -1)
+        cage.addObjective(
+            C.feature(ry.FS.scalarProductZZ, [gripper_1, gripper_2], [1e2], [-1]),
+            ry.OT.eq, -1)
+        cage.addObjective(
+            C.feature(ry.FS.positionDiff, [gripper_1_center, gripper_2_center], [1e2]),
+            ry.OT.sos, 0.005)
+
+        return [align_1, align_2, cage]

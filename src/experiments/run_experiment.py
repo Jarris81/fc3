@@ -87,7 +87,7 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
     current_interference = interference_list[interference_num]
     C.view()
 
-    robot = RLGS(C, verbose=verbose)
+    robot = RLGS(C, verbose=False)
     if not robot.setup(action_list, planner, scene_objects):
         print("Plan is not feasible!")
         return

@@ -58,27 +58,27 @@ def setup_tower_env(num_blocks=3, block_size=(.06, .06, .06, 0.001)):
 def setup_pick_and_place_env(block_size=(.1, .1, .1, 0.001)):
     C, scene_objects = setup_tower_env(1)
 
-    radius = 0.02
-    stick_length = 0.5
-    stick_pos = np.array([0.5, 0.5, table_height + radius])
-    scene_objects[constants.type_stick] = ["stick"]
-    stick = C.addFrame("stick")
-    stick.setQuaternion([1, 1, 0, 0])
-    stick.setPosition(stick_pos)
-    stick.setColor([1, 1, 1])
-    stick.setMass(1)
-    stick.setShape(ry.ST.cylinder, size=[stick_length, radius])  # 0.001
-    stick.setContact(1)
-
-    stick_handle_length = 0.2
-    stick_handle = C.addFrame("stickHandle", parent="stick")
-    stick_handle.setQuaternion([1, 0, 1, 0])
-    stick_handle_pos = stick_pos + np.array([-stick_handle_length / 2, stick_length / 2, 0])
-    stick_handle.setPosition(stick_handle_pos)
-    stick_handle.setColor([1, 1, 1])
-    stick_handle.setMass(1)
-    stick_handle.setShape(ry.ST.cylinder, size=[stick_handle_length, radius])  # 0.001
-    stick_handle.setContact(1)
+    # radius = 0.02
+    # stick_length = 0.5
+    # stick_pos = np.array([0.5, 0.5, table_height + radius])
+    # scene_objects[constants.type_stick] = ["stick"]
+    # stick = C.addFrame("stick")
+    # stick.setQuaternion([1, 1, 0, 0])
+    # stick.setPosition(stick_pos)
+    # stick.setColor([1, 1, 1])
+    # stick.setMass(1)
+    # stick.setShape(ry.ST.cylinder, size=[stick_length, radius])  # 0.001
+    # stick.setContact(1)
+    #
+    # stick_handle_length = 0.2
+    # stick_handle = C.addFrame("stickHandle", parent="stick")
+    # stick_handle.setQuaternion([1, 0, 1, 0])
+    # stick_handle_pos = stick_pos + np.array([-stick_handle_length / 2, stick_length / 2, 0])
+    # stick_handle.setPosition(stick_handle_pos)
+    # stick_handle.setColor([1, 1, 1])
+    # stick_handle.setMass(1)
+    # stick_handle.setShape(ry.ST.cylinder, size=[stick_handle_length, radius])  # 0.001
+    # stick_handle.setContact(1)
 
     #S = C.simulation(ry.SimulatorEngine.bullet, True)
 

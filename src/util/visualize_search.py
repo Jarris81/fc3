@@ -3,11 +3,6 @@ import pydot
 import matplotlib.pyplot as plt
 
 def draw_search_graph(plan, state_plan, G, filename="action_tree.png"):
-    #get all edges in plan
-
-    #colors = ["r" if x in plan_id else "b" for x in G.nodes]
-    #nx.draw_networkx(G, with_labels=True, node_color=colors)
-    #plt.show()
 
     pyg = nx.nx_pydot.to_pydot(G)
 
@@ -22,11 +17,7 @@ def draw_search_graph(plan, state_plan, G, filename="action_tree.png"):
     for e in edges:
         graph.add_edge(e)
 
-    for a in plan:
-        print(a)
-
     for s in state_plan:
-        print(s, s.id)
         pyg.get_node(str(s.id))[0].set_shape("box")
         node = pydot.Node(str(s.id))
         # graph.add_node(node)

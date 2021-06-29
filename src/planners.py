@@ -3,6 +3,7 @@ import actions
 import predicates as pred
 import util.constants as dt
 import libry as ry
+from util.visualize_search import draw_search_graph
 
 
 """
@@ -124,10 +125,11 @@ class PickAndPlacePlanner:
 
         init = list()
 
-        # empty hand
-        init_hand_empty = pred.HandEmpty("G")
-        init_hand_empty.ground_predicate(G=scene_obj[dt.type_gripper][0])
-        init.append(init_hand_empty.get_grounded_predicate())
+        # empty hands
+        for gripper in scene_obj[dt.type_gripper]:
+            init_hand_empty = pred.HandEmpty("G")
+            init_hand_empty.ground_predicate(G=gripper)
+            init.append(init_hand_empty.get_grounded_predicate())
 
         # free blocks
         for block in scene_obj[dt.type_block]:
@@ -138,10 +140,11 @@ class PickAndPlacePlanner:
         # normal goal predicates
         self.goal = list()
 
-        # hand should be free
-        goal_hand_empty = pred.HandEmpty("G")
-        goal_hand_empty.ground_predicate(G=scene_obj[dt.type_gripper][0])
-        self.goal.append(goal_hand_empty.get_grounded_predicate())
+        # hands should be free
+        for gripper in scene_obj[dt.type_gripper]:
+            goal_hand_empty = pred.HandEmpty("G")
+            goal_hand_empty.ground_predicate(G=gripper)
+            self.goal.append(goal_hand_empty.get_grounded_predicate())
 
         # first block should be at position
         block_at_goal = pred.BlockAtGoal("B")
@@ -164,7 +167,7 @@ class PickAndPlacePlanner:
             plan = planner(prob, verbose=self.verbose)
         else:
             action_plan, state_plan, __ = backwards_planner(prob, goal=self.goal, action_tree=False, verbose=True)
-            plan, state_plan, G = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=1,
+            plan, state_plan, G = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=4,
                                                     root_state_plan=state_plan, verbose=True)
             # need to reverse plan
             plan = plan[::-1]
@@ -189,6 +192,7 @@ class PickAndPlacePlanner:
                 C.feature(ry.FS.position, [block], [1e1], goal_place),
                 ry.OT.eq, -1)
             goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", block), True)
+            goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("L_gripper", block), True)
 
         return goal_feature
 
@@ -209,16 +213,23 @@ if __name__ == '__main__':
 
     action_list = [
         actions.GrabBlock(),
-        actions.PlaceOn(),
+        actions.PlacePosition(),
+        actions.HandOver(),
     ]
 
     objects = {
-             dt.type_block: (1, 2, 3),  # , "b3"),
-             dt.type_gripper: ("gripper_R",)
+             dt.type_block: (1,),  # , "b3"),
+             dt.type_gripper: ("R_gripper", "L_gripper")
          }
 
     # Parse arguments
     opts, args = parser.parse_args()
-    #get_tower_plan(opts.verbose, action_list, objects)
+    planner = PickAndPlacePlanner()
+    plan, goal, state_plan, G = planner.get_plan(action_list, objects)
+
+    for a in plan:
+        print(a)
+
+    draw_search_graph(plan, state_plan, G)
 
 
