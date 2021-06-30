@@ -130,7 +130,7 @@ def get_robust_system2(C, komo_feasy, controllers, goal_controller, verbose=Fals
     return robust_controller_chain
 
 
-def get_robust_chain(C, controllers, goal_controller, verbose=True):
+def get_robust_chain(C, controllers, goal_controller, verbose=False):
     """
     We want to get the implicit features without states (configs) and only use the goal geometric description
     @param C: cuurent config of world
@@ -275,7 +275,7 @@ def get_robust_set_of_chains(C, tree, state_plan, goal_controller, verbose=False
         for name, con in grounded_ctrlsets[edge]:
             original_controllers.append((edge, name, con))
 
-    implicit_chain = get_robust_chain(C, original_controllers, goal_controller, verbose)
+    implicit_chain = get_robust_chain(C, original_controllers, goal_controller, False)
 
     for edge, name, implicit_controller in implicit_chain:
         implicit_ctrlsets[edge].append((name, implicit_controller))

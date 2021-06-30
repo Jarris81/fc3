@@ -11,6 +11,8 @@ from RLGS import RLGS
 from interference import ResetPosition, NoInterference
 import util.setup_env as setup_env
 
+import libpybot as pybot
+
 
 
 
@@ -87,22 +89,53 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
     current_interference = interference_list[interference_num]
     C.view()
 
+
     robot = RLGS(C, verbose=False)
     if not robot.setup(action_list, planner, scene_objects):
         print("Plan is not feasible!")
+        C.view_close()
         return
 
+    bot = pybot.BotOp(C, False)
+    #
+    # qHome = bot.get_q()
+    # q = bot.get_q()[:7]
+    # q[1] = q[1] - .2
+    #
+    # bot.move(q.reshape(1, 7), [2])
+    # bot.move(qHome.reshape(1, 7), [2])
+    # bot.move(q.reshape(1, 7), [2])
+    #
+    # while bot.getTimeToEnd() > 0:
+    #     bot.step(C_real, .1)
+    #     time.sleep(.1)
+
+    ref_tau = 0.05
+
     for t in range(10000):
+
+        t_0 = time.time()
+
         if add_interference:
             current_interference.do_interference(C, t)
 
         # get the next q values of robot
         q = robot.step(t, tau)
 
-        time.sleep(tau)
+        bot.moveLeap(q, 2)
+        bot.step(C, 0)
 
         if robot.is_goal_fulfilled() or robot.is_no_plan_feasible():
             break
+
+        t_1 = time.time()
+        t_delta = t_1 - t_0
+        if t_delta > ref_tau:
+            print("3")
+            time.sleep(t_delta - ref_tau)
+
+
+
 
     if robot.is_no_plan_feasible():
         print("No Plan is feasible, abort")

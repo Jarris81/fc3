@@ -10,7 +10,7 @@ from util.constants import type_block
 def _get_ctrlset_description(C, ctrlset):
     for o in ctrlset.getObjectives():
         f = o.feat()
-        print(f"{f.getFS()}, {f.getFrameNames(C)}, {o.get_OT()}, {f.getScale()}")
+        print(f"{f.getFS()}, {f.getFrameNames(C)}, {o.get_OT()}, {f.getScale()}, {f.getTarget()}, {o.getOriginalTarget()}")
 
 
 def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0.1, verbose=False):
@@ -18,16 +18,17 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     # plan is feasible until proven otherwise
     plan_is_feasible = True
 
-    C_temp = ry.Config()
-    C_temp.copy(C)
-
     # TODO: get gripper and block names as input
     gripper = "R_gripper"
+
+    C_temp = ry.Config()
+    C_temp.copy(C)
 
     holding_list = {}
     holding = {}
     for block_name in scene_objects[type_block]:
-        block = C_temp.frame(block_name)
+        block = C_temp.getFrame(block_name)
+        info = block.info()
         if "parent" in block.info() and block.info()["parent"] == gripper:
             holding_list[block_name] = [True]
             holding[block_name] = True
@@ -43,8 +44,12 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     komo.addSquaredQuaternionNorms([], 3.)
 
     # build a komo in which we only show controller switches
-    for i, (name, controller) in enumerate(controls):
+    for i, (edge, name, controller) in enumerate(controls):
 
+        if i == 3:
+            print()
+            _get_ctrlset_description(C, controller)
+            print()
         # get the sos objectives of current controller
         for o in controller.getObjectives():
             f = o.feat()
@@ -52,7 +57,6 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
             if o.get_OT() == ry.OT.sos and "qItself" not in f.description(C_temp):
                 komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_temp), o.get_OT(), f.getScale(),
                                   o.getOriginalTarget())
-
         for ctrlCommand in controller.getSymbolicCommands():
             gripper, block = ctrlCommand.getFrameNames()
             if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
@@ -87,43 +91,40 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
             if grab:
                 # grab
                 if end == len(controls):
-                    komo.addSwitch_stable(start, -1, "world", gripper, block)
+                    komo.addSwitch_stable(start, -1, "b3", gripper, block)
                 else:
-                    komo.addSwitch_stable(start, end, "world", gripper, block)
+                    komo.addSwitch_stable(start, end, "b3", gripper, block)
             else:
                 # open
                 if end == len(controls):
-                    komo.addSwitch_stable(start, -1, gripper, "world", block)
+                    komo.addSwitch_stable(start, -1, gripper, "b3", block)
                 else:
-                    komo.addSwitch_stable(start, end, gripper, "world", block)
+                    komo.addSwitch_stable(start, end, gripper, "b3", block)
 
     # solve or optime the given komo objectives
     komo.optimize()
 
     # get the report, which which generates the z.costReport file, which we can read
-    komo.getReport(verbose)
+    komo.getReport()
     df_transient = pd.read_csv("z.costReport", index_col=None)
     df_transient.name = "Transient features:"
 
     # next, check for immediate constraints, and check if any are violated
     controls_and_goal = list(controls)
-    controls_and_goal.append(("goal", goal))
+    controls_and_goal.append(("(0,0)", "goal", goal))
 
-    C_temp = ry.Config()
-    C_temp.copy(C)
-    frames_state = 0  # needs to be initialized somehow
-    frames_state = komo.getPathFrames(frames_state)
+    frames_state = komo.getPathFrames()
 
     # create a pandas data frame to store cost error for switches with unique features
-    imm_objs = set([o.feat().description(C_temp) for control in controls_and_goal for o in control[1].getObjectives()])
+    imm_objs = set([o.feat().description(C_temp) for control in controls_and_goal for o in control[-1].getObjectives()])
     df_immediate = pd.DataFrame(data=np.zeros((len(controls_and_goal), len(imm_objs))), columns=imm_objs)
     df_immediate.name = "immediate features"
 
     # check all immediate features
-    for i, (name, control) in enumerate(controls_and_goal):
+    for i, (edge, name, control) in enumerate(controls_and_goal):
         # for the first switch, we can just use the initial frame state, therefore no need to set one from komo
         if i != 0:
-            C_temp.setFrameState(frames_state[i-1])
+            C_temp.setFrameState(frames_state[i - 1])
         for o in control.getObjectives():
             if o.get_OT() == ry.OT.eq or o.get_OT() == ry.OT.ineq:
                 f = o.feat()
@@ -141,11 +142,11 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
         features = df.columns
         for i_row, i_col in np.argwhere(mse > tolerance):
             plan_is_feasible = False
-            if verbose:
+            if verbose or True:
                 print(f'{df.name} {features[i_col]} at switch #{i_row} is not feasible!')
 
     # Visualize some results
-    if verbose:
+    if verbose or True:
         # create a figure with two plot
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
         df_transient.plot(ax=ax1, title="Transient Features")
@@ -153,9 +154,9 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
         plt.show()
 
         # visualize the switches
-        komo.view(False, "Feasibility Check")
-        time.sleep(3)
-        komo.view_play(.1, False)
+        #komo.view(False, "Feasibility Check")
+        #time.sleep(3)
+        komo.view_play(.1, True)
         time.sleep(3)
         komo.view_close()
 

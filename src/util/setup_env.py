@@ -10,8 +10,8 @@ table_height = 0.65
 def setup_tower_env(num_blocks=3, block_size=(.06, .06, .06, 0.001)):
     path_to_repo = "/home/jason/git/thesis_2020/"
     # scene = "rai/testing/KOMO/switches/model2.g"
-    scene = "rai-robotModels/scenarios/pandasTable.g"
-    # scene = "rai-robotModels/scenarios/pandaSingle.g"
+    # scene = "rai-robotModels/scenarios/pandasTable.g"
+    scene = "rai-robotModels/scenarios/pandaSingle.g"
 
     # setup simulation (Real World)
 
@@ -23,9 +23,9 @@ def setup_tower_env(num_blocks=3, block_size=(.06, .06, .06, 0.001)):
              [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
 
     positions = (
-        (0.5, 0.3),
-        (0.2, 0.2),  # 0.8 for infeasible
-        (0.0, -0.2)
+        (0.6, -0.2),
+        (0.4, 0.0),  # 0.8 for infeasible
+        (0.1, 0.3),
     )
 
     scene_objects = {constants.type_gripper: ["R_gripper"], constants.type_block: []}

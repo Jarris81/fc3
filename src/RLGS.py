@@ -38,7 +38,13 @@ class RLGS:
         self.feasy_check_rate = 50  # every 50 steps check for feasibility
         self.gripper_action = None
 
+        self.q = None
+        self.q_old = None
+
     def setup(self, action_list, planner, scene_objects):
+
+        self.q = self.C.getJointState()
+        self.q_old = self.q
 
         # put all objects into one dictionary with types
         self.scene_objects = scene_objects
@@ -84,20 +90,18 @@ class RLGS:
         first_plan = self.robust_set_of_chains[0]
 
         # check if plan is feasible in current config
-        # is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller,
-        #                                                          self.scene_objects, verbose=self.verbose)
-        is_feasible = True
+        is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller,
+                                                                 self.scene_objects, verbose=self.verbose)
         self.active_robust_reverse_plan = first_plan[::-1]
 
         tau = 0.01
         for name, x in nx.get_edge_attributes(action_tree, "implicit_ctrlsets").items():
-            for y in x:
-                pass
-                #y.add_qControlObjective(2, 1e-5 * np.sqrt(tau),
-                #                        self.C)  # TODO this will make some actions unfeasible (PlaceSide)
-                #y.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
+            for name, y in x:
+                y.add_qControlObjective(2, 1e-5 * np.sqrt(tau),
+                                        self.C)  # TODO this will make some actions unfeasible (PlaceSide)
+                y.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
                 # TODO enabling contact will run into local minima, solved with MPC (Leap Controller from Marc)
-                #y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.ineq)
+                y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.ineq)
 
         if not is_feasible:
             print("Plan is not feasible in current Scene!")
@@ -182,12 +186,15 @@ class RLGS:
         #             self.no_plan_feasible = True
         #             self.active_robust_reverse_plan = []
 
-        ctrl.update(q_real, [], self.C)
+        q_dot = self.q - self.q_old
+
+        ctrl.update(q_real, q_dot, self.C)
         q = ctrl.solve()
-        self.C.setJointState(q)
 
         # TODO add info is feasibility failed
-        return q,
+        self.q = q_real
+        self.q_old = self.q_old
+        return q
 
     def cheat_update_obj(self, object_infos):
         for obj_name, obj_info in object_infos.items():
