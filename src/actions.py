@@ -1,10 +1,7 @@
 import libry as ry
 from pyddl import Action, neg
 import predicates as pred
-from objective import Objective
 import util.constants as dt
-import itertools as it
-from varname import nameof
 
 
 def _get_unset_effects(predicate, all_objects, obj_type):
@@ -59,10 +56,6 @@ class BaseAction:
 
         self.objectives = []
 
-    def set_frame_type_count(self):
-        self.frame_type_count = \
-            {obj_type: self.frame_type.count(obj_type) for obj_type in set(self.frame_type)}
-
     def getAllObjectives(self):
         return self.objectives
 
@@ -86,9 +79,6 @@ class BaseAction:
     def get_grounded_control_set(self, C, frames):
         self.ctrl_set = ry.CtrlSet()
         self.sym2frame = {sym: frames[i] for i, sym in enumerate(self.symbols.keys())}
-
-    def get_name_for_controllers(self, controllers):
-        return [(nameof(x), x) for x in controllers]
 
 
 class GrabBlock(BaseAction):
@@ -124,39 +114,41 @@ class GrabBlock(BaseAction):
         gripper_center = gripper + "Center"
         block = sym2frame[self.block_sym]
 
-        height_block = C.getFrame(block).getSize()[-1] * 2
+        height_block = C.getFrame(block).getSize()[-1]
+
+        transient_step = 0.02
 
         align_over = ry.CtrlSet()
         align_over.addObjective(
             C.feature(ry.FS.scalarProductYZ, [block, gripper], [1e2]),
-            ry.OT.sos, 0.01)
+            ry.OT.sos, transient_step)
         align_over.addObjective(
             C.feature(ry.FS.scalarProductYZ, [block, gripper], [1e1]),
-            ry.OT.sos, 0.01)
+            ry.OT.sos, transient_step)
         align_over.addObjective(
             C.feature(ry.FS.positionRel, [gripper_center, block], [1e2], [0, 0, height_block]),
-            ry.OT.sos, 0.01)
+            ry.OT.sos, transient_step)
         align_over.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, gripper], [1e2]),
-            ry.OT.sos, 0.01)
+            ry.OT.sos, transient_step)
 
         cage_block = ry.CtrlSet()
         cage_block.addObjective(
-            C.feature(ry.FS.positionRel, [gripper_center, block], [1, 1, 0]),
+            C.feature(ry.FS.positionRel, [gripper_center, block], [1e1, 1e1, 0]),
             ry.OT.eq, -1)
         # move close to block
         cage_block.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper_center, block], [1e3]),
-            ry.OT.sos, 0.01)
+            C.feature(ry.FS.positionDiff, [gripper_center, block], [1e2]),
+            ry.OT.sos, transient_step)
         # align axis with block
 
         # weird: following objective lets the robot oscillate between align and cage
         cage_block.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, gripper], [1e0]),
             ry.OT.eq, -1)
-        # cage_block.addObjective(
-        #     C.feature(ry.FS.scalarProductYZ, [block, gripper], [1e2]),
-        #     ry.OT.eq, -1)
+        cage_block.addObjective(
+            C.feature(ry.FS.scalarProductYZ, [block, gripper], [1e2]),
+            ry.OT.eq, -1)
         cage_block.addObjective(
             C.feature(ry.FS.scalarProductYZ, [block, gripper], [1e0]),
             ry.OT.eq, -1)
@@ -227,19 +219,19 @@ class PlaceOn(BaseAction):
             C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e1]),
             ry.OT.sos, 0.01)
         align_over.addObjective(
-            C.feature(ry.FS.positionRel, [gripper, block_placed_on], [1e1], [0, 0, dist2]),
+            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e1], [0, 0, dist2]),
             ry.OT.sos, 0.01)
         align_over.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
         place_on_block = ry.CtrlSet()
-        place_on_block.addObjective(
-            C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e0]),
-            ry.OT.eq, -1)
         # place_on_block.addObjective(
-        #     C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e1], [0., 0., dist * 2]),
-        #     ry.OT.ineq, -1)
+        #     C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e1]),
+        #     ry.OT.eq, -1)
         place_on_block.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e3], [0., 0., dist]),
+            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e1, 1e1, 0]),
+            ry.OT.eq, -1)
+        place_on_block.addObjective(
+            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e2], [0., 0., dist]),
             ry.OT.sos, 0.01)
         # should have z-axis in same direction
         place_on_block.addObjective(

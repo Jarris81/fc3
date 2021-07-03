@@ -4,16 +4,16 @@ import util.constants as constants
 from os.path import join
 import time
 
+path_to_repo = "/home/jason/git/thesis_2020/"
+
 table_height = 0.65
 
 
+
 def setup_tower_env(num_blocks=3, block_size=(.06, .06, .06, 0.001)):
-    path_to_repo = "/home/jason/git/thesis_2020/"
     # scene = "rai/testing/KOMO/switches/model2.g"
     # scene = "rai-robotModels/scenarios/pandasTable.g"
     scene = "rai-robotModels/scenarios/pandaSingle.g"
-
-    # setup simulation (Real World)
 
     # setup configuration (what robot knows)
     C = ry.Config()
@@ -25,7 +25,7 @@ def setup_tower_env(num_blocks=3, block_size=(.06, .06, .06, 0.001)):
     positions = (
         (0.6, -0.2),
         (0.4, 0.0),  # 0.8 for infeasible
-        (0.1, 0.3),
+        (0.2, 0.2),
     )
 
     scene_objects = {constants.type_gripper: ["R_gripper"], constants.type_block: []}
@@ -38,7 +38,7 @@ def setup_tower_env(num_blocks=3, block_size=(.06, .06, .06, 0.001)):
         scene_objects[constants.type_block].append(name)
 
         pos_xy = positions[o]
-        pos_block = (*pos_xy, block_size[2] / 2 + 0.65)
+        pos_block = (*pos_xy, block_size[2] / 2 + 0.635)
 
         # quick hack to see if predicate is feasible
         # if o == 0:
@@ -49,7 +49,7 @@ def setup_tower_env(num_blocks=3, block_size=(.06, .06, .06, 0.001)):
         block.setColor(color[o])
         block.setMass(1)
         block.setShape(ry.ST.box, size=block_size[:-1])  # 0.001
-        block.setContact(1)
+        block.setContact(0)
 
     #S = C.simulation(ry.SimulatorEngine.bullet, True)
     return C, scene_objects
@@ -83,3 +83,11 @@ def setup_pick_and_place_env(block_size=(.1, .1, .1, 0.001)):
     #S = C.simulation(ry.SimulatorEngine.bullet, True)
 
     return C, scene_objects
+
+def setup_handover_env():
+    scene = "rai-robotModels/scenarios/pandasTable.g"
+
+    # setup configuration (what robot knows)
+    C = ry.Config()
+    C.addFile(path_to_repo + scene)
+

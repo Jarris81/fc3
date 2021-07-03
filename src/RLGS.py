@@ -41,6 +41,8 @@ class RLGS:
         self.q = None
         self.q_old = None
 
+        self.eqPrecision = 1e-2
+
     def setup(self, action_list, planner, scene_objects):
 
         self.q = self.C.getJointState()
@@ -90,18 +92,21 @@ class RLGS:
         first_plan = self.robust_set_of_chains[0]
 
         # check if plan is feasible in current config
-        is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller,
-                                                                 self.scene_objects, verbose=self.verbose)
+        # is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller,
+        #                                                          self.scene_objects, verbose=self.verbose)
         self.active_robust_reverse_plan = first_plan[::-1]
+
+        is_feasible = True
 
         tau = 0.01
         for name, x in nx.get_edge_attributes(action_tree, "implicit_ctrlsets").items():
             for name, y in x:
+                pass
                 y.add_qControlObjective(2, 1e-5 * np.sqrt(tau),
                                         self.C)  # TODO this will make some actions unfeasible (PlaceSide)
                 y.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
                 # TODO enabling contact will run into local minima, solved with MPC (Leap Controller from Marc)
-                y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e2]), ry.OT.ineq)
+                y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e1]), ry.OT.ineq)
 
         if not is_feasible:
             print("Plan is not feasible in current Scene!")
@@ -113,7 +118,7 @@ class RLGS:
 
     def is_goal_fulfilled(self):
         ctrl = ry.CtrlSolver(self.C, 0.1, 1)
-        return self.goal_controller.canBeInitiated(ctrl)
+        return self.goal_controller.canBeInitiated(ctrl, self.eqPrecision)
 
     def is_no_plan_feasible(self):
         return self.no_plan_feasible
@@ -136,13 +141,22 @@ class RLGS:
 
         # iterate over each controller, check which can be started first
         for i, (edge, name, c) in enumerate(self.active_robust_reverse_plan):
-            if c.canBeInitiated(ctrl):
+            if c.canBeInitiated(ctrl, self.eqPrecision):
                 if self.verbose or True:
                     print(f"Initiating: {name}")
                 ctrl.set(c)
                 is_any_controller_feasible = True
                 is_current_plan_feasible = True
                 current_controller_index = i
+
+                for ctrlCommand in c.getSymbolicCommands():
+                    if ctrlCommand.isCondition():
+                        continue
+                    elif ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
+                        self.gripper_action = True
+                        break
+                    elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
+                        self.gripper_action = False
 
 
                 # leave loop, we have the controller
@@ -186,15 +200,17 @@ class RLGS:
         #             self.no_plan_feasible = True
         #             self.active_robust_reverse_plan = []
 
+
+
         q_dot = self.q - self.q_old
 
-        ctrl.update(q_real, q_dot, self.C)
-        q = ctrl.solve()
+        ctrl.update(q_real, [], self.C)
+        q = ctrl.solve(self.C)
 
         # TODO add info is feasibility failed
         self.q = q_real
         self.q_old = self.q_old
-        return q
+        return q, self.gripper_action
 
     def cheat_update_obj(self, object_infos):
         for obj_name, obj_info in object_infos.items():

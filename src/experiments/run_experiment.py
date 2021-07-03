@@ -114,28 +114,30 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
 
     for t in range(10000):
 
-        t_0 = time.time()
-
         if add_interference:
             current_interference.do_interference(C, t)
 
         # get the next q values of robot
-        q = robot.step(t, tau)
+        q, gripper_action = robot.step(t, tau)
 
+        # if gripper_action is True:
+        #     bot.gripperClose(10, 0.05, 0.1)
+        # elif gripper_action is False:
+        #     bot.gripperOpen(0.1, 0.1)
+
+        # move the real bot
         bot.moveLeap(q, 2)
-        bot.step(C, 0)
+        bot.step(C, 0.1)
+
+        # t_1 = time.time()
+        # t_delta = t_1 - t_0
+        # if t_delta > ref_tau:
+        #     bot.step(C, t_delta - ref_tau)
+        # else:
+        #     bot.step(C, 0)
 
         if robot.is_goal_fulfilled() or robot.is_no_plan_feasible():
             break
-
-        t_1 = time.time()
-        t_delta = t_1 - t_0
-        if t_delta > ref_tau:
-            print("3")
-            time.sleep(t_delta - ref_tau)
-
-
-
 
     if robot.is_no_plan_feasible():
         print("No Plan is feasible, abort")
