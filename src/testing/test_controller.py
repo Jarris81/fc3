@@ -9,7 +9,7 @@ from planners import TowerPlanner
 
 if __name__ == '__main__':
 
-    C, block_names = setup_hand_over_env()
+    C, block_names = setup_tower_env(2)
 
     grab_stick = actions.GrabStick()
     pull_block = actions.PullBlockStick()
@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     C.view()
 
-    eqPrecision = 1e-2
+    eqPrecision = 1.5e-1
 
     tau = 0.01
 
@@ -35,11 +35,9 @@ if __name__ == '__main__':
     # robust_plan.extend(pull_block.get_grounded_control_set(C, ["R_gripper", "b1", "stick"]))
 
     robust_plan.extend(grab_block.get_grounded_control_set(C, ["R_gripper", "b1"]))
-    #robust_plan.extend(place_block_place.get_grounded_control_set(C, ["R_gripper", "b1", "b2"]))
+    robust_plan.extend(place_block_place.get_grounded_control_set(C, ["R_gripper", "b1", "b2"]))
     #robust_plan.extend(handover.get_grounded_control_set(C, ["R_gripper", "L_gripper", "b1"]))
-    robust_plan.extend(place_pos.get_grounded_control_set(C, ["R_gripper", "b1"]))
-
-
+    #robust_plan.extend(place_pos.get_grounded_control_set(C, ["R_gripper", "b2"]))
 
 
     for name, a in robust_plan:
@@ -49,12 +47,14 @@ if __name__ == '__main__':
     block = C.getFrame("b1")
     print(block.info())
 
-    bot = pybot.BotOp(C, False)
+    bot = pybot.BotOp(C, True)
     q_start = C.getJointState()
 
-    #bot.move(q_start[:7].reshape(1, 7), [2])
+    bot.move(q_start[:7].reshape(1, 7), [2])
 
     ref_tau = 0.05
+
+    robust_plan = robust_plan[:-1]
 
     while bot.getTimeToEnd() > 0:
         bot.step(C, .1)
@@ -77,12 +77,12 @@ if __name__ == '__main__':
         ctrl.update(q_real, [], C)
         q = ctrl.solve(C)
         #print(q.reshape(1, 7))
-        C.setJointState(q)
+        # C.setJointState(q)
         #C.computeCollisions()
         #coll = C.getCollisions(0)
 
-        # bot.moveLeap(q, 2)
-        # bot.step(C, 0)
+        bot.moveLeap(q, 2)
+        bot.step(C, 0)
 
         t_1 = time.time()
         t_delta = t_1 - t_0

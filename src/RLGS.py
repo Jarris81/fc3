@@ -205,7 +205,7 @@ class RLGS:
 
         q_dot = self.q - self.q_old
 
-        ctrl.update(q_real, [], self.C)
+        ctrl.update(q_real, q_dot, self.C)
         q = ctrl.solve(self.C)
 
         # TODO add info is feasibility failed

@@ -96,7 +96,7 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
         C.view_close()
         return
 
-    bot = pybot.BotOp(C, False)
+    bot = pybot.BotOp(C, True)
     #
     # qHome = bot.get_q()
     # q = bot.get_q()[:7]
