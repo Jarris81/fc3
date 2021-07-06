@@ -86,14 +86,14 @@ class RLGS:
 
         # get robust tree/ set of chains
         self.robust_set_of_chains = get_robust_set_of_chains(self.C, action_tree, state_plan, self.goal_controller,
-                                                             self.verbose)
+                                                             False)
 
         # first plan we want to execute
         first_plan = self.robust_set_of_chains[0]
 
         # check if plan is feasible in current config
-        # is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller,
-        #                                                          self.scene_objects, verbose=self.verbose)
+        is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller,
+                                                                 self.scene_objects, verbose=True)
         self.active_robust_reverse_plan = first_plan[::-1]
 
         is_feasible = True
@@ -106,12 +106,13 @@ class RLGS:
                                         self.C)  # TODO this will make some actions unfeasible (PlaceSide)
                 y.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
                 # TODO enabling contact will run into local minima, solved with MPC (Leap Controller from Marc)
-                y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e1]), ry.OT.ineq)
+                #y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e1]), ry.OT.ineq)
 
         if not is_feasible:
             print("Plan is not feasible in current Scene!")
             print("Aborting")
-            return False
+            #return False
+            return True # TODO remove this
 
         else:
             return True

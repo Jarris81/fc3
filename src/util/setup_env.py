@@ -12,7 +12,7 @@ table_height = 0.65
 
 def setup_tower_env(num_blocks=3, block_size=(.06, .06, .06, 0.001)):
     # scene = "rai/testing/KOMO/switches/model2.g"
-    # scene = "rai-robotModels/scenarios/pandasTable.g"
+    #scene = "rai-robotModels/scenarios/pandasTable.g"
     scene = "rai-robotModels/scenarios/pandaSingle.g"
 
     # setup configuration (what robot knows)
@@ -49,7 +49,7 @@ def setup_tower_env(num_blocks=3, block_size=(.06, .06, .06, 0.001)):
         block.setColor(color[o])
         block.setMass(1)
         block.setShape(ry.ST.box, size=block_size[:-1])  # 0.001
-        block.setContact(0)
+        block.setContact(1)
 
     #S = C.simulation(ry.SimulatorEngine.bullet, True)
     return C, scene_objects
@@ -84,10 +84,44 @@ def setup_pick_and_place_env(block_size=(.1, .1, .1, 0.001)):
 
     return C, scene_objects
 
-def setup_handover_env():
+
+def setup_hand_over_env(block_size=(.06, .06, .06, 0.001)):
     scene = "rai-robotModels/scenarios/pandasTable.g"
 
     # setup configuration (what robot knows)
     C = ry.Config()
     C.addFile(path_to_repo + scene)
+
+    color = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0],
+             [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
+
+    positions = (
+        (0.6, 0.1),
+        (0.4, 0.0),  # 0.8 for infeasible
+        (0.2, 0.2),
+    )
+
+    scene_objects = {constants.type_gripper: ["R_gripper"], constants.type_block: []}
+
+    # create blocks
+    name = "b1"
+
+    block = C.addFrame(name)
+    scene_objects[constants.type_block].append(name)
+
+    pos_xy = positions[0]
+    pos_block = (*pos_xy, block_size[2] / 2 + 0.635)
+
+    # quick hack to see if predicate is feasible
+    # if o == 0:
+    #     pos_block = 0.3, 0.3, pos_block[2] + block_size[2]
+
+    block.setPosition(pos_block)
+    block.setQuaternion([1, 0, 0, 0])
+    block.setColor(color[0])
+    block.setMass(1)
+    block.setShape(ry.ST.box, size=block_size[:-1])  # 0.001
+    block.setContact(1)
+
+    return C, scene_objects
 

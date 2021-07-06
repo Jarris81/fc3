@@ -112,7 +112,7 @@ class TowerPlanner:
         return goal_feature
 
 
-class PickAndPlacePlanner:
+class HandOverPlanner:
 
     def __init__(self, verbose=False):
 
@@ -186,22 +186,15 @@ class PickAndPlacePlanner:
         goal_place = (0.3, 0.3, 0.71)
 
         goals_block_at_goal = [x for x in self.goal if x[0] == pred.BlockAtGoal.__name__]
-
-        for _, block in goals_block_at_goal:
-            goal_feature.addObjective(
-                C.feature(ry.FS.position, [block], [1e1], goal_place),
-                ry.OT.eq, -1)
-            goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", block), True)
-            goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("L_gripper", block), True)
+        block = "b1"
+        goal_feature.addObjective(
+            C.feature(ry.FS.position, [block], [1e0], goal_place),
+            ry.OT.eq, -1)
+        goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", block), True)
+        #goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("L_gripper", block), True)
 
         return goal_feature
 
-class HandOverPlaner:
-
-    def __init__(self, verbose=False):
-
-        self.verbose = verbose
-        self.goal = []
 
 if __name__ == '__main__':
     from optparse import OptionParser
@@ -224,7 +217,7 @@ if __name__ == '__main__':
 
     # Parse arguments
     opts, args = parser.parse_args()
-    planner = PickAndPlacePlanner()
+    planner = HandOverPlanner()
     plan, goal, state_plan, G = planner.get_plan(action_list, objects)
 
     for a in plan:

@@ -222,11 +222,11 @@ def get_robust_chain(C, controllers, goal_controller, verbose=False):
         for implicit_sc in implicit_scs:
             ctrlset.addSymbolicCommand(implicit_sc.getCommand(), implicit_sc.getFrameNames(), True)  # always condition
             if verbose:
-                print(implicit_sc.getCommand())  # TODO: add description
+                print(implicit_sc.getCommand(), implicit_sc.getFrameNames())  # TODO: add description
 
         if verbose:
-            komo.view(True, f"Implicit conditions check for {name}")
-            #time.sleep(5)
+            komo.view(False, f"Implicit conditions check for {name}")
+            time.sleep(2)
             komo.view_close()
 
         robust_controller_chain.append((edge, name, ctrlset))
@@ -275,7 +275,7 @@ def get_robust_set_of_chains(C, tree, state_plan, goal_controller, verbose=False
         for name, con in grounded_ctrlsets[edge]:
             original_controllers.append((edge, name, con))
 
-    implicit_chain = get_robust_chain(C, original_controllers, goal_controller, False)
+    implicit_chain = get_robust_chain(C, original_controllers, goal_controller, verbose)
 
     for edge, name, implicit_controller in implicit_chain:
         implicit_ctrlsets[edge].append((name, implicit_controller))

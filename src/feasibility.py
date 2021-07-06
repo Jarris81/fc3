@@ -19,7 +19,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     plan_is_feasible = True
 
     # TODO: get gripper and block names as input
-    gripper = "R_gripper"
+    gripper_name = "R_gripper"
 
     C_temp = ry.Config()
     C_temp.copy(C)
@@ -29,7 +29,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     for block_name in scene_objects[type_block]:
         block = C_temp.getFrame(block_name)
         info = block.info()
-        if "parent" in block.info() and block.info()["parent"] == gripper:
+        if "parent" in block.info() and block.info()["parent"] == gripper_name:
             holding_list[block_name] = [True]
             holding[block_name] = True
         else:
@@ -46,10 +46,6 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     # build a komo in which we only show controller switches
     for i, (edge, name, controller) in enumerate(controls):
 
-        if i == 3:
-            print()
-            _get_ctrlset_description(C, controller)
-            print()
         # get the sos objectives of current controller
         for o in controller.getObjectives():
             f = o.feat()
@@ -59,9 +55,9 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
                                   o.getOriginalTarget())
         for ctrlCommand in controller.getSymbolicCommands():
             gripper, block = ctrlCommand.getFrameNames()
-            if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
+            if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER and gripper == gripper_name:
                 holding[block] = True
-            elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
+            elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER and gripper == gripper_name:
                 holding[block] = False
 
         # append blocks
@@ -91,17 +87,18 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
             if grab:
                 # grab
                 if end == len(controls):
-                    komo.addSwitch_stable(start, -1, "b3", gripper, block)
+                    komo.addSwitch_stable(start, -1, "world", gripper_name, block)
                 else:
-                    komo.addSwitch_stable(start, end, "b3", gripper, block)
+                    komo.addSwitch_stable(start, end, "world", gripper_name, block)
             else:
                 # open
                 if end == len(controls):
-                    komo.addSwitch_stable(start, -1, gripper, "b3", block)
+                    komo.addSwitch_stable(start, -1, gripper_name, "world", block)
                 else:
-                    komo.addSwitch_stable(start, end, gripper, "b3", block)
+                    komo.addSwitch_stable(start, end, gripper_name, "world", block)
 
-    # solve or optime the given komo objectives
+        print(holding_duration)
+    # solve or optimize the given komo objectives
     komo.optimize()
 
     # get the report, which which generates the z.costReport file, which we can read

@@ -4,7 +4,6 @@ import libry as ry
 import random
 from optparse import OptionParser
 
-
 import actions
 import planners
 from RLGS import RLGS
@@ -12,9 +11,6 @@ from interference import ResetPosition, NoInterference
 import util.setup_env as setup_env
 
 import libpybot as pybot
-
-
-
 
 """
 Build a tower with the provided plan. 
@@ -25,7 +21,6 @@ interference in the real world.
 
 
 def get_obj_info(S, C, scene_objects):
-
     obj_infos = {}
 
     all_objects = [x for y in scene_objects for x in scene_objects[y]]
@@ -43,20 +38,21 @@ def get_obj_info(S, C, scene_objects):
 
 
 def run_experiment(experiment_name, interference_num=0, verbose=False):
-
     C = None
     action_list = []
     planner = None
     scene_objects = {}
+    tau = 0.01
+    interference_list = [NoInterference()]
 
     add_verbose = False
     add_interference = True
 
-    interference_list = [NoInterference()]
-
-    tau = 0.01
-
+    #
+    # Tower Experiment
+    #
     if experiment_name == "tower":
+
         C, scene_objects = setup_env.setup_tower_env(3)
         action_list = [
             actions.GrabBlock(),
@@ -78,25 +74,29 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
             ResetPosition(50, 52, "b1", infeasible_pos_b1)
         ))
 
-    elif experiment_name == "pick_and_place":
-        C, scene_objects = setup_env.setup_pick_and_place_env()
+
+    #
+    # Hand Over
+    #
+    elif experiment_name == "hand_over":
+        C, scene_objects = setup_env.setup_hand_over_env()
         action_list = [
             actions.GrabBlock(),
             actions.PlacePosition(),
+            actions.HandOver()
         ]
-        planner = planners.PickAndPlacePlanner()
+        planner = planners.HandOverPlanner()
 
     current_interference = interference_list[interference_num]
     C.view()
 
-
-    robot = RLGS(C, verbose=False)
+    robot = RLGS(C, verbose=True)
     if not robot.setup(action_list, planner, scene_objects):
         print("Plan is not feasible!")
         C.view_close()
         return
 
-    bot = pybot.BotOp(C, False)
+    #bot = pybot.BotOp(C, False)
     #
     # qHome = bot.get_q()
     # q = bot.get_q()[:7]
@@ -121,13 +121,16 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
         q, gripper_action = robot.step(t, tau)
 
         # if gripper_action is True:
-        #     bot.gripperClose(10, 0.05, 0.1)
+        #     bot.gripperClose(10, 0.01, 0.01)
+        #
         # elif gripper_action is False:
-        #     bot.gripperOpen(0.1, 0.1)
-
-        # move the real bot
-        bot.moveLeap(q, 2)
-        bot.step(C, 0.1)
+        #     bot.gripperOpen(0.15, 0.1)
+        #
+        # bot.waitGripperIdle()
+        #
+        # # move the real bot
+        # bot.moveLeap(q, 2)
+        # bot.step(C, 0.1)
 
         # t_1 = time.time()
         # t_delta = t_1 - t_0
@@ -135,6 +138,7 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
         #     bot.step(C, t_delta - ref_tau)
         # else:
         #     bot.step(C, 0)
+        C.setJointState(q)
 
         if robot.is_goal_fulfilled() or robot.is_no_plan_feasible():
             break
@@ -146,9 +150,14 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
     else:
         print("Plan not finished!")
 
+    # move the robot home
+    # bot.home(C)
+    #
+    # while bot.getTimeToEnd() > 0:
+    #     bot.step(C, .1)
+
     time.sleep(5)
     C.view_close()
-
 
 
 if __name__ == '__main__':
@@ -168,5 +177,3 @@ if __name__ == '__main__':
     run_experiment(options.experiment_name,
                    int(options.interference_num),
                    options.verbose)
-
-
