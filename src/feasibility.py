@@ -41,7 +41,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     komo.setTiming(len(controls), 1, 5., 1)
 
     komo.add_qControlObjective([], 1, 1e-1)  # DIFFERENT
-    komo.addSquaredQuaternionNorms([], 3.)
+    komo.addSquaredQuaternionNorms([], 2.)
 
     # build a komo in which we only show controller switches
     for i, (edge, name, controller) in enumerate(controls):

@@ -232,7 +232,7 @@ class PlaceOn(BaseAction):
             ry.OT.sos, 0.01)
         # should have z-axis in same direction
         place_on_block.addObjective(
-            C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e3]),
+            C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e1]),
             ry.OT.eq, -1)
         # align axis with block
         place_on_block.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)

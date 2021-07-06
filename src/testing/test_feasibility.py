@@ -1,6 +1,11 @@
 import libry as ry
 import time
 from util.setup_env import setup_tower_env
+import actions
+import feasibility
+
+from planners import TowerPlanner
+
 
 '''
 - only need to set switches when frames get different parent frames
@@ -9,13 +14,25 @@ from util.setup_env import setup_tower_env
 
 if __name__ == '__main__':
 
-    R, C, _ = setup_tower_env(1)
-
+    C, scene_objects = setup_tower_env(2)
 
     tau = 0.01
 
-    #get gripper position and pose
-    gripper_f = C.frame("R_gripper")
+    # grab_block = actions.GrabBlock()
+    # place_block_place = actions.PlaceOn()
+    #
+    # robust_plan = []
+    # robust_plan.extend(grab_block.get_grounded_control_set(C, ["R_gripper", "b1"]))
+    # robust_plan.extend(place_block_place.get_grounded_control_set(C, ["R_gripper", "b1", "b2"]))
+    #
+    # planner = TowerPlanner()
+    # goal = planner.get_goal_controller(C)
+    #
+    #
+    # feasibility.check_switch_chain_feasibility(C, robust_plan, goal, scene_objects, verbose=True)
+
+    # get gripper position and pose
+    gripper_f = C.getFrame("R_gripper")
     box_f = C.frame("b1")
 
     x = gripper_f.getPosition()
@@ -25,18 +42,17 @@ if __name__ == '__main__':
 
     komo = ry.KOMO()
     komo.setModel(C, False)
-    komo.setTiming(4., 10, 1., 2)  # DIFFERENT
-
+    komo.setTiming(4., 1, 5., 2)  # DIFFERENT
 
 
     komo.add_qControlObjective([], 1, 1e-1)  # DIFFERENT
     komo.addSquaredQuaternionNorms([], 3.)
 
     # grasp
-    # komo.addSwitch_stable(1., 2., "table", "R_gripper", "b1")
-    # komo.addObjective([1.], ry.FS.positionDiff, ["R_gripperCenter", "b1"], ry.OT.eq, [1e2])
-    # komo.addObjective([1.], ry.FS.scalarProductXX, ["R_gripper", "b1"], ry.OT.eq, [1e2], [0.])
-    # komo.addObjective([1.], ry.FS.vectorZ, ["R_gripper"], ry.OT.eq, [1e2], [0., 0., 1.])
+    komo.addSwitch_stable(1., 2., "table", "R_gripper", "b1")
+    komo.addObjective([1.], ry.FS.positionDiff, ["R_gripperCenter", "b1"], ry.OT.eq, [1e2])
+    komo.addObjective([1.], ry.FS.scalarProductXX, ["R_gripper", "b1"], ry.OT.eq, [1e2], [0.])
+    komo.addObjective([1.], ry.FS.vectorZ, ["R_gripper"], ry.OT.eq, [1e2], [0., 0., 1.])
 
     # lift up
     #komo.addSwitch_stable(2., 3., "R_gripper", "R_gripper", "b1")

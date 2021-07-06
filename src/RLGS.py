@@ -93,7 +93,7 @@ class RLGS:
 
         # check if plan is feasible in current config
         is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller,
-                                                                 self.scene_objects, verbose=True)
+                                                                 self.scene_objects, verbose=False)
         self.active_robust_reverse_plan = first_plan[::-1]
 
         is_feasible = True
