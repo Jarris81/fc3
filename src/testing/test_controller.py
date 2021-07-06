@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     C.view()
 
-    eqPrecision = 1.5e-1
+    eqPrecision = 1e-2
 
     tau = 0.01
 

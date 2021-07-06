@@ -106,13 +106,13 @@ class RLGS:
                                         self.C)  # TODO this will make some actions unfeasible (PlaceSide)
                 y.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
                 # TODO enabling contact will run into local minima, solved with MPC (Leap Controller from Marc)
-                #y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e1]), ry.OT.ineq)
+                # y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e1]), ry.OT.ineq)
 
         if not is_feasible:
             print("Plan is not feasible in current Scene!")
             print("Aborting")
-            #return False
-            return True # TODO remove this
+            # return False
+            return True  # TODO remove this
 
         else:
             return True
@@ -133,7 +133,7 @@ class RLGS:
         q_real = self.C.getJointState()
 
         # create a new solver every step (not ideal)
-        ctrl = ry.CtrlSolver(self.C, tau, 2)
+        ctrl = ry.CtrlSolver(self.C, 0.1, 2)
         is_any_controller_feasible = False
         is_current_plan_feasible = False
         self.gripper_action = None
@@ -158,7 +158,6 @@ class RLGS:
                         break
                     elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
                         self.gripper_action = False
-
 
                 # leave loop, we have the controller
                 break
@@ -201,10 +200,9 @@ class RLGS:
         #             self.no_plan_feasible = True
         #             self.active_robust_reverse_plan = []
 
-
-
         q_dot = self.q - self.q_old
 
+        print(q_real)
         ctrl.update(q_real, q_dot, self.C)
         q = ctrl.solve(self.C)
 
@@ -215,7 +213,6 @@ class RLGS:
 
     def cheat_update_obj(self, object_infos):
         for obj_name, obj_info in object_infos.items():
-
             obj = self.C.frame(obj_name)
             obj.setPosition(obj_info['pos'])
             shape = obj_info['shape']

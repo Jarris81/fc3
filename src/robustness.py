@@ -182,8 +182,10 @@ def get_robust_chain(C, controllers, goal_controller, verbose=False):
 
         implicit_features_tuples = []
 
+        all_objectives = action_next.getObjectives() + action_next.getStartConditions()
+
         # implicit features are all those features of next/follow controller, which are NOT fulfilled in komo solution
-        for follow_obj in action_next.getObjectives():
+        for follow_obj in all_objectives:
             # only care about immediate objectives
             obj_type = follow_obj.get_OT()
             if obj_type == ry.OT.eq or obj_type == ry.OT.ineq:
@@ -216,7 +218,7 @@ def get_robust_chain(C, controllers, goal_controller, verbose=False):
             print(f"Implicit Features for {name}:")
         # add implicit objectives to current controller as transient objectives
         for implicit_feature, obj_type in implicit_features_tuples:
-            ctrlset.addObjective(implicit_feature, ry.OT.eq, -1)  # TODO: need to get the same OT, could also be ineq
+            ctrlset.addStartCondition(implicit_feature, ry.OT.eq)  # TODO: need to get the same OT, could also be ineq
             if verbose:
                 print(implicit_feature.description(C), )
         for implicit_sc in implicit_scs:

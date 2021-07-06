@@ -120,17 +120,17 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
         # get the next q values of robot
         q, gripper_action = robot.step(t, tau)
 
-        if gripper_action is True:
-            bot.gripperClose(10, 0.01, 0.01)
-
-        elif gripper_action is False:
-            bot.gripperOpen(0.15, 0.1)
+        # if gripper_action is True:
+        #     bot.gripperClose(10, 0.01, 0.01)
+        #
+        # elif gripper_action is False:
+        #     bot.gripperOpen(0.08, 0.1)
 
         #bot.waitGripperIdle()
 
         # move the real bot
         bot.moveLeap(q, 2)
-        bot.step(C, 0.01)
+        bot.step(C, 0)
 
         # t_1 = time.time()
         # t_delta = t_1 - t_0

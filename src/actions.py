@@ -150,7 +150,7 @@ class GrabBlock(BaseAction):
         #  block needs to be close to block
         grab = ry.CtrlSet()
         grab.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper_center, block], [1e1]),
+            C.feature(ry.FS.positionDiff, [gripper_center, block], [1e0]),
             ry.OT.eq, -1)
         # condition, nothing is in hand of gripper
         grab.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
@@ -225,17 +225,20 @@ class PlaceOn(BaseAction):
             C.feature(ry.FS.positionDiff, [block, block_placed_on], [5, 5, 0]),
             ry.OT.eq, -1)
         place_on_block.addObjective(
-            C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e2], [0., 0., dist]),
-            ry.OT.sos, 0.001)
+            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e1], [0., 0., dist]),
+            ry.OT.sos, 0.01)
         # should have z-axis in same direction
         place_on_block.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e1]),
-            ry.OT.sos, 0.001)
+            ry.OT.sos, 0.01)
         # align axis with block
         place_on_block.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
         # open gripper
         open_gripper = ry.CtrlSet()
+        open_gripper.addObjective(
+            C.feature(ry.FS.positionRel, [block, block_placed_on], [5], [0., 0., dist]),
+            ry.OT.eq, -1)
         # open_gripper.addObjective(
         #     C.feature(ry.FS.distance, [gripper_center, block], [1e0]),
         #     ry.OT.eq, -1)
