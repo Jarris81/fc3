@@ -126,7 +126,7 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
         elif gripper_action is False:
             bot.gripperOpen(0.15, 0.1)
 
-        bot.waitGripperIdle()
+        #bot.waitGripperIdle()
 
         # move the real bot
         bot.moveLeap(q, 2)

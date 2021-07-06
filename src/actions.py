@@ -117,16 +117,10 @@ class GrabBlock(BaseAction):
 
         align_over = ry.CtrlSet()
         align_over.addObjective(
-            C.feature(ry.FS.scalarProductYZ, [block, gripper], [1e2]),
+            C.feature(ry.FS.positionRel, [gripper_center, block], [1e1], [0, 0, height_block]),
             ry.OT.sos, transient_step)
         align_over.addObjective(
-            C.feature(ry.FS.scalarProductYZ, [block, gripper], [1e1]),
-            ry.OT.sos, transient_step)
-        align_over.addObjective(
-            C.feature(ry.FS.positionRel, [gripper_center, block], [1e2], [0, 0, height_block]),
-            ry.OT.sos, transient_step)
-        align_over.addObjective(
-            C.feature(ry.FS.vectorZDiff, [block, gripper], [1e2]),
+            C.feature(ry.FS.vectorZDiff, [block, gripper], [1e1]),
             ry.OT.sos, transient_step)
 
         cage_block = ry.CtrlSet()
