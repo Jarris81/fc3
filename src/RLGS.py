@@ -106,7 +106,7 @@ class RLGS:
                                         self.C)  # TODO this will make some actions unfeasible (PlaceSide)
                 y.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
                 # TODO enabling contact will run into local minima, solved with MPC (Leap Controller from Marc)
-                # y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e1]), ry.OT.ineq)
+                # y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e0]), ry.OT.ineq)
 
         if not is_feasible:
             print("Plan is not feasible in current Scene!")

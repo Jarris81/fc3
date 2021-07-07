@@ -111,7 +111,7 @@ class GrabBlock(BaseAction):
         gripper_center = gripper + "Center"
         block = sym2frame[self.block_sym]
 
-        height_block = C.getFrame(block).getSize()[-1]
+        height_block = C.getFrame(block).getSize()[2]
 
         transient_step = 0.02
 
@@ -122,6 +122,9 @@ class GrabBlock(BaseAction):
         align_over.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, gripper], [1e1]),
             ry.OT.sos, transient_step)
+        align_over.addObjective(
+            C.feature(ry.FS.scalarProductYX, [block, gripper], [1e3]),
+            ry.OT.sos, 0.05)
 
         cage_block = ry.CtrlSet()
         cage_block.addObjective(
@@ -130,10 +133,13 @@ class GrabBlock(BaseAction):
         # move close to block
         cage_block.addObjective(
             C.feature(ry.FS.positionDiff, [gripper_center, block], [1e2]),
-            ry.OT.sos, 0.005)
+            ry.OT.sos, 0.05)
         cage_block.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, gripper], [1e1]),
             ry.OT.sos, transient_step)
+        cage_block.addObjective(
+            C.feature(ry.FS.scalarProductYX, [block, gripper], [1e3]),
+            ry.OT.sos, 0.05)
         # align axis with block
 
         # weird: following objective lets the robot oscillate between align and cage
@@ -150,7 +156,7 @@ class GrabBlock(BaseAction):
         #  block needs to be close to block
         grab = ry.CtrlSet()
         grab.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper_center, block], [1e0]),
+            C.feature(ry.FS.positionDiff, [gripper_center, block], [1e1]),
             ry.OT.eq, -1)
         # condition, nothing is in hand of gripper
         grab.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
@@ -202,8 +208,8 @@ class PlaceOn(BaseAction):
         block = sym2frame[self.block_sym]
         block_placed_on = sym2frame['B_placed']
 
-        height_block = C.getFrame(block).getSize()[-2]
-        height_block_place_on = C.getFrame(block_placed_on).getSize()[-2]
+        height_block = C.getFrame(block).getSize()[2]
+        height_block_place_on = C.getFrame(block_placed_on).getSize()[2]
 
         dist = (height_block + height_block_place_on) / 2
         dist2 = dist*2
@@ -213,7 +219,7 @@ class PlaceOn(BaseAction):
             C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e1]),
             ry.OT.sos, 0.01)
         align_over.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e1], [0, 0, dist2]),
+            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e2], [0, 0, dist2]),
             ry.OT.sos, 0.01)
         align_over.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
@@ -246,11 +252,21 @@ class PlaceOn(BaseAction):
         open_gripper.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
         open_gripper.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
 
+        move_safely = ry.CtrlSet()
+        move_safely.addObjective(
+            C.feature(ry.FS.vectorZDiff, [block, gripper], [1e1]),
+            ry.OT.sos, 0.01)
+        move_safely.addObjective(
+            C.feature(ry.FS.positionRel, [gripper, block], [1e2], [0, 0, dist2]),
+            ry.OT.sos, 0.01)
+        move_safely.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
+
         # return tuple of controllers
         controllers = [
             ("align_over", align_over),
             ("place_on_block", place_on_block),
-            ("open_gripper", open_gripper)
+            ("open_gripper", open_gripper),
+            ("move_safely", move_safely)
         ]
         return add_action_name(self.name, controllers)
 

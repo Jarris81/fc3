@@ -90,9 +90,9 @@ class TowerPlanner:
         for _, block, block_place_on in goals_block_on_block:
 
             if block not in block_heights:
-                block_heights[block] = C.frame(block).getSize()[-2]
+                block_heights[block] = C.frame(block).getSize()[2]
             if block_place_on not in block_heights:
-                block_heights[block_place_on] = C.frame(block_place_on).getSize()[-2]
+                block_heights[block_place_on] = C.frame(block_place_on).getSize()[2]
 
             height_block = block_heights[block]
             height_block_place_on = block_heights[block_place_on]

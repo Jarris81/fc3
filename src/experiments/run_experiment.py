@@ -97,18 +97,13 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
         return
 
     bot = pybot.BotOp(C, True)
-    #
-    # qHome = bot.get_q()
-    # q = bot.get_q()[:7]
-    # q[1] = q[1] - .2
-    #
-    # bot.move(q.reshape(1, 7), [2])
-    # bot.move(qHome.reshape(1, 7), [2])
-    # bot.move(q.reshape(1, 7), [2])
-    #
-    # while bot.getTimeToEnd() > 0:
-    #     bot.step(C_real, .1)
-    #     time.sleep(.1)
+    bot.home(C)
+    while bot.getTimeToEnd() > 0:
+        bot.step(C, .1)
+        time.sleep(.1)
+
+    bot.gripperOpen(0.08, 0.1)
+    bot.waitGripperIdle()
 
     ref_tau = 0.05
 
@@ -120,13 +115,13 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
         # get the next q values of robot
         q, gripper_action = robot.step(t, tau)
 
-        # if gripper_action is True:
-        #     bot.gripperClose(10, 0.01, 0.01)
-        #
-        # elif gripper_action is False:
-        #     bot.gripperOpen(0.08, 0.1)
+        if gripper_action is True:
+            bot.gripperClose(10, 0.01, 0.1)
 
-        #bot.waitGripperIdle()
+        elif gripper_action is False:
+            bot.gripperOpen(0.08, 0.1)
+
+        bot.waitGripperIdle()
 
         # move the real bot
         bot.moveLeap(q, 2)
