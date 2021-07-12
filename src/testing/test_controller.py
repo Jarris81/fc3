@@ -9,7 +9,7 @@ from planners import TowerPlanner
 
 if __name__ == '__main__':
 
-    C, block_names = setup_hand_over_env()
+    C, block_names = setup_tower_env(3)
 
     grab_stick = actions.GrabStick()
     pull_block = actions.PullBlockStick()
@@ -35,11 +35,9 @@ if __name__ == '__main__':
     # robust_plan.extend(pull_block.get_grounded_control_set(C, ["R_gripper", "b1", "stick"]))
 
     robust_plan.extend(grab_block.get_grounded_control_set(C, ["R_gripper", "b1"]))
-    #robust_plan.extend(place_block_place.get_grounded_control_set(C, ["R_gripper", "b1", "b2"]))
+    robust_plan.extend(place_block_place.get_grounded_control_set(C, ["R_gripper", "b1", "b2"]))
     #robust_plan.extend(handover.get_grounded_control_set(C, ["R_gripper", "L_gripper", "b1"]))
-    robust_plan.extend(place_pos.get_grounded_control_set(C, ["R_gripper", "b1"]))
-
-
+    #robust_plan.extend(place_pos.get_grounded_control_set(C, ["R_gripper", "b1"]))
 
 
     for name, a in robust_plan:
