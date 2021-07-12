@@ -90,9 +90,9 @@ class TowerPlanner:
         for _, block, block_place_on in goals_block_on_block:
 
             if block not in block_heights:
-                block_heights[block] = C.frame(block).getSize()[-2]
+                block_heights[block] = C.frame(block).getSize()[2]
             if block_place_on not in block_heights:
-                block_heights[block_place_on] = C.frame(block_place_on).getSize()[-2]
+                block_heights[block_place_on] = C.frame(block_place_on).getSize()[2]
 
             height_block = block_heights[block]
             height_block_place_on = block_heights[block_place_on]
@@ -100,12 +100,12 @@ class TowerPlanner:
             dist = (height_block + height_block_place_on)/2
 
             goal_feature.addObjective(
-                C.feature(ry.FS.positionRel, [block, block_place_on], [1e1], [0, 0, dist]),
+                C.feature(ry.FS.positionRel, [block, block_place_on], [5], [0, 0, dist]),
                 ry.OT.eq, -1)
             # should have z-axis in same direction
-            goal_feature.addObjective(
-                C.feature(ry.FS.vectorZDiff, [block, block_place_on], [1e1]),
-                ry.OT.eq, -1)
+            # goal_feature.addObjective(
+            #     C.feature(ry.FS.vectorZDiff, [block, block_place_on], [1e1]),
+            #     ry.OT.eq, -1)
 
             goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", block), True)
 
