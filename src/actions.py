@@ -381,7 +381,7 @@ class PlaceSide(BaseAction):
         self.delete_effects = self.preconditions
 
     def get_grounded_control_set(self, C, frames):
-        free_place = (0.5, 0.1, 0.68)
+        free_place = (-0.3, 0.3, 0.68)
         table_pos = (-0.2, -0.2, 0)
         sym2frame = _get_sym2frame(self.symbols, frames)
 

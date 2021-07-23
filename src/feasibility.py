@@ -96,7 +96,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
                 if end == len(controls):
                     komo.addSwitch_stable(start+1, -1, gripper_name, "world", block)
                 else:
-                    komo.addSwitch_stable(start, end, gripper_name, "world", block)
+                    komo.addSwitch_stable(start+1, end, gripper_name, "world", block)
 
         print(holding_duration)
     # solve or optimize the given komo objectives
