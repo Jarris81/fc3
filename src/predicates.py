@@ -1,7 +1,5 @@
-import util.constants as dt
 import libry as ry
 import numpy as np
-import itertools
 
 
 class BasePredicate:
@@ -140,7 +138,7 @@ class HandEmpty(BasePredicate):
                 C.feature(ry.FS.pairCollision_negScalar, [frame, gripper_pre_grasp_frame], [1e1])
             )
         return []
-        #return features
+        # return features
 
     def symbolic_commands(self, C, all_frames):
         commands = []
@@ -181,6 +179,35 @@ class BlockFree(BasePredicate):
         return features
 
 
+class BottleFree(BasePredicate):
+
+    def __init__(self, bottle_sym):
+        super().__init__()
+        self.bottle_sym = bottle_sym
+        self.rel_symbols = [self.bottle_sym]
+
+    def get_predicate(self):
+
+        return self.name, self.bottle_sym
+
+    def features(self, C, all_frames):
+
+        features = []
+        block_frame = self.sym2frame[self.bottle_sym]
+
+        all_frames = set(all_frames)
+        rel_frames = {block_frame}
+        other_frames = all_frames.difference(rel_frames)
+        block_place_box_frame = block_frame + "_place_box"
+        for frame in other_frames:
+            if not "gripper" in frame:
+                features.append(
+                    C.feature(ry.FS.pairCollision_negScalar, [frame, block_place_box_frame], [1e0])
+                )
+
+        return features
+
+
 class BlockOnBlock(BasePredicate):
 
     def __init__(self, block_sym, block_placed_on_sym):
@@ -192,7 +219,6 @@ class BlockOnBlock(BasePredicate):
         return self.name, self.block_sym, self.block_placed_on_sym
 
     def features(self, C, all_frames):
-
         super().features(C, all_frames)
 
         block = self.sym2frame[self.block_sym]
@@ -228,3 +254,12 @@ class BlockIsClose(BasePredicate):
     def get_predicate(self):
         return self.name, self.block_sym
 
+
+class BottleOpen(BasePredicate):
+
+    def __init__(self, bottle_sym):
+        super().__init__()
+        self.bottle_sym = bottle_sym
+
+    def get_predicate(self):
+        return self.name, self.bottle_sym

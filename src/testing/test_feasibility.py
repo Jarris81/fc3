@@ -14,7 +14,7 @@ from planners import TowerPlanner
 
 if __name__ == '__main__':
 
-    C, scene_objects = setup_tower_env(2)
+    C, scene_objects = setup_tower_env()
 
     tau = 0.01
 

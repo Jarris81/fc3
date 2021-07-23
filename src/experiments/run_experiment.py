@@ -37,7 +37,7 @@ def get_obj_info(S, C, scene_objects):
     return obj_infos
 
 
-def run_experiment(experiment_name, interference_num=0, verbose=False):
+def run_experiment(experiment_name, use_real_robot, use_config_only, interference_num=0, verbose=False):
     C = None
     action_list = []
     planner = None
@@ -53,7 +53,7 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
     #
     if experiment_name == "tower":
 
-        C, scene_objects = setup_env.setup_tower_env(3)
+        C, scene_objects = setup_env.setup_tower_env()
         action_list = [
             actions.GrabBlock(),
             actions.PlaceOn(),
@@ -74,7 +74,6 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
             ResetPosition(50, 52, "b1", infeasible_pos_b1)
         ))
 
-
     #
     # Hand Over
     #
@@ -87,25 +86,37 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
         ]
         planner = planners.HandOverPlanner()
 
+
+    #
+    # Bottle Open
+    #
+    elif experiment_name == "botle_open":
+        C, scene_objects = setup_env.setup_bottle_open_env()
+        action_list = [
+
+        ]
+
     current_interference = interference_list[interference_num]
     C.view()
 
-    robot = RLGS(C, verbose=True)
-    if not robot.setup(action_list, planner, scene_objects):
+    rlgs = RLGS(C, verbose=True)
+    if not rlgs.setup(action_list, planner, scene_objects):
         print("Plan is not feasible!")
         C.view_close()
         return
 
-    bot = pybot.BotOp(C, True)
-    bot.home(C)
-    while bot.getTimeToEnd() > 0:
-        bot.step(C, .1)
-        time.sleep(.1)
+    # Setup the real or simulated robot here
+    if not use_config_only:
 
-    bot.gripperOpen(0.08, 0.1)
-    bot.waitGripperIdle()
+        bot = pybot.BotOp(C, use_real_robot)
+        bot.home(C)
+        while bot.getTimeToEnd() > 0:
+            bot.step(C, .1)
+            time.sleep(.1)
 
-    ref_tau = 0.05
+        bot.gripperOpen(0.08, 0.1)
+        bot.waitGripperIdle()
+
 
     for t in range(10000):
 
@@ -113,43 +124,46 @@ def run_experiment(experiment_name, interference_num=0, verbose=False):
             current_interference.do_interference(C, t)
 
         # get the next q values of robot
-        q, gripper_action = robot.step(t, tau)
+        q, gripper_action = rlgs.step(t, tau)
 
-        if gripper_action is True:
-            bot.gripperClose(10, 0.01, 0.1)
+        if not use_config_only:
 
-        elif gripper_action is False:
-            bot.gripperOpen(0.08, 0.1)
+            if gripper_action is True:
+                bot.gripperClose(10, 0.01, 0.1)
 
-        bot.waitGripperIdle()
+            elif gripper_action is False:
+                bot.gripperOpen(0.08, 0.1)
 
-        # move the real bot
-        bot.moveLeap(q, 2)
-        bot.step(C, 0)
+            bot.waitGripperIdle()
 
-        # t_1 = time.time()
-        # t_delta = t_1 - t_0
-        # if t_delta > ref_tau:
-        #     bot.step(C, t_delta - ref_tau)
-        # else:
-        #     bot.step(C, 0)
-        #C.setJointState(q)
+            # move the real bot
+            bot.moveLeap(q, 2)
+            bot.step(C, 0)
+        else:
+            C.setJointState(q)
+            time.sleep(tau)
 
-        if robot.is_goal_fulfilled() or robot.is_no_plan_feasible():
+        if rlgs.is_goal_fulfilled() or rlgs.is_no_plan_feasible():
             break
 
-    if robot.is_no_plan_feasible():
+    if rlgs.is_no_plan_feasible():
         print("No Plan is feasible, abort")
-    elif robot.is_goal_fulfilled():
+    elif rlgs.is_goal_fulfilled():
         print("Plan finished!")
     else:
         print("Plan not finished!")
 
-    # move the robot home
-    bot.home(C)
+    if not use_config_only:
+        # move the robot home
+        bot.home(C)
+        while bot.getTimeToEnd() > 0:
+            bot.step(C, 0)
 
-    while bot.getTimeToEnd() > 0:
-        bot.step(C, .1)
+    else:
+        while not rlgs.is_home():
+            q = rlgs.move_home()
+            C.setJointState(q)
+            time.sleep(tau)
 
     time.sleep(5)
     C.view_close()
@@ -168,7 +182,15 @@ if __name__ == '__main__':
     parser.add_option("-i", "--interference", dest="interference_num", default=0,
                       help="Define interference")
 
+    parser.add_option("-c", "--config_only", dest="use_config_only", default=False,
+                      help="True if only use config, dont simulate real robot")
+
+    parser.add_option("-r", "--real", dest="use_real_robot", default=True,
+                      help="True if use a real robot")
+
     (options, args) = parser.parse_args()
     run_experiment(options.experiment_name,
+                   options.use_real_robot,
+                   options.use_config_only,
                    int(options.interference_num),
                    options.verbose)

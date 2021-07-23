@@ -41,7 +41,39 @@ class RLGS:
         self.q = None
         self.q_old = None
 
+        # precision needed to initiate a controller
         self.eqPrecision = 1e-2
+
+        # home controller, used when robot is done with plan
+        self.home_controller = ry.CtrlSet()
+        self.q_home = C.getJointState()
+        self.home_controller.addObjective(
+            C.feature(ry.FS.qItself, [], [1e2], self.q_home),
+            ry.OT.sos, 0.05
+        )
+        self.home_controller.add_qControlObjective(2, 1e-5 * np.sqrt(0.01),
+                                self.C)  # TODO this will make some actions unfeasible (PlaceSide)
+        self.home_controller.add_qControlObjective(1, 1e-3 * np.sqrt(0.01), self.C)
+
+
+
+    def move_home(self):
+
+        ctrl = ry.CtrlSolver(self.C, 0.1, 2)
+        ctrl.set(self.home_controller)
+        ctrl.update(self.C.getJointState(), [], self.C)
+        return ctrl.solve(self.C)
+
+
+    def is_home(self):
+        #ctrl = ry.CtrlSolver(self.C, 0.1, 2)
+        # TODO: not working, convergence should be
+        # return self.home_controller.isConverged(ctrl, self.eqPrecision)
+        q_home = self.q_home
+        q_cur = self.C.getJointState()
+        is_home = np.allclose(self.C.getJointState(), self.q_home, self.eqPrecision, self.eqPrecision)
+        return is_home
+
 
     def setup(self, action_list, planner, scene_objects):
 
@@ -66,7 +98,7 @@ class RLGS:
             print("Aborting")
             return
 
-        # setup controlsets
+        # setup control sets
 
         name2con = {x.name: x for x in action_list}
         grounded_actions = nx.get_edge_attributes(action_tree, "action")
@@ -166,12 +198,12 @@ class RLGS:
                     print(f"Cannot be initiated: {name}")
 
         # check feasibility of chain
-        # if not t % self.feasy_check_rate:
-        #     # check rest of chain for feasibility
-        #     residual_plan = self.active_robust_reverse_plan[current_controller_index::-1]
-        #     is_current_plan_feasible, _ = check_switch_chain_feasibility(self.C, residual_plan,
-        #                                                                  self.goal_controller,
-        #                                                                  self.scene_objects, verbose=False)
+        if not t % self.feasy_check_rate:
+            # check rest of chain for feasibility
+            residual_plan = self.active_robust_reverse_plan[current_controller_index::-1]
+            is_current_plan_feasible, _ = check_switch_chain_feasibility(self.C, residual_plan,
+                                                                         self.goal_controller,
+                                                                         self.scene_objects, verbose=True)
 
         # # if current plan is not feasible, check other plans
         # if (not is_any_controller_feasible or not is_current_plan_feasible) and not t % self.feasy_check_rate:
