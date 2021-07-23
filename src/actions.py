@@ -113,7 +113,7 @@ class GrabBlock(BaseAction):
 
         height_block = C.getFrame(block).getSize()[2]
 
-        transient_step = 0.1
+        transient_step = 0.01
 
         align_over = ry.CtrlSet()
         align_over.addObjective(
@@ -163,9 +163,11 @@ class GrabBlock(BaseAction):
         grab.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
 
         # return tuple of controllers
-        controllers = [("align_over", align_over),
-                       ("cage_block", cage_block),
-                       ("grab", grab)]
+        controllers = [
+            ("align_over", align_over),
+            ("cage_block", cage_block),
+            ("grab", grab)
+        ]
 
         return add_action_name(self.name, controllers)
 
@@ -240,9 +242,11 @@ class GrabBottle(BaseAction):
         grab.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, bottle), False)
 
         # return tuple of controllers
-        controllers = [("align_side", align_side),
-                       ("cage_bottle", cage_bottle),
-                       ("grab", grab)]
+        controllers = [
+            ("align_side", align_side),
+            ("cage_bottle", cage_bottle),
+            ("grab", grab)
+        ]
 
         return add_action_name(self.name, controllers)
 
@@ -291,14 +295,14 @@ class PlaceOn(BaseAction):
         dist = (height_block + height_block_place_on) / 2
         dist2 = dist * 2
 
-        transient_step = 0.1
+        transient_step = 0.01
 
         align_over = ry.CtrlSet()
         align_over.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e1]),
             ry.OT.sos, transient_step)
         align_over.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e2], [0, 0, dist2]),
+            C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e1], [0, 0, 0.12]),
             ry.OT.sos, transient_step)
         align_over.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
@@ -307,10 +311,10 @@ class PlaceOn(BaseAction):
         #     C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e1]),
         #     ry.OT.eq, -1)
         place_on_block.addObjective(
-            C.feature(ry.FS.positionDiff, [block, block_placed_on], [5, 5, 0]),
+            C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e1, 1e1, 0]),
             ry.OT.eq, -1)
         place_on_block.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e1], [0., 0., dist]),
+            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e2], [0., 0., dist]),
             ry.OT.sos, transient_step / 10)
         # should have z-axis in same direction
         place_on_block.addObjective(
@@ -809,7 +813,6 @@ class OpenBottle(BaseAction):
         grab_cap.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_1, bottle), True)
         grab_cap.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_2, cap), False)
 
-
         # turn cap
         turn_cap = ry.CtrlSet()
         turn_cap.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_1, bottle), True)
@@ -823,8 +826,7 @@ class OpenBottle(BaseAction):
         #     C.feature(ry.FS.quaternionDiff, [bottle, cap], [1e2], [0,0,0,1]),
         #     ry.OT.sos, 0.005)
 
-
-        #grab_cap.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_2, cap), False)
+        # grab_cap.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_2, cap), False)
         # align_2.addObjective(
         #     C.feature(ry.FS.scalarProductZZ, [gripper_1, gripper_2], [1e2], [-1]),
         #     ry.OT.sos, 0.01)

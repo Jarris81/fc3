@@ -218,7 +218,7 @@ def get_robust_chain(C, controllers, goal_controller, verbose=False):
             print(f"Implicit Features for {name}:")
         # add implicit objectives to current controller as transient objectives
         for implicit_feature, obj_type in implicit_features_tuples:
-            ctrlset.addStartCondition(implicit_feature, ry.OT.eq)  # TODO: need to get the same OT, could also be ineq
+            ctrlset.addStartCondition(implicit_feature, obj_type)  # TODO: need to get the same OT, could also be ineq
             if verbose:
                 print(implicit_feature.description(C), )
         for implicit_sc in implicit_scs:
@@ -309,7 +309,7 @@ def get_robust_set_of_chains(C, tree, state_plan, goal_controller, verbose=False
             implicit_ctrlsets[edge].append((name, implicit_controller))
 
         # add entire path to set of control chains
-        set_of_chains.append([(name, x) for edge in path for name, x in implicit_ctrlsets[edge]])
+        set_of_chains.append([(edge, name, x) for edge in path for name, x in implicit_ctrlsets[edge]])
 
     nx.set_edge_attributes(tree, implicit_ctrlsets, "implicit_ctrlsets")
 

@@ -6,7 +6,7 @@ import time
 
 path_to_repo = "/home/jason/git/thesis_2020/"
 
-table_height = 0.65
+table_height = 0.635
 
 
 def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2)),  block_size=(.06, .06, .06, 0.001)):
@@ -33,7 +33,7 @@ def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2)),  block_size=(.06,
         scene_objects[constants.type_block].append(name)
 
         pos_xy = positions[o]
-        pos_block = (*pos_xy, block_size[2] / 2 + 0.635)
+        pos_block = (*pos_xy, block_size[2] / 2 + table_height)
 
         # quick hack to see if predicate is feasible
         # if o == 0:

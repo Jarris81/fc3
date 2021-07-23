@@ -38,10 +38,10 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
 
     komo = ry.KOMO()
     komo.setModel(C_temp, False)  # use swift collision engine
-    komo.setTiming(len(controls), 1, 5., 1)
+    komo.setTiming(len(controls), 1, 1., 1)
 
     komo.add_qControlObjective([], 1, 1e-1)  # DIFFERENT
-    komo.addSquaredQuaternionNorms([], 2.)
+    komo.addSquaredQuaternionNorms([], 3)
 
     # build a komo in which we only show controller switches
     for i, (edge, name, controller) in enumerate(controls):
@@ -82,6 +82,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
                     holding_duration.append([hold, holding_duration[-1][-1], 1 + holding_duration[-1][-1]])
             last_hold = hold
         for j, (grab, start, end) in enumerate(holding_duration):
+            # first switch we can skip
             if j == 0:
                 continue
             if grab:
@@ -93,7 +94,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
             else:
                 # open
                 if end == len(controls):
-                    komo.addSwitch_stable(start, -1, gripper_name, "world", block)
+                    komo.addSwitch_stable(start+1, -1, gripper_name, "world", block)
                 else:
                     komo.addSwitch_stable(start, end, gripper_name, "world", block)
 
