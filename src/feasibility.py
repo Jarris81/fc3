@@ -28,79 +28,128 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     komo.add_qControlObjective([], 1, 1e-1)  # DIFFERENT
     komo.addSquaredQuaternionNorms([], 3)
 
-    for gripper_name in scene_objects[type_gripper]:
-        # gripper_name = "R_gripper"
+    holding_list = {}
 
-        holding_list = {}
-        holding = {}
-        for block_name in scene_objects[type_block]:
-            block = C_temp.getFrame(block_name)
-            info = block.info()
-            if "parent" in block.info() and block.info()["parent"] == gripper_name:
-                holding_list[block_name] = [True]
-                holding[block_name] = True
-            else:
-                holding_list[block_name] = [False]
-                holding[block_name] = False
+    # iterate over every block
+
+    for block_name in scene_objects[type_block]:
+        block_info = C_temp.getFrame(block_name).info()
+        holding_list[block_name] = ["world"] * len(controls)
+        if "parent" in block_info:
+            holding_list[block_name][0] = block_info["parent"]
+
+    # build a komo in which we only show controller switches
+    # we need to extract the switches from the symbolic commands, to build objects bin switched
+    for i, (edge, name, controller) in enumerate(controls):
+
+        # get the sos objectives of current controller
+        for o in controller.getObjectives():
+            f = o.feat()
+            # we dont care about control objectives
+            if o.get_OT() == ry.OT.sos and "qItself" not in f.description(C_temp):
+                komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_temp), o.get_OT(), f.getScale(),
+                                  o.getOriginalTarget())
+
+        # go over symbolic commands
+        for ctrlCommand in controller.getSymbolicCommands():
+            gripper, block = ctrlCommand.getFrameNames()
+            if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:  # and not ctrlCommand.isCondition():
+                holding_list[block][i] = gripper
+                # holding_list[block][i-1] = gripper
+
+                # # find where the block was grabbed
+                # grab_index = holding_list[block][::-1].index(gripper)
+                #
+                # holding_list[block][-(grab_index-1):i] = [gripper] * ()
+                # pass
+
+        # # go over symbolic commands
+        # for ctrlCommand in controller.getSymbolicCommands():
+        #     gripper, block = ctrlCommand.getFrameNames()
+        #     if not ctrlCommand.isCondition():
+        #         if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:  # and not ctrlCommand.isCondition():
+        #             holding_list[block][i] = gripper
+    # go over symbolic commands
+    for ctrlCommand in goal.getSymbolicCommands():
+        gripper, block = ctrlCommand.getFrameNames()
+        if ctrlCommand.isCondition():
+            if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:  # and not ctrlCommand.isCondition():
+                holding_list[block].append(gripper)
+                break
+            elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:  # and not ctrlCommand.isCondition():
+                holding_list[block].append("world")
+                break
 
 
 
-        # build a komo in which we only show controller switches
-        for i, (edge, name, controller) in enumerate(controls):
-
-            # get the sos objectives of current controller
-            for o in controller.getObjectives():
-                f = o.feat()
-                # we dont care about control objectives
-                if o.get_OT() == ry.OT.sos and "qItself" not in f.description(C_temp):
-                    komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_temp), o.get_OT(), f.getScale(),
-                                      o.getOriginalTarget())
-            for ctrlCommand in controller.getSymbolicCommands():
-                gripper, block = ctrlCommand.getFrameNames()
-                if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER and gripper == gripper_name:
-                    holding[block] = True
-                elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER and gripper == gripper_name:
-                    holding[block] = False
-
-            # append blocks
-            for block in holding:
-                holding_list[block].append(holding[block])
-
-        # go over every switch for each block
-        for block in holding_list:
-            hold_list = holding_list[block]
-            holding_duration = [[hold_list[0], 0, 0]]
-            last_hold = hold_list[0]
-            for i, hold in enumerate(hold_list):
-                # specifying the first grab/release is redundant, since no switch
-                if i == 0:
-                    continue
+    # count the duration of each phase
+    holding_phase_list = {}
+    for block, phases in holding_list.items():
+        holding_phase_list[block] = []
+        last_phase, previous_holder = phases[0], phases[0]
+        start = 0
+        for i, phase in enumerate(phases):
+            if phase != last_phase:
+                is_handover = "gripper" in previous_holder and "gripper" in last_phase
+                if is_handover:
+                    holding_phase_list[block].append(
+                        (start-1, i-1, previous_holder, last_phase)
+                    )
                 else:
-                    # if are same, add one to duration
-                    if last_hold is hold:
-                        holding_duration[-1][-1] += 1
-                    else:
-                        # switch was made!
-                        holding_duration.append([hold, holding_duration[-1][-1], 1 + holding_duration[-1][-1]])
-                last_hold = hold
-            for j, (grab, start, end) in enumerate(holding_duration):
-                # first switch we can skip
-                if j == 0:
-                    continue
-                if grab:
-                    # grab
-                    if end == len(controls):
-                        komo.addSwitch_stable(start, -1, "world", gripper_name, block)
-                    else:
-                        komo.addSwitch_stable(start, end, "world", gripper_name, block)
-                else:
-                    # open
-                    if end == len(controls):
-                        komo.addSwitch_stable(start + 1, -1, gripper_name, "world", block)
-                    else:
-                        komo.addSwitch_stable(start + 1, end, gripper_name, "world", block)
+                    holding_phase_list[block].append(
+                        (start, i-1, previous_holder, last_phase)
+                    )
+                start = i
+                previous_holder = last_phase
+            last_phase = phase
+            if i == len(phases)-1:
+                holding_phase_list[block].append(
+                    (start, -1, previous_holder, phase)
+                )
+                # if len(holding_phase_list[block]) != 1:
+                #     holding_phase_list[block].append(
+                #         (i-1, -1, phase, "world")
+                #     )
 
-            print(holding_duration)
+    for block, switches in holding_phase_list.items():
+        for start, end, previous, next in switches[1:]:
+            komo.addSwitch_stable(start, end, previous, next, block)
+
+    # # go over every switch for each block
+    # for block in holding_list:
+    #     hold_list = holding_list[block]
+    #     holding_duration = [[hold_list[0], 0, 0]]
+    #     last_hold = hold_list[0]
+    #     for i, hold in enumerate(hold_list):
+    #         # specifying the first grab/release is redundant, since no switch
+    #         if i == 0:
+    #             continue
+    #         else:
+    #             # if are same, add one to duration
+    #             if last_hold is hold:
+    #                 holding_duration[-1][-1] += 1
+    #             else:
+    #                 # switch was made!
+    #                 holding_duration.append([hold, holding_duration[-1][-1], 1 + holding_duration[-1][-1]])
+    #         last_hold = hold
+    #     for j, (grab, start, end) in enumerate(holding_duration):
+    #         # first switch we can skip
+    #         if j == 0:
+    #             continue
+    #         if grab:
+    #             # grab
+    #             if end == len(controls):
+    #                 komo.addSwitch_stable(start, -1, "world", gripper_name, block)
+    #             else:
+    #                 komo.addSwitch_stable(start, end, "world", gripper_name, block)
+    #         else:
+    #             # open
+    #             if end == len(controls):
+    #                 komo.addSwitch_stable(start + 1, -1, gripper_name, "world", block)
+    #             else:
+    #                 komo.addSwitch_stable(start + 1, end, gripper_name, "world", block)
+    #
+    #     print(holding_duration)
     # solve or optimize the given komo objectives
     komo.optimize()
 

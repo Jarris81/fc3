@@ -460,7 +460,7 @@ class PlacePosition(BaseAction):
         self.delete_effects = self.preconditions
 
     def get_grounded_control_set(self, C, frames):
-        goal_place = (0.5, 0.3, 0.71)
+        goal_place = (-0.5, 0.3, 0.71)
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         gripper = sym2frame[self.gripper_sym]
@@ -728,30 +728,30 @@ class HandOver(BaseAction):
         hand_over_1.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper_give, block), False)
         hand_over_1.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_give, block), True)
 
-        # hand_over_1.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper_take, block), True)
-        # hand_over_1.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_take, block), False)
+        hand_over_1.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper_take, block), True)
+        hand_over_1.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_take, block), False)
 
-        hand_over_2 = ry.CtrlSet()
-        hand_over_2.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper_give_center, block], [1e2]),
-            ry.OT.eq, -1)
-        hand_over_2.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper_take_center, block], [1e2]),
-            ry.OT.eq, -1)
-
-        # condition, nothing is in hand of gripper
-        # hand_over_2.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper_give, block), False)
-        # hand_over_2.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_give, block), True)
-
-        hand_over_2.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper_take, block), True)
-        hand_over_2.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_take, block), False)
+        # hand_over_2 = ry.CtrlSet()
+        # hand_over_2.addObjective(
+        #     C.feature(ry.FS.positionDiff, [gripper_give_center, block], [1e2]),
+        #     ry.OT.eq, -1)
+        # hand_over_2.addObjective(
+        #     C.feature(ry.FS.positionDiff, [gripper_take_center, block], [1e2]),
+        #     ry.OT.eq, -1)
+        #
+        # # condition, nothing is in hand of gripper
+        # # hand_over_2.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper_give, block), False)
+        # # hand_over_2.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_give, block), True)
+        #
+        # hand_over_2.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper_take, block), True)
+        # hand_over_2.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_take, block), False)
 
         controllers = [
             ("align_1", align_1),
             ("align_2", align_2),
             ("cage", cage),
             ("hand_over_1", hand_over_1),
-            ("hand_over_2", hand_over_2)
+            # ("hand_over_2", hand_over_2)
         ]
 
         return add_action_name(self.name, controllers)
