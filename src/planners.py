@@ -141,10 +141,10 @@ class HandOverPlanner:
         self.goal = list()
 
         # hands should be free
-        for gripper in scene_obj[dt.type_gripper]:
-            goal_hand_empty = pred.HandEmpty("G")
-            goal_hand_empty.ground_predicate(G=gripper)
-            self.goal.append(goal_hand_empty.get_grounded_predicate())
+        # for gripper in scene_obj[dt.type_gripper]:
+        #     goal_hand_empty = pred.HandEmpty("G")
+        #     goal_hand_empty.ground_predicate(G=gripper)
+        #     self.goal.append(goal_hand_empty.get_grounded_predicate())
 
         # first block should be at position
         block_at_goal = pred.BlockAtGoal("B")
@@ -167,7 +167,7 @@ class HandOverPlanner:
             plan = planner(prob, verbose=self.verbose)
         else:
             action_plan, state_plan, __ = backwards_planner(prob, goal=self.goal, action_tree=False, verbose=True)
-            plan, state_plan, G = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=4,
+            plan, state_plan, G = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=5,
                                                     root_state_plan=state_plan, verbose=True)
             # need to reverse plan
             plan = plan[::-1]
@@ -183,7 +183,7 @@ class HandOverPlanner:
     def get_goal_controller(self, C):
         goal_feature = ry.CtrlSet()
         # TODO put this in some domain class
-        goal_place = (0.3, 0.3, 0.71)
+        goal_place = (0.5, 0.3, 0.71)
 
         goals_block_at_goal = [x for x in self.goal if x[0] == pred.BlockAtGoal.__name__]
         block = "b1"
@@ -191,7 +191,7 @@ class HandOverPlanner:
             C.feature(ry.FS.position, [block], [1e0], goal_place),
             ry.OT.eq, -1)
         goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", block), True)
-        #goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("L_gripper", block), True)
+        goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("L_gripper", block), True)
 
         return goal_feature
 

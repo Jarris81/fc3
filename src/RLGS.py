@@ -125,29 +125,25 @@ class RLGS:
 
         # check if plan is feasible in current config
         is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller,
-                                                                 self.scene_objects, verbose=False)
-        self.active_robust_reverse_plan = first_plan[::-1]
+                                                                 self.scene_objects, verbose=True)
+        if not is_feasible:
+            print("Plan is not feasible in current Scene!")
+            print("Aborting")
+            return False
 
-        is_feasible = True
+        self.active_robust_reverse_plan = first_plan[::-1]
 
         tau = 0.01
         for name, x in nx.get_edge_attributes(action_tree, "implicit_ctrlsets").items():
             for name, y in x:
                 pass
-                y.add_qControlObjective(2, 1e-5 * np.sqrt(tau),
+                y.add_qControlObjective(2, 1e-3 * np.sqrt(tau),
                                         self.C)  # TODO this will make some actions unfeasible (PlaceSide)
                 y.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
                 # TODO enabling contact will run into local minima, solved with MPC (Leap Controller from Marc)
                 # y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e0]), ry.OT.ineq)
 
-        if not is_feasible:
-            print("Plan is not feasible in current Scene!")
-            print("Aborting")
-            # return False
-            return True  # TODO remove this
-
-        else:
-            return True
+        return True
 
     def is_goal_fulfilled(self):
         ctrl = ry.CtrlSolver(self.C, 0.1, 1)
@@ -203,7 +199,7 @@ class RLGS:
             residual_plan = self.active_robust_reverse_plan[current_controller_index::-1]
             is_current_plan_feasible, _ = check_switch_chain_feasibility(self.C, residual_plan,
                                                                          self.goal_controller,
-                                                                         self.scene_objects, verbose=False)
+                                                                         self.scene_objects, verbose=True)
 
         # # if current plan is not feasible, check other plans
         if (not is_any_controller_feasible or not is_current_plan_feasible) and not t % self.feasy_check_rate:
