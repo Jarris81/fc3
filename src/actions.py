@@ -138,7 +138,7 @@ class GrabBlock(BaseAction):
             C.feature(ry.FS.vectorZDiff, [block, gripper], [1e1]),
             ry.OT.sos, transient_step)
         cage_block.addObjective(
-            C.feature(ry.FS.scalarProductYX, [block, gripper], [1e2]),
+            C.feature(ry.FS.scalarProductYX, [block, gripper], [1e1]),
             ry.OT.sos, transient_step)
         # align axis with block
 
@@ -767,6 +767,9 @@ class HandOver(BaseAction):
         # hand_over_2.addObjective(
         #     C.feature(ry.FS.scalarProductXZ, ["world", gripper_take], [1e1], [-1*direction]),
         #     ry.OT.sos, speed)
+        hand_over_2.addObjective(
+            C.feature(ry.FS.scalarProductXY, ["world", gripper_take], [1e1], [direction]),
+            ry.OT.eq, -1)
 
         for hand_o in [hand_over_1, hand_over_2]:
 
@@ -774,9 +777,9 @@ class HandOver(BaseAction):
                 C.feature(ry.FS.positionRel, [gripper_take_center, block], [1e1]),
                 ry.OT.eq, -1)
 
-            hand_o.addObjective(
-                C.feature(ry.FS.scalarProductXY, ["world", gripper_take], [1e1], [direction]),
-                ry.OT.eq, -1)
+            # hand_o.addObjective(
+            #     C.feature(ry.FS.scalarProductXY, ["world", gripper_take], [1e1], [direction]),
+            #     ry.OT.eq, -1)
 
 
 
