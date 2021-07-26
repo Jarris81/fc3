@@ -94,42 +94,6 @@ def get_implicit_objectives_chain(C, komo_feasy, current, follow, step, vis=Fals
     return implicit_objectives_list, implicit_sym_commands_list
 
 
-def get_robust_system2(C, komo_feasy, controllers, goal_controller, verbose=False):
-
-    robust_controller_chain = []
-
-    # start from last controller (closest to goal), work up
-    for i, (name, ctrlset) in enumerate(reversed(controllers)):
-        # check if we need the goal or the last modified ctrlset
-        if i == 0:
-            action_next = goal_controller
-        else:
-            action_next = robust_controller_chain[-1][1]
-        if verbose:
-            print("-"*20)
-            print(f"Implicit Features for {name}:")
-
-        step = i + 2  # need a step of 2 more, because start from back (0 becomes -1) and dont need to see goal switch
-        implicit_features, implicit_scs = get_implicit_objectives_chain(C, komo_feasy, ctrlset, action_next, step, verbose)
-
-        # add implicit objectives to current controller as transient objectives
-        for implicit_feature in implicit_features:
-            if implicit_feature.getFS() == ry.FS.pairCollision_negScalar:
-                ctrlset.addObjective(implicit_feature, ry.OT.ineq, -1)  # TODO: need to get the same OT, could also be ineq
-            else:
-                ctrlset.addObjective(implicit_feature, ry.OT.eq, -1)
-            if verbose:
-                print(implicit_feature.description(C), )
-        for implicit_sc in implicit_scs:
-            ctrlset.addSymbolicCommand(implicit_sc.getCommand(), implicit_sc.getFrameNames(), True)  # always condition
-            if verbose:
-                print(implicit_sc.getCommand()) # TODO: add description
-
-        robust_controller_chain.append((name, ctrlset))
-
-    return robust_controller_chain
-
-
 def get_robust_chain(C, controllers, goal_controller, verbose=False):
     """
     We want to get the implicit features without states (configs) and only use the goal geometric description
@@ -218,7 +182,7 @@ def get_robust_chain(C, controllers, goal_controller, verbose=False):
             print(f"Implicit Features for {name}:")
         # add implicit objectives to current controller as transient objectives
         for implicit_feature, obj_type in implicit_features_tuples:
-            ctrlset.addStartCondition(implicit_feature, obj_type)  # TODO: need to get the same OT, could also be ineq
+            #ctrlset.addStartCondition(implicit_feature, obj_type)  # TODO: need to get the same OT, could also be ineq
             if verbose:
                 print(implicit_feature.description(C), )
         for implicit_sc in implicit_scs:

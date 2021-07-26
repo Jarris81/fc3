@@ -46,8 +46,11 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
         for o in controller.getObjectives():
             f = o.feat()
             # we dont care about control objectives
-            if o.get_OT() == ry.OT.sos and "qItself" not in f.description(C_temp):
-                komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_temp), o.get_OT(), f.getScale(),
+            desc = f.description(C_temp)
+            if "F_qZeroVel" not in desc and "qItself" not in desc:
+                komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_temp),
+                                  o.get_OT(),
+                                  f.getScale(),
                                   o.getOriginalTarget())
 
         # go over symbolic commands
@@ -93,7 +96,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
                 is_handover = "gripper" in previous_holder and "gripper" in last_phase
                 if is_handover:
                     holding_phase_list[block].append(
-                        (start-1, i-1, previous_holder, last_phase)
+                        (start, i-1, previous_holder, last_phase)
                     )
                 else:
                     holding_phase_list[block].append(
@@ -156,6 +159,11 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     # get the report, which which generates the z.costReport file, which we can read
     komo.getReport(verbose)
     df_transient = pd.read_csv("z.costReport", index_col=None)
+
+    df_transient = df_transient[[col for col in df_transient.columns if
+                                 "F_qZeroVel" not in col and
+                                 "F_Pose" not in col and
+                                 "F_qItself" not in col]]
     df_transient.name = "Transient features:"
 
     # next, check for immediate constraints, and check if any are violated
@@ -185,7 +193,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
                 description = f.description(C_temp)  # get the name
                 df_immediate.loc[i, description] = mse  # set the mean squared error for switch
 
-    for df in [df_transient, df_immediate]:
+    for df in [df_transient]:
         # see which transient and immediate features are not fulfilled
         mse = df.to_numpy()
         features = df.columns
@@ -200,6 +208,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
         df_transient.plot(ax=ax1, title="Transient Features")
         df_immediate.plot(ax=ax2, title="Immediate Features")
+        ax1.plot((0, len(controls)), (0.1, 0.1), color="r")
         plt.show()
 
         # visualize the switches

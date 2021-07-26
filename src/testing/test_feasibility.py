@@ -50,12 +50,20 @@ if __name__ == '__main__':
     komo.addObjective([1.], ry.FS.scalarProductXX, [gripper_give, "b1"], ry.OT.eq, [1e2], [0.])
     komo.addObjective([1.], ry.FS.vectorZ, [gripper_give], ry.OT.eq, [1e2], [0., 0., 1.])
 
+    # align giver
     hand_over_pos_1 = [0, 0.0, 1.2]
+    komo.addObjective([2.], ry.FS.scalarProductXZ, ["world", gripper_give_center], ry.OT.sos, [1e2], [-1])
     komo.addObjective([2.], ry.FS.position, [block], ry.OT.eq, [1e1], hand_over_pos_1)
+    komo.addObjective([2.], ry.FS.positionDiff, [block, gripper_take_center], ry.OT.sos, [1e2])
+    komo.addObjective([2.], ry.FS.scalarProductZZ, [gripper_give_center, gripper_take_center], ry.OT.sos, [1e2], [-1])
 
     # align with gripper take
     komo.addSwitch_stable(3., 4, gripper_give, gripper_take, "b1")
     komo.addObjective([3.], ry.FS.positionDiff, [block, gripper_take_center], ry.OT.sos, [1e2])
+    komo.addObjective([3.], ry.FS.scalarProductXZ, ["world", gripper_take_center], ry.OT.sos, [1e2], [1])
+
+    # komo.addObjective([3.], ry.FS.scalarProductZZ, [gripper_give_center, gripper_take_center], ry.OT.sos, [1e2], [-1])
+
     # #komo.addSwitch_stable(2., 3., "R_gripper", "R_gripper", "b1")
     # komo.addObjective([1.5], ry.FS.position, ["R_gripper"], ry.OT.eq, [1e1], [0, 0.2, 1])
     # komo.addObjective([1.5], ry.FS.vectorZ, ["R_gripper"], ry.OT.eq, [1e2], [0., 0., 1.])

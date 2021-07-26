@@ -81,7 +81,7 @@ def run_experiment(experiment_name, use_real_robot, use_config_only, interferenc
         C, scene_objects = setup_env.setup_hand_over_env()
         action_list = [
             actions.GrabBlock(),
-            actions.PlacePosition(),
+            actions.PlaceGoal(),
             actions.HandOver()
         ]
         planner = planners.HandOverPlanner()

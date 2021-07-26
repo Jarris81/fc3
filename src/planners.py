@@ -183,7 +183,7 @@ class HandOverPlanner:
     def get_goal_controller(self, C):
         goal_feature = ry.CtrlSet()
         # TODO put this in some domain class
-        goal_place = (-0.5, 0.3, 0.71)
+        goal_place = (0.5, 0.3, 0.71)
 
         goals_block_at_goal = [x for x in self.goal if x[0] == pred.BlockAtGoal.__name__]
         block = "b1"
@@ -206,7 +206,7 @@ if __name__ == '__main__':
 
     action_list = [
         actions.GrabBlock(),
-        actions.PlacePosition(),
+        actions.PlaceGoal(),
         actions.HandOver(),
     ]
 

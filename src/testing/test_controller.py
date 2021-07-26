@@ -8,7 +8,7 @@ from planners import TowerPlanner
 
 if __name__ == '__main__':
 
-    C, block_names = setup_env.setup_bottle_open_env()
+    C, block_names = setup_env.setup_hand_over_env()
 
     grab_stick = actions.GrabStick()
     pull_block = actions.PullBlockStick()
@@ -17,9 +17,9 @@ if __name__ == '__main__':
     place_block_place = actions.PlaceOn()
 
     handover = actions.HandOver()
-    move_to = actions.PlacePosition()
+    move_to = actions.PlaceGoal()
 
-    place_pos = actions.PlacePosition()
+    place_pos = actions.PlaceGoal()
 
     grab_bottle = actions.GrabBottle()
     open_bottle = actions.OpenBottle()
@@ -27,7 +27,6 @@ if __name__ == '__main__':
     # TowerPlanner.get_goal_controller(self.)
 
     C.view()
-
 
     lfinger1 = C.getFrame("L_panda_finger_joint2")
     rfingerjoin = C.getFrame("L_panda_finger_joint1")
@@ -39,22 +38,30 @@ if __name__ == '__main__':
 
     eqPrecision = 1e-2
 
-    tau = 0.01
+    tau = 0.1
+
+    gripper_take, gripper_give = "L_gripper", "R_gripper"
+
+    if True:
+        gripper_take, gripper_give = gripper_give, gripper_take
 
     robust_plan = []
     # robust_plan.extend(grab_stick.get_grounded_control_set(C, ["R_gripper", "stick"]))
     # robust_plan.extend(pull_block.get_grounded_control_set(C, ["R_gripper", "b1", "stick"]))
 
-    # robust_plan.extend(grab_block.get_grounded_control_set(C, ["R_gripper", "b1"]))
-    robust_plan.extend(grab_bottle.get_grounded_control_set(C, ["R_gripper", "bottle"]))
-    robust_plan.extend(open_bottle.get_grounded_control_set(C, ["R_gripper", "L_gripper", "bottle"]))
+    #robust_plan.extend(grab_block.get_grounded_control_set(C, ["R_gripper", "b1"]))
+    # robust_plan.extend(grab_bottle.get_grounded_control_set(C, ["R_gripper", "bottle"]))
+    # robust_plan.extend(open_bottle.get_grounded_control_set(C, ["R_gripper", "L_gripper", "bottle"]))
     # robust_plan.extend(place_block_place.get_grounded_control_set(C, ["R_gripper", "b1", "b2"]))
-    # robust_plan.extend(handover.get_grounded_control_set(C, ["R_gripper", "L_gripper", "b1"]))
-    # robust_plan.extend(place_pos.get_grounded_control_set(C, ["R_gripper", "b2"]))
+
+    # Test handover
+    robust_plan.extend(grab_block.get_grounded_control_set(C, [gripper_give, "b1"]))
+    robust_plan.extend(handover.get_grounded_control_set(C, [gripper_give, gripper_take, "b1"]))
+    robust_plan.extend(place_pos.get_grounded_control_set(C, [gripper_take, "b1"]))
 
     for name, a in robust_plan:
         pass
-        # a.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e1]), ry.OT.ineq)
+        # a.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e-1]), ry.OT.ineq)
 
     bot = pybot.BotOp(C, False)
     q_start = C.getJointState()
@@ -68,31 +75,29 @@ if __name__ == '__main__':
         time.sleep(.1)
 
     do_once = True
-
+    q_old = C.getJointState()
     for t in range(0, 10000):
-
-        t_0 = time.time()
 
         q_real = C.getJointState()
         # create a new solver everytime
-        ctrl = ry.CtrlSolver(C, tau, 2)
+        ctrl = ry.CtrlSolver(C, 0.1, 2)
 
         for i, (name, c) in enumerate(robust_plan[::-1]):
             if c.canBeInitiated(ctrl, eqPrecision):
-                print("Inting controller: ", name)
                 ctrl.set(c)
-
+                print(f"Inting controller: {name}")
                 # if t > 500 and do_once:
                 #     C.attach("world", "cap")
                 #     do_once = False
                 break
             # update simulation/ make a step
-        ctrl.update(q_real, [], C)
+        q_dot = q_real - q_old
+        ctrl.update(q_real, q_dot, C)
         q = ctrl.solve(C)
 
-        cap = C.frame("cap").info()
-        bottle = C.frame("bottle").info()
-        a = 1
+        # cap = C.frame("cap").info()
+        # bottle = C.frame("bottle").info()
+        # a = 1
 
 
         # print(q.reshape(1, 7))
@@ -101,9 +106,9 @@ if __name__ == '__main__':
         # coll = C.getCollisions(0)
 
         bot.moveLeap(q, 2)
-        bot.step(C, 0)
+        bot.step(C, 0.1)
 
-        t_1 = time.time()
-        t_delta = t_1 - t_0
-        if t_delta > ref_tau:
-            time.sleep(t_delta - ref_tau)
+        # t_1 = time.time()
+        # t_delta = t_1 - t_0
+        # if t_delta > ref_tau:
+        #     time.sleep(t_delta - ref_tau)

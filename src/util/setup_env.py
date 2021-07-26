@@ -66,7 +66,7 @@ def setup_tower_env():
 
 def setup_hand_over_env():
     positions = (
-        (0.6, 0.1),
+        (-0.6, 0.1),
         (0.4, 0.0),  # 0.8 for infeasible
         (0.2, 0.2),
     )
