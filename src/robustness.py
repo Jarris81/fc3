@@ -182,7 +182,7 @@ def get_robust_chain(C, controllers, goal_controller, verbose=False):
             print(f"Implicit Features for {name}:")
         # add implicit objectives to current controller as transient objectives
         for implicit_feature, obj_type in implicit_features_tuples:
-            #ctrlset.addStartCondition(implicit_feature, obj_type)  # TODO: need to get the same OT, could also be ineq
+            ctrlset.addStartCondition(implicit_feature, obj_type)  # TODO: need to get the same OT, could also be ineq
             if verbose:
                 print(implicit_feature.description(C), )
         for implicit_sc in implicit_scs:

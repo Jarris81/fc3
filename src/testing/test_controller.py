@@ -8,7 +8,7 @@ from planners import TowerPlanner
 
 if __name__ == '__main__':
 
-    C, block_names = setup_env.setup_hand_over_env()
+    C, block_names = setup_env.setup_stick_pull_env()
 
     grab_stick = actions.GrabStick()
     pull_block = actions.PullBlockStick()
@@ -28,6 +28,7 @@ if __name__ == '__main__':
 
     C.view()
 
+
     lfinger1 = C.getFrame("L_panda_finger_joint2")
     rfingerjoin = C.getFrame("L_panda_finger_joint1")
 
@@ -42,12 +43,14 @@ if __name__ == '__main__':
 
     gripper_take, gripper_give = "L_gripper", "R_gripper"
 
-    if True:
+    if False:
         gripper_take, gripper_give = gripper_give, gripper_take
 
     robust_plan = []
-    # robust_plan.extend(grab_stick.get_grounded_control_set(C, ["R_gripper", "stick"]))
-    # robust_plan.extend(pull_block.get_grounded_control_set(C, ["R_gripper", "b1", "stick"]))
+
+    #test block pull
+    robust_plan.extend(grab_stick.get_grounded_control_set(C, ["R_gripper", "stick"]))
+    robust_plan.extend(pull_block.get_grounded_control_set(C, ["R_gripper", "b1", "stick"]))
 
     #robust_plan.extend(grab_block.get_grounded_control_set(C, ["R_gripper", "b1"]))
     # robust_plan.extend(grab_bottle.get_grounded_control_set(C, ["R_gripper", "bottle"]))
@@ -55,9 +58,9 @@ if __name__ == '__main__':
     # robust_plan.extend(place_block_place.get_grounded_control_set(C, ["R_gripper", "b1", "b2"]))
 
     # Test handover
-    robust_plan.extend(grab_block.get_grounded_control_set(C, [gripper_give, "b1"]))
-    robust_plan.extend(handover.get_grounded_control_set(C, [gripper_give, gripper_take, "b1"]))
-    robust_plan.extend(place_pos.get_grounded_control_set(C, [gripper_take, "b1"]))
+    #robust_plan.extend(grab_block.get_grounded_control_set(C, [gripper_give, "b1"]))
+    #robust_plan.extend(handover.get_grounded_control_set(C, [gripper_give, gripper_take, "b1"]))
+    #robust_plan.extend(place_pos.get_grounded_control_set(C, [gripper_take, "b1"]))
 
     for name, a in robust_plan:
         pass
@@ -65,8 +68,8 @@ if __name__ == '__main__':
 
     bot = pybot.BotOp(C, False)
     q_start = C.getJointState()
-    q_shaped = q_start.reshape(1, 14)
-    bot.move(q_shaped, [2])
+    q_start = q_start.reshape(1, 7)
+    bot.move(q_start, [2])
 
     ref_tau = 0.05
 

@@ -1,6 +1,6 @@
 import libry as ry
 from pyddl import Action, neg
-from objective import Objective
+from objectives import Objective
 import util.constants as dt
 import itertools as it
 

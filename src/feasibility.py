@@ -22,7 +22,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     C_temp.copy(C)
 
     komo = ry.KOMO()
-    komo.setModel(C_temp, False)  # use swift collision engine
+    komo.setModel(C_temp, True)  # use swift collision engine
     komo.setTiming(len(controls), 1, 1., 1)
 
     komo.add_qControlObjective([], 1, 1e-1)  # DIFFERENT
@@ -82,8 +82,6 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
             elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:  # and not ctrlCommand.isCondition():
                 holding_list[block].append("world")
                 break
-
-
 
     # count the duration of each phase
     holding_phase_list = {}
@@ -203,7 +201,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
                 print(f'{df.name} {features[i_col]} at switch #{i_row} is not feasible!')
 
     # Visualize some results
-    if verbose:
+    if verbose and plan_is_feasible:
         # create a figure with two plot
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
         df_transient.plot(ax=ax1, title="Transient Features")

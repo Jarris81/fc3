@@ -1,4 +1,4 @@
-from pyddl import Domain, Problem, State, Action, neg, planner, backwards_planner
+from pyddl import Domain, Problem, State, Action, neg, planner, backwards_planner, backwards_tree_exploration
 import actions
 import predicates as pred
 import util.constants as dt
@@ -33,7 +33,7 @@ class TowerPlanner:
 
         # free blocks
         for block in scene_obj[dt.type_block]:
-            free_block = pred.BlockFree("B")
+            free_block = pred.IsFree("B")
             free_block.ground_predicate(B=block)
             init.append(free_block.get_grounded_predicate())
 
@@ -133,7 +133,7 @@ class HandOverPlanner:
 
         # free blocks
         for block in scene_obj[dt.type_block]:
-            free_block = pred.BlockFree("B")
+            free_block = pred.IsFree("B")
             free_block.ground_predicate(B=block)
             init.append(free_block.get_grounded_predicate())
 
@@ -183,7 +183,7 @@ class HandOverPlanner:
     def get_goal_controller(self, C):
         goal_feature = ry.CtrlSet()
         # TODO put this in some domain class
-        goal_place = (0.5, 0.3, 0.71)
+        goal_place = (-0.5, 0.3, 0.71)
 
         goals_block_at_goal = [x for x in self.goal if x[0] == pred.BlockAtGoal.__name__]
         block = "b1"
@@ -194,6 +194,34 @@ class HandOverPlanner:
         goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("L_gripper", block), True)
 
         return goal_feature
+
+class StickPullPlanner:
+
+    def __init__(self, verbose=False):
+
+        self.verbose = verbose
+        self.goal = []
+
+    def get_plan(self, control_actions, scene_obj, forward=False):
+
+        domain = Domain((x.get_simple_action() for x in control_actions))
+
+        init = list()
+
+        # empty hands
+        for gripper in scene_obj[dt.type_gripper]:
+            init_hand_empty = pred.HandEmpty("G")
+            init_hand_empty.ground_predicate(G=gripper)
+            init.append(init_hand_empty.get_grounded_predicate())
+
+        # free blocks
+        for block in scene_obj[dt.type_block]:
+            free_block = pred.IsFree("B")
+            free_block.ground_predicate(B=block)
+            init.append(free_block.get_grounded_predicate())
+
+        # normal goal predicates
+        self.goal = list()
 
 
 if __name__ == '__main__':

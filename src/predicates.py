@@ -150,7 +150,7 @@ class HandEmpty(BasePredicate):
         return commands
 
 
-class BlockFree(BasePredicate):
+class IsFree(BasePredicate):
 
     def __init__(self, block_sym):
         super().__init__()

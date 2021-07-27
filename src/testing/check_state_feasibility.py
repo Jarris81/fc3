@@ -27,7 +27,7 @@ inhand = predicates.InHand("G", "B1")
 collisionfree = predicates.CollisionFree()
 bonb = predicates.BlockOnBlock("B", "B_placed_on")
 handempty = predicates.HandEmpty("G")
-freeblock = predicates.BlockFree("B")
+freeblock = predicates.IsFree("B")
 
 preds = [
     inhand,

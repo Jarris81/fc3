@@ -69,7 +69,7 @@ def run_experiment(experiment_name, use_real_robot, use_config_only, interferenc
             # b2 is knocked of tower while gripper is moving to b1
             ResetPosition(190, 192, "b2", ori_pos_b2),
             # b2 is knocked of tower while gripper is holding b1
-            ResetPosition(260, 262, "b2", ori_pos_b2),
+            ResetPosition(150, 262, "b2", ori_pos_b2),
             # b1 is moved out of reach
             ResetPosition(50, 52, "b1", infeasible_pos_b1)
         ))
