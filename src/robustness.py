@@ -94,12 +94,13 @@ def get_implicit_objectives_chain(C, komo_feasy, current, follow, step, vis=Fals
     return implicit_objectives_list, implicit_sym_commands_list
 
 
-def get_robust_chain(C, controllers, goal_controller, verbose=False):
+def get_robust_chain(C, controllers, goal_controller, tolerance=1e-1, verbose=False):
     """
     We want to get the implicit features without states (configs) and only use the goal geometric description
     @param C: cuurent config of world
     @param controllers: controller chain
     @param goal_controller: goal controller
+    @param tolerance:
     @param verbose: True if you want some info
     @return:
     """
@@ -111,6 +112,9 @@ def get_robust_chain(C, controllers, goal_controller, verbose=False):
 
     for i, (edge, name, ctrlset) in enumerate(reversed(controllers)):
 
+        if edge == (3, 1):
+            pass
+            # verbose = True
         if i == 0:
             action_next = goal_controller
         else:
@@ -118,7 +122,7 @@ def get_robust_chain(C, controllers, goal_controller, verbose=False):
 
         # do a 1-step komo from current controller, and see which objectives are missing
         komo = ry.KOMO()
-        komo.setModel(C, True)  # use swift collision engine
+        komo.setModel(C_temp, True)  # use swift collision engine
         komo.setTiming(1, 1, 5., 1)
 
         # setup control cost
@@ -159,7 +163,7 @@ def get_robust_chain(C, controllers, goal_controller, verbose=False):
                 error = follow_feat.eval(C_temp)[0]  # evaluate feature in frame switch
 
                 # if all errors are smaller than tolerance, feature is NOT fulfilled
-                if np.any(np.sqrt(error * error) > 1e-1):
+                if np.any(np.sqrt(error * error) > tolerance):
                     # check if feature is not already in current controller
                     implicit_features_tuples.append((follow_feat, obj_type))
 
@@ -191,8 +195,8 @@ def get_robust_chain(C, controllers, goal_controller, verbose=False):
                 print(implicit_sc.getCommand(), implicit_sc.getFrameNames())  # TODO: add description
 
         if verbose:
-            komo.view(False, f"Implicit conditions check for {name}")
-            time.sleep(2)
+            komo.view(False, f"Implicit conditions check for {edge} - {name}")
+            time.sleep(5)
             komo.view_close()
 
         robust_controller_chain.append((edge, name, ctrlset))
@@ -221,11 +225,11 @@ def get_leaf_paths(G):
     return edge_paths
 
 
-def get_robust_set_of_chains(C, tree, state_plan, goal_controller, verbose=False):
+def get_robust_set_of_chains(C, tree, goal_controller, verbose=False):
 
     edges = nx.edges(tree)
 
-    ori_edge_plan = [(s.id, t.id) for s, t in zip(state_plan[1:], state_plan[:-1])]
+    # ori_edge_plan = [(s.id, t.id) for s, t in zip(state_plan[1:], state_plan[:-1])]
 
     # initialize implicit controlsets with empty list
     implicit_ctrlsets = {edge: [] for edge in edges}
@@ -237,16 +241,16 @@ def get_robust_set_of_chains(C, tree, state_plan, goal_controller, verbose=False
     # iterate over each path, and get implicit conditions
 
     original_controllers = []
-    for edge in reversed(ori_edge_plan):
-        for name, con in grounded_ctrlsets[edge]:
-            original_controllers.append((edge, name, con))
+    # for edge in reversed(ori_edge_plan):
+    #     for name, con in grounded_ctrlsets[edge]:
+    #         original_controllers.append((edge, name, con))
+    #
+    # implicit_chain = get_robust_chain(C, original_controllers, goal_controller, verbose)
 
-    implicit_chain = get_robust_chain(C, original_controllers, goal_controller, verbose)
+    # for edge, name, implicit_controller in implicit_chain:
+    #     implicit_ctrlsets[edge].append((name, implicit_controller))
 
-    for edge, name, implicit_controller in implicit_chain:
-        implicit_ctrlsets[edge].append((name, implicit_controller))
-
-    set_of_chains = [implicit_chain]
+    set_of_chains = []
     # go over every leaf path, and build implicit conditions for each
     for path in get_leaf_paths(tree):
         #path = get_leaf_paths(tree)[8]
@@ -268,7 +272,7 @@ def get_robust_set_of_chains(C, tree, state_plan, goal_controller, verbose=False
         print("subgoal is:")
         for o in sub_goal.getObjectives():
             print(o.feat().description(C))
-        partial_implicit_chain = get_robust_chain(C, original_controllers, sub_goal, verbose)
+        partial_implicit_chain = get_robust_chain(C, original_controllers, sub_goal, tolerance=1e-1, verbose=verbose)
         for edge, name, implicit_controller in partial_implicit_chain:
             implicit_ctrlsets[edge].append((name, implicit_controller))
 

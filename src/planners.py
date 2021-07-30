@@ -169,6 +169,8 @@ class HandOverPlanner:
             action_plan, state_plan, __ = backwards_planner(prob, goal=self.goal, action_tree=False, verbose=True)
             plan, state_plan, G = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=5,
                                                     root_state_plan=state_plan, verbose=True)
+
+            G = backwards_tree_exploration(prob, goal=self.goal, verbose=True, max_depth=3)
             # need to reverse plan
             plan = plan[::-1]
         if self.verbose:
@@ -183,7 +185,7 @@ class HandOverPlanner:
     def get_goal_controller(self, C):
         goal_feature = ry.CtrlSet()
         # TODO put this in some domain class
-        goal_place = (-0.5, 0.3, 0.71)
+        goal_place = (0.5, 0.3, 0.71)
 
         goals_block_at_goal = [x for x in self.goal if x[0] == pred.BlockAtGoal.__name__]
         block = "b1"

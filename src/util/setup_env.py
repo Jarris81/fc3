@@ -57,8 +57,9 @@ def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2)),  block_size=(.06,
 def setup_tower_env():
     positions = (
         (-0.6, -0.2),
-        (-0.4, -0.1),  # 0.8 for infeasible
-        (-0.5, -0.5),
+        (-0.4, -0.1),
+        (-0.5, -0.5)
+
     )
 
     return _setup(num_blocks=3, positions=positions)
@@ -66,7 +67,7 @@ def setup_tower_env():
 
 def setup_hand_over_env():
     positions = (
-        (0.6, 0.1),
+        (-0.6, 0.1),
         (0.4, 0.0),  # 0.8 for infeasible
         (0.2, 0.2),
     )

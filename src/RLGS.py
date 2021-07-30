@@ -110,19 +110,19 @@ class RLGS:
         draw_search_graph(plan, state_plan, action_tree)
 
         # get robust tree/ set of chains
-        self.robust_set_of_chains = get_robust_set_of_chains(self.C, action_tree, state_plan, self.goal_controller,
-                                                             False)
+        self.robust_set_of_chains = get_robust_set_of_chains(self.C, action_tree, self.goal_controller,
+                                                             )
 
         # first plan we want to execute
         first_plan = self.robust_set_of_chains[0]
 
         # check if plan is feasible in current config
-        is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller,
-                                                                 self.scene_objects, verbose=False)
-        if not is_feasible:
-            print("Plan is not feasible in current Scene!")
-            print("Aborting")
-            return False
+        #is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller,
+                                                                 # self.scene_objects, verbose=False)
+        # if not is_feasible:
+        #     print("Plan is not feasible in current Scene!")
+        #     print("Aborting")
+        #     return False
 
         # self.active_robust_reverse_plan = first_plan[::-1]
 
@@ -200,14 +200,15 @@ class RLGS:
             print("No controller can be initiated or current plan is not feasible!")
 
             # lets switch the plan
-            for plan in self.robust_set_of_chains[1:]:
+            for plan in self.robust_set_of_chains:
                 is_feasible = False
                 for i, (edge, name, c) in enumerate(plan[::-1]):
                     if c.canBeInitiated(ctrl, self.eqPrecision):
-                        new_plan = plan
-                        is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, new_plan, self.goal_controller,
+                        print(f"{edge} CAN be initiated!")
+                        residual_plan = plan[-i-1:]
+                        is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, residual_plan, self.goal_controller,
                                                                                  self.scene_objects,
-                                                                                 True)
+                                                                                 verbose=True)
                     elif self.verbose:
                         print(f"{edge} cannot be initiated!")
                 if is_feasible:

@@ -154,8 +154,8 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     # solve or optimize the given komo objectives
     komo.optimize()
 
-    # get the report, which which generates the z.costReport file, which we can read
-    komo.getReport(verbose)
+    # we always need this, otherwise wrong calculation
+    komo.getReport(True)
     df_transient = pd.read_csv("z.costReport", index_col=None)
 
     df_transient = df_transient[[col for col in df_transient.columns if
@@ -201,7 +201,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
                 print(f'{df.name} {features[i_col]} at switch #{i_row} is not feasible!')
 
     # Visualize some results
-    if verbose and plan_is_feasible:
+    if verbose:
         # create a figure with two plot
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
         df_transient.plot(ax=ax1, title="Transient Features")
