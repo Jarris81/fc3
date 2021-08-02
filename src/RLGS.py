@@ -33,7 +33,7 @@ class RLGS:
 
         # stuff for execution
         self.is_done = False
-        self.feasy_check_rate = 50  # every 50 steps check for feasibility
+        self.feasy_check_rate = 10  # every 50 steps check for feasibility
         self.gripper_action = None
 
         self.q = None
@@ -52,6 +52,8 @@ class RLGS:
         self.home_controller.add_qControlObjective(2, 1e-5 * np.sqrt(0.01),
                                                    self.C)  # TODO this will make some actions unfeasible (PlaceSide)
         self.home_controller.add_qControlObjective(1, 1e-3 * np.sqrt(0.01), self.C)
+
+        self.log = self.log_default
 
     def move_home(self):
 
@@ -111,20 +113,10 @@ class RLGS:
 
         # get robust tree/ set of chains
         self.robust_set_of_chains = get_robust_set_of_chains(self.C, action_tree, self.goal_controller,
-                                                             )
-
+                                                             verbose=False)
         # first plan we want to execute
-        first_plan = self.robust_set_of_chains[0]
+        self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ry.CtrlSolver(self.C, 0.1, 2), True)
 
-        # check if plan is feasible in current config
-        #is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, first_plan, self.goal_controller,
-                                                                 # self.scene_objects, verbose=False)
-        # if not is_feasible:
-        #     print("Plan is not feasible in current Scene!")
-        #     print("Aborting")
-        #     return False
-
-        # self.active_robust_reverse_plan = first_plan[::-1]
 
         tau = 0.01
         for name, x in nx.get_edge_attributes(action_tree, "implicit_ctrlsets").items():
@@ -165,8 +157,7 @@ class RLGS:
         # iterate over each controller, check which can be started first
         for i, (edge, name, c) in enumerate(self.active_robust_reverse_plan):
             if c.canBeInitiated(ctrl, self.eqPrecision):
-                if self.verbose or True:
-                    print(f"Initiating: {name}")
+                self.log(f"Initiating: {name}")
                 ctrl.set(c)
                 is_any_controller_feasible = True
                 is_current_plan_feasible = True
@@ -184,9 +175,7 @@ class RLGS:
                 # leave loop, we have the controller
                 break
             else:
-                if self.verbose:
-                    print(f"Cannot be initiated: {name}")
-
+                self.log(f"Cannot be initiated: {name}")
         # check feasibility of chain
         if not t % self.feasy_check_rate and len(self.active_robust_reverse_plan):
             # check rest of chain for feasibility
@@ -198,28 +187,7 @@ class RLGS:
         # # if current plan is not feasible, check other plans
         if (not is_any_controller_feasible or not is_current_plan_feasible) and not t % self.feasy_check_rate:
             print("No controller can be initiated or current plan is not feasible!")
-
-            # lets switch the plan
-            for plan in self.robust_set_of_chains:
-                is_feasible = False
-                for i, (edge, name, c) in enumerate(plan[::-1]):
-                    if c.canBeInitiated(ctrl, self.eqPrecision):
-                        print(f"{edge} CAN be initiated!")
-                        residual_plan = plan[-i-1:]
-                        is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, residual_plan, self.goal_controller,
-                                                                                 self.scene_objects,
-                                                                                 verbose=True)
-                    elif self.verbose:
-                        print(f"{edge} cannot be initiated!")
-                if is_feasible:
-                    print("new plan found!")
-                    print(plan)
-                    self.active_robust_reverse_plan = plan[::-1]
-                    self.no_plan_feasible = False
-                    break
-                else:
-                    self.no_plan_feasible = True
-                    self.active_robust_reverse_plan = []
+            self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ctrl, False)
 
         q_dot = self.q - self.q_old
 
@@ -230,6 +198,30 @@ class RLGS:
         self.q = q_real
         self.q_old = self.q_old
         return q, self.gripper_action
+
+    def get_feasible_reverse_plan(self, ctrl, verbose=False):
+        # find a new feasible plan
+        for plan in self.robust_set_of_chains:
+            for i, (edge, name, c) in enumerate(plan[::-1]):
+                if c.canBeInitiated(ctrl, self.eqPrecision):
+                    self.log(f"{edge} CAN be initiated!")
+                    residual_plan = plan[-i - 1:]
+                    is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, residual_plan,
+                                                                             self.goal_controller,
+                                                                             self.scene_objects,
+                                                                             verbose=verbose)
+                    if is_feasible:
+                        if self.verbose:
+                            print("new plan found!")
+                            print(residual_plan)
+                        return residual_plan[::-1]
+                    else:
+                        self.log(f"Plan {[x[1] for x in  residual_plan]} is not feasible!")
+                elif self.verbose:
+                    print(f"{edge} cannot be initiated!")
+
+        # if no plan is feasible, return false
+        return None
 
     def cheat_update_obj(self, object_infos):
         for obj_name, obj_info in object_infos.items():
@@ -245,3 +237,13 @@ class RLGS:
     def set_gripper_width(self, gripper):
 
         self.C.setJointState()
+
+    def log_default(self, msg):
+        if self.verbose:
+            print(msg)
+
+    def set_log_function(self, log_function):
+        self.log = log_function
+
+
+

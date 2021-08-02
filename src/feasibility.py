@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from util.constants import type_block, type_gripper
+from util.constants import type_block, type_gripper, type_stick
 
 
 def _get_ctrlset_description(C, ctrlset):
@@ -30,9 +30,12 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
 
     holding_list = {}
 
-    # iterate over every block
+    graspable_objects = list(scene_objects[type_block])
+    if type_stick in scene_objects:
+        graspable_objects.extend(scene_objects[type_stick])
 
-    for block_name in scene_objects[type_block]:
+    # iterate over every grabable object
+    for block_name in graspable_objects:
         block_info = C_temp.getFrame(block_name).info()
         holding_list[block_name] = ["world"] * len(controls)
         if "parent" in block_info:
@@ -116,41 +119,6 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
         for start, end, previous, next in switches[1:]:
             komo.addSwitch_stable(start, end, previous, next, block)
 
-    # # go over every switch for each block
-    # for block in holding_list:
-    #     hold_list = holding_list[block]
-    #     holding_duration = [[hold_list[0], 0, 0]]
-    #     last_hold = hold_list[0]
-    #     for i, hold in enumerate(hold_list):
-    #         # specifying the first grab/release is redundant, since no switch
-    #         if i == 0:
-    #             continue
-    #         else:
-    #             # if are same, add one to duration
-    #             if last_hold is hold:
-    #                 holding_duration[-1][-1] += 1
-    #             else:
-    #                 # switch was made!
-    #                 holding_duration.append([hold, holding_duration[-1][-1], 1 + holding_duration[-1][-1]])
-    #         last_hold = hold
-    #     for j, (grab, start, end) in enumerate(holding_duration):
-    #         # first switch we can skip
-    #         if j == 0:
-    #             continue
-    #         if grab:
-    #             # grab
-    #             if end == len(controls):
-    #                 komo.addSwitch_stable(start, -1, "world", gripper_name, block)
-    #             else:
-    #                 komo.addSwitch_stable(start, end, "world", gripper_name, block)
-    #         else:
-    #             # open
-    #             if end == len(controls):
-    #                 komo.addSwitch_stable(start + 1, -1, gripper_name, "world", block)
-    #             else:
-    #                 komo.addSwitch_stable(start + 1, end, gripper_name, "world", block)
-    #
-    #     print(holding_duration)
     # solve or optimize the given komo objectives
     komo.optimize()
 

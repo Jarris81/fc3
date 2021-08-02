@@ -91,7 +91,24 @@ def run_experiment(experiment_name, use_real_robot, use_config_only, interferenc
             # b1 is knocked of tower while gripper is moving to b1
             ResetPosition(5, 7, "b1", x_flip_pos_b1),
         ))
-
+    #
+    # Stick Pull
+    #
+    elif experiment_name == "stick_pull":
+        C, scene_objects = setup_env.setup_stick_pull_env()
+        action_list = [
+            actions.GrabBlock(),
+            actions.PlaceGoal(),
+            actions.GrabStick(),
+            actions.PullBlockStick()
+        ]
+        planner = planners.StickPullPlanner()
+        x_flip_pos_b1 = C.frame("b1").getPosition()
+        x_flip_pos_b1[0] = x_flip_pos_b1[0] * -1
+        interference_list.extend((
+            # b1 is knocked of tower while gripper is moving to b1
+            ResetPosition(5, 7, "b1", x_flip_pos_b1),
+        ))
 
     #
     # Bottle Open

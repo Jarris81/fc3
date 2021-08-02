@@ -112,9 +112,8 @@ def get_robust_chain(C, controllers, goal_controller, tolerance=1e-1, verbose=Fa
 
     for i, (edge, name, ctrlset) in enumerate(reversed(controllers)):
 
-        if edge == (3, 1):
-            pass
-            # verbose = True
+        verbose = True if edge == (7, 4) or edge == (4, 2) else False
+
         if i == 0:
             action_next = goal_controller
         else:
@@ -122,7 +121,7 @@ def get_robust_chain(C, controllers, goal_controller, tolerance=1e-1, verbose=Fa
 
         # do a 1-step komo from current controller, and see which objectives are missing
         komo = ry.KOMO()
-        komo.setModel(C_temp, True)  # use swift collision engine
+        komo.setModel(C, True)  # use swift collision engine
         komo.setTiming(1, 1, 5., 1)
 
         # setup control cost
@@ -165,7 +164,16 @@ def get_robust_chain(C, controllers, goal_controller, tolerance=1e-1, verbose=Fa
                 # if all errors are smaller than tolerance, feature is NOT fulfilled
                 if np.any(np.sqrt(error * error) > tolerance):
                     # check if feature is not already in current controller
-                    implicit_features_tuples.append((follow_feat, obj_type))
+
+                    # we only care about features concerning objects, not the robot
+                    frames = follow_feat.getFrameNames(C)
+                    # TODO dirty fix, should use scene objects
+                    only_objects = all([True
+                                        if "R_gripper" not in x and "L_gripper" not in x
+                                        else False for x in frames])
+
+                    if only_objects:
+                        implicit_features_tuples.append((follow_feat, obj_type))
 
         # symbolic commands are handled exactly like in RLDS paper
         # if current controller does not have that condition as run command, it is implicit

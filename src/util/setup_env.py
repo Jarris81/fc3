@@ -67,9 +67,7 @@ def setup_tower_env():
 
 def setup_hand_over_env():
     positions = (
-        (-0.6, 0.1),
-        (0.4, 0.0),  # 0.8 for infeasible
-        (0.2, 0.2),
+        (0.6, 0.1),
     )
     C, scene_objects = _setup(dual=True, num_blocks=1, positions=positions)
 
@@ -78,7 +76,7 @@ def setup_hand_over_env():
 
 def setup_stick_pull_env():
     positions = (
-        (0.1, 0.5),
+        (-0.8, -0.1),
     )
 
     C, scene_objects = _setup(dual=False, num_blocks=1, positions=positions)
@@ -107,6 +105,8 @@ def setup_stick_pull_env():
     stick_handle.setMass(1)
     stick_handle.setShape(ry.ST.box, size=(handle_length, stick_th, stick_th))  # 0.001
     stick_handle.setContact(1)
+
+    scene_objects[constants.type_stick] = ("stick", )
 
     return C, scene_objects
 

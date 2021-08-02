@@ -1,7 +1,7 @@
 import libry as ry
 from pyddl import Action, neg
 import predicates as pred
-import util.constants as dt
+from util import constants
 
 
 def _get_unset_effects(predicate, all_objects, obj_type):
@@ -87,8 +87,8 @@ class GrabBlock(BaseAction):
         self.block_sym = "B"
 
         self.symbols_types = {
-            self.gripper_sym: dt.type_gripper,
-            self.block_sym: dt.type_block,
+            self.gripper_sym: constants.type_gripper,
+            self.block_sym: constants.type_block,
         }
 
         self.symbols = self.symbols_types.keys()
@@ -183,8 +183,8 @@ class GrabBottle(BaseAction):
         self.bottle_sym = "B"
 
         self.symbols_types = {
-            self.gripper_sym: dt.type_gripper,
-            self.bottle_sym: dt.type_bottle,
+            self.gripper_sym: constants.type_gripper,
+            self.bottle_sym: constants.type_bottle,
         }
 
         self.symbols = self.symbols_types.keys()
@@ -263,9 +263,9 @@ class PlaceOn(BaseAction):
         self.block_placed_sym = "B_placed"
 
         self.symbols_types = {
-            self.gripper_sym: dt.type_gripper,
-            self.block_sym: dt.type_block,
-            self.block_placed_sym: dt.type_block
+            self.gripper_sym: constants.type_gripper,
+            self.block_sym: constants.type_block,
+            self.block_placed_sym: constants.type_block
         }
 
         self.symbols = self.symbols_types.keys()
@@ -365,8 +365,8 @@ class PlaceSide(BaseAction):
         self.block_sym = "B"
 
         self.symbols_types = {
-            self.gripper_sym: dt.type_gripper,
-            self.block_sym: dt.type_block,
+            self.gripper_sym: constants.type_gripper,
+            self.block_sym: constants.type_block,
         }
 
         self.symbols = self.symbols_types.keys()
@@ -443,8 +443,8 @@ class PlaceGoal(BaseAction):
         self.block_sym = "B"
 
         self.symbols_types = {
-            self.gripper_sym: dt.type_gripper,
-            self.block_sym: dt.type_block,
+            self.gripper_sym: constants.type_gripper,
+            self.block_sym: constants.type_block,
         }
 
         self.symbols = self.symbols_types.keys()
@@ -462,7 +462,7 @@ class PlaceGoal(BaseAction):
         self.delete_effects = self.preconditions
 
     def get_grounded_control_set(self, C, frames):
-        goal_place = (0.5, 0.3, 0.71)
+        goal_place = constants.goal_block_pos
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         speed = 0.1
@@ -472,9 +472,6 @@ class PlaceGoal(BaseAction):
         block = sym2frame[self.block_sym]
 
         place_block_pos = ry.CtrlSet()
-        place_block_pos.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper_center, block], [1e1]),
-            ry.OT.eq, -1)
 
         # block should be placed on table, doesnt matter where in x-y plane
         place_block_pos.addObjective(
@@ -483,7 +480,7 @@ class PlaceGoal(BaseAction):
 
         place_block_pos.addObjective(
             C.feature(ry.FS.scalarProductZZ, [gripper, "world"], [1e3], [1]),
-            ry.OT.sos, speed*10)
+            ry.OT.sos, speed * 10)
         # place_block_pos.addObjective(
         #     C.feature(ry.FS.scalarProductYZ, [block, "world"], [1e1]),
         #     ry.OT.sos, speed)
@@ -502,7 +499,7 @@ class PlaceGoal(BaseAction):
 
         # necessary, so that the block is only released when on ground, and not mid-air
         open_gripper.addObjective(
-            C.feature(ry.FS.position, [block], [1, 1, 1], goal_place),
+            C.feature(ry.FS.position, [block], [1], goal_place),
             ry.OT.eq, -1)
         # open_gripper.addObjective(
         #     C.feature(ry.FS.scalarProductZZ, [gripper, "world"], [1e1], [1]),
@@ -527,8 +524,8 @@ class GrabStick(BaseAction):
         self.stick_sym = "S"
 
         self.symbols_types = {
-            self.gripper_sym: dt.type_gripper,
-            self.stick_sym: dt.type_stick,
+            self.gripper_sym: constants.type_gripper,
+            self.stick_sym: constants.type_stick,
         }
 
         self.symbols = self.symbols_types.keys()
@@ -557,7 +554,7 @@ class GrabStick(BaseAction):
         stick_frame = C.getFrame(stick)
         stick_length = stick_frame.getSize()[1]
 
-        grab_pos = (0, -stick_length/3, 0)
+        grab_pos = (0, -stick_length / 3, 0)
 
         move_to = ry.CtrlSet()
         # move close to block
@@ -575,7 +572,7 @@ class GrabStick(BaseAction):
         #  block needs to be close to block
         grab = ry.CtrlSet()
         grab.addObjective(
-            C.feature(ry.FS.positionRel, [gripper_center, stick], [1e1] , grab_pos),
+            C.feature(ry.FS.positionRel, [gripper_center, stick], [1e3], grab_pos),
             ry.OT.eq, -1)
         # condition, nothing is in hand of gripper
         grab.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, stick), True)
@@ -601,9 +598,9 @@ class PullBlockStick(BaseAction):
         self.stick_sym = "S"
 
         self.symbols_types = {
-            self.gripper_sym: dt.type_gripper,
-            self.block_sym: dt.type_block,
-            self.stick_sym: dt.type_stick,
+            self.gripper_sym: constants.type_gripper,
+            self.block_sym: constants.type_block,
+            self.stick_sym: constants.type_stick,
         }
 
         self.symbols = self.symbols_types.keys()
@@ -613,15 +610,22 @@ class PullBlockStick(BaseAction):
         ]
 
         self.add_effects = [
-            pred.InHand(self.gripper_sym, self.stick_sym)
+            pred.HandEmpty(self.gripper_sym)
         ]
 
         self.delete_effects = self.preconditions
 
     def get_grounded_control_set(self, C, frames):
-
         transientStep = 0.1
         sym2frame = _get_sym2frame(self.symbols, frames)
+
+        stick = sym2frame[self.stick_sym]
+
+        # get stick length
+        stick_frame = C.getFrame(stick)
+        stick_length = stick_frame.getSize()[1]
+
+        grab_pos = (0, -stick_length / 3, 0)
 
         gripper = sym2frame[self.gripper_sym]
         gripper_center = gripper + "Center"
@@ -629,41 +633,46 @@ class PullBlockStick(BaseAction):
         stick = sym2frame[self.stick_sym]
         stick_handle = stick + "Handle"
 
-
         block_pos_init = C.getFrame(block).getPosition()
         block_pos_init[1] = block_pos_init[1] - 0.3
 
-        # get stick length
+        align_pos_rel = [-0.03, 0.05, 0.0]
 
+        # get stick length
         move_to_block = ry.CtrlSet()
+
         # move close to block
         move_to_block.addObjective(
-            C.feature(ry.FS.positionRel, [stick_handle, block], [1e1] * 3, [0.1, 0.1, 0.1]),
+            C.feature(ry.FS.positionRel, [stick_handle, block], [1e2] * 3, align_pos_rel),
             ry.OT.sos, transientStep)
-        move_to_block.addObjective(
-            C.feature(ry.FS.scalarProductZZ, ["world", stick], [1e1], [1]),
-            ry.OT.eq, -1)
-        move_to_block.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, stick), True)
+
         # align axis with block
-        move_to_block.addObjective(
-            C.feature(ry.FS.scalarProductXY, [stick_handle, block], [1e1]),
-            ry.OT.sos, transientStep)
+        # move_to_block.addObjective(
+        #     C.feature(ry.FS.scalarProductXX, [stick_handle, block], [1e1]),
+        #     ry.OT.sos, transientStep)
 
         attach_handle_stick = ry.CtrlSet()
-        attach_handle_stick.addObjective(
-            C.feature(ry.FS.positionRel, [stick_handle, block], [1e1], [0.1, 0.1, 0.1]),
-            ry.OT.eq, -1)
         attach_handle_stick.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
+        attach_handle_stick.addObjective(
+            C.feature(ry.FS.positionRel, [stick_handle, block], [1e1], align_pos_rel),
+            ry.OT.eq, -1)
 
-        move_back = ry.CtrlSet()
-        move_back.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
-        move_back.addObjective(
+        pull_back = ry.CtrlSet()
+        pull_back.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
+
+        pull_back.addObjective(
             C.feature(ry.FS.position, [block], [1e1], block_pos_init),
             ry.OT.sos, transientStep)
-        move_back.addObjective(
-            C.feature(ry.FS.scalarProductZZ, ["world", stick], [1e1], [1]),
-            ry.OT.eq, -1)
 
+        for ctrl in [move_to_block, attach_handle_stick, pull_back]:
+            ctrl.addObjective(
+                C.feature(ry.FS.positionRel, [gripper_center, stick], [1e1], grab_pos),
+                ry.OT.eq, -1)
+            ctrl.addObjective(
+                C.feature(ry.FS.scalarProductZZ, ["world", stick], [1e1], [1]),
+                ry.OT.eq, -1)
+
+            ctrl.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, stick), True)
 
         #  block needs to be close to block
         # grab = ry.CtrlSet()
@@ -678,7 +687,7 @@ class PullBlockStick(BaseAction):
         controllers = [
             ("move_to_block", move_to_block),
             ("attach_handle_stick", attach_handle_stick),
-            ("move_back", move_back)
+            ("pull_back", pull_back)
         ]
         return add_action_name(self.name, controllers)
 
@@ -693,9 +702,9 @@ class HandOver(BaseAction):
         self.block_sym = "B"
 
         self.symbols_types = {
-            self.gripper_give_sym: dt.type_gripper,
-            self.gripper_take_sym: dt.type_gripper,
-            self.block_sym: dt.type_block,
+            self.gripper_give_sym: constants.type_gripper,
+            self.gripper_take_sym: constants.type_gripper,
+            self.block_sym: constants.type_block,
         }
 
         self.symbols = self.symbols_types.keys()
@@ -731,7 +740,7 @@ class HandOver(BaseAction):
         align_1 = ry.CtrlSet()
 
         align_1.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_give, block), True)
-        
+
         # transient objectives
         align_1.addObjective(
             C.feature(ry.FS.position, [block], [1e1], hand_over_pos_1),
@@ -769,9 +778,9 @@ class HandOver(BaseAction):
         cage = ry.CtrlSet()
         cage.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_give, block), True)
 
-        cage.addObjective(
-            C.feature(ry.FS.scalarProductXZ, ["world", gripper_give], [1e1], [direction]),
-            ry.OT.eq, -1)
+        # cage.addObjective(
+        #     C.feature(ry.FS.scalarProductXZ, ["world", gripper_give], [1e1], [direction]),
+        #     ry.OT.eq, -1)
         cage.addObjective(
             C.feature(ry.FS.position, [block], [1e1], hand_over_pos_1),
             ry.OT.eq, -1)
@@ -791,7 +800,7 @@ class HandOver(BaseAction):
 
         cage.addObjective(
             C.feature(ry.FS.positionDiff, [gripper_take_center, block], [1e3]),
-            ry.OT.sos, speed/10)
+            ry.OT.sos, speed / 10)
 
         hand_over_1 = ry.CtrlSet()
         hand_over_2 = ry.CtrlSet()
@@ -803,7 +812,6 @@ class HandOver(BaseAction):
         hand_over_1.addObjective(
             C.feature(ry.FS.scalarProductZZ, [gripper_give, gripper_take], [1e2], [-1]),
             ry.OT.eq, -1)
-
 
         hand_over_1.addObjective(
             C.feature(ry.FS.scalarProductXZ, ["world", gripper_give], [1e1], [direction]),
@@ -821,7 +829,6 @@ class HandOver(BaseAction):
         #     ry.OT.eq, -1)
 
         for hand_o in [hand_over_1, hand_over_2]:
-
             hand_o.addObjective(
                 C.feature(ry.FS.positionRel, [gripper_take_center, block], [1e1]),
                 ry.OT.eq, -1)
@@ -829,9 +836,6 @@ class HandOver(BaseAction):
             # hand_o.addObjective(
             #     C.feature(ry.FS.scalarProductXY, ["world", gripper_take], [1e1], [direction]),
             #     ry.OT.eq, -1)
-
-
-
 
         # condition, nothing is in hand of gripper
         hand_over_1.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_give, block), True)
@@ -868,9 +872,9 @@ class OpenBottle(BaseAction):
         self.bottle_sym = "B"
 
         self.symbols_types = {
-            self.gripper_1_sym: dt.type_gripper,
-            self.gripper_2_sym: dt.type_gripper,
-            self.bottle_sym: dt.type_bottle,
+            self.gripper_1_sym: constants.type_gripper,
+            self.gripper_2_sym: constants.type_gripper,
+            self.bottle_sym: constants.type_bottle,
         }
 
         self.symbols = self.symbols_types.keys()
