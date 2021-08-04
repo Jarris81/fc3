@@ -37,7 +37,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     # iterate over every grabable object
     for block_name in graspable_objects:
         block_info = C_temp.getFrame(block_name).info()
-        holding_list[block_name] = ["world"] * len(controls)
+        holding_list[block_name] = ["world"] * (len(controls)+1)
         if "parent" in block_info:
             holding_list[block_name][0] = block_info["parent"]
 
@@ -51,7 +51,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
             # we dont care about control objectives
             desc = f.description(C_temp)
             if "F_qZeroVel" not in desc and "qItself" not in desc:
-                komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_temp),
+                komo.addObjective([i+1], f.getFS(), f.getFrameNames(C_temp),
                                   o.get_OT(),
                                   f.getScale(),
                                   o.getOriginalTarget())
@@ -59,8 +59,8 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
         # go over symbolic commands
         for ctrlCommand in controller.getSymbolicCommands():
             gripper, block = ctrlCommand.getFrameNames()
-            if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:  # and not ctrlCommand.isCondition():
-                holding_list[block][i] = gripper
+            if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:# and ctrlCommand.isCondition():
+                holding_list[block][i+1] = gripper
                 # holding_list[block][i-1] = gripper
 
                 # # find where the block was grabbed
@@ -80,10 +80,10 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
         gripper, block = ctrlCommand.getFrameNames()
         if ctrlCommand.isCondition():
             if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:  # and not ctrlCommand.isCondition():
-                holding_list[block].append(gripper)
+                holding_list[block][-1] = gripper
                 break
             elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:  # and not ctrlCommand.isCondition():
-                holding_list[block].append("world")
+                holding_list[block][-1] = "world"
                 break
 
     # count the duration of each phase
@@ -123,7 +123,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     komo.optimize()
 
     # we always need this, otherwise wrong calculation
-    komo.getReport(True)
+    komo.getReport(True, False)
     df_transient = pd.read_csv("z.costReport", index_col=None)
 
     df_transient = df_transient[[col for col in df_transient.columns if

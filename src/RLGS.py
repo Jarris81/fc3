@@ -115,7 +115,7 @@ class RLGS:
         self.robust_set_of_chains = get_robust_set_of_chains(self.C, action_tree, self.goal_controller,
                                                              verbose=False)
         # first plan we want to execute
-        self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ry.CtrlSolver(self.C, 0.1, 2), True)
+        self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ry.CtrlSolver(self.C, 0.1, 2), False)
 
 
         tau = 0.01
@@ -157,26 +157,35 @@ class RLGS:
         # iterate over each controller, check which can be started first
         for i, (edge, name, c) in enumerate(self.active_robust_reverse_plan):
             if c.canBeInitiated(ctrl, self.eqPrecision):
-                self.log(f"Initiating: {name}")
-                ctrl.set(c)
-                is_any_controller_feasible = True
-                is_current_plan_feasible = True
-                current_controller_index = i
 
-                for ctrlCommand in c.getSymbolicCommands():
-                    if ctrlCommand.isCondition():
-                        continue
-                    elif ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
-                        self.gripper_action = True
-                        break
-                    elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
-                        self.gripper_action = False
 
-                # leave loop, we have the controller
-                break
+                residual_plan = self.active_robust_reverse_plan[i::-1]
+                is_current_plan_feasible, _ = check_switch_chain_feasibility(self.C, residual_plan,
+                                                                             self.goal_controller,
+                                                                             self.scene_objects, verbose=name == "GrabStick_grab")
+
+                if is_current_plan_feasible:
+                    self.log(f"Initiating: {name}")
+
+                    ctrl.set(c)
+                    is_any_controller_feasible = True
+                    is_current_plan_feasible = True
+                    current_controller_index = i
+
+                    for ctrlCommand in c.getSymbolicCommands():
+                        if ctrlCommand.isCondition():
+                            continue
+                        elif ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
+                            self.gripper_action = True
+                            break
+                        elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
+                            self.gripper_action = False
+
+                    # leave loop, we have the controller
+                    break
             else:
                 self.log(f"Cannot be initiated: {name}")
-        # check feasibility of chain
+        #check feasibility of chain
         if not t % self.feasy_check_rate and len(self.active_robust_reverse_plan):
             # check rest of chain for feasibility
             residual_plan = self.active_robust_reverse_plan[current_controller_index::-1]

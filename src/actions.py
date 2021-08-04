@@ -633,8 +633,8 @@ class PullBlockStick(BaseAction):
         stick = sym2frame[self.stick_sym]
         stick_handle = stick + "Handle"
 
-        block_pos_init = C.getFrame(block).getPosition()
-        block_pos_init[1] = block_pos_init[1] - 0.3
+        block_pos_slide = C.getFrame(block).getPosition()
+        block_pos_slide[0] -= -0.3
 
         align_pos_rel = [-0.03, 0.05, 0.0]
 
@@ -661,7 +661,7 @@ class PullBlockStick(BaseAction):
         pull_back.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
         pull_back.addObjective(
-            C.feature(ry.FS.position, [block], [1e1], block_pos_init),
+            C.feature(ry.FS.position, [block], [1e1], block_pos_slide),
             ry.OT.sos, transientStep)
 
         for ctrl in [move_to_block, attach_handle_stick, pull_back]:
