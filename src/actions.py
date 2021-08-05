@@ -113,7 +113,7 @@ class GrabBlock(BaseAction):
 
         height_block = C.getFrame(block).getSize()[2]
 
-        transient_step = 0.01
+        transient_step = 0.1
 
         align_over = ry.CtrlSet()
         align_over.addObjective(
@@ -124,23 +124,23 @@ class GrabBlock(BaseAction):
             ry.OT.sos, transient_step)
         align_over.addObjective(
             C.feature(ry.FS.scalarProductYX, [block, gripper], [1e2]),
-            ry.OT.sos, transient_step)
+            ry.OT.sos, transient_step*2)
         align_over.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
 
         cage_block = ry.CtrlSet()
         cage_block.addObjective(
-            C.feature(ry.FS.positionRel, [gripper_center, block], [1e1, 1e1, 0]),
+            C.feature(ry.FS.positionRel, [gripper_center, block], [1e0, 1e0, 0]),
             ry.OT.eq, -1)
         # move close to block
         cage_block.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper_center, block], [1e3]),
-            ry.OT.sos, transient_step)
+            C.feature(ry.FS.positionDiff, [gripper_center, block], [1e2]),
+            ry.OT.sos, transient_step*2e-1)
         cage_block.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, gripper], [1e1]),
-            ry.OT.sos, transient_step)
+            ry.OT.sos, transient_step*2e-1)
         cage_block.addObjective(
-            C.feature(ry.FS.scalarProductYX, [block, gripper], [1e1]),
-            ry.OT.sos, transient_step)
+            C.feature(ry.FS.scalarProductYX, [block, gripper], [1e0]),
+            ry.OT.eq, -1)
         cage_block.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
         # align axis with block
 
@@ -297,15 +297,15 @@ class PlaceOn(BaseAction):
         dist = (height_block + height_block_place_on) / 2
         dist2 = dist * 2
 
-        transient_step = 0.01
+        transient_step = 0.1
 
         align_over = ry.CtrlSet()
         align_over.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e1]),
             ry.OT.sos, transient_step)
         align_over.addObjective(
-            C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e1], [0, 0, 0.12]),
-            ry.OT.sos, transient_step)
+            C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e2], [0, 0, 0.12]),
+            ry.OT.sos, transient_step/3)
         align_over.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
         place_on_block = ry.CtrlSet()
@@ -313,15 +313,15 @@ class PlaceOn(BaseAction):
         #     C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e1]),
         #     ry.OT.eq, -1)
         place_on_block.addObjective(
-            C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e1, 1e1, 0]),
+            C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e0, 1e0, 0]),
             ry.OT.eq, -1)
         place_on_block.addObjective(
             C.feature(ry.FS.positionRel, [block, block_placed_on], [1e2], [0., 0., dist]),
-            ry.OT.sos, transient_step / 10)
+            ry.OT.sos, transient_step * 1e-1)
         # should have z-axis in same direction
         place_on_block.addObjective(
             C.feature(ry.FS.scalarProductZZ, [block, block_placed_on], [1e1], [1]),
-            ry.OT.sos, transient_step / 10)
+            ry.OT.sos, transient_step * 1e-1)
         # align axis with block
         place_on_block.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
@@ -383,7 +383,7 @@ class PlaceSide(BaseAction):
         self.delete_effects = self.preconditions
 
     def get_grounded_control_set(self, C, frames):
-        free_place = (-0.3, -0.7, 0.68)
+        free_place = (-0.4, -0.0, 0.68)
         table_pos = (-0.2, -0.2, 0)
         sym2frame = _get_sym2frame(self.symbols, frames)
 
@@ -391,19 +391,21 @@ class PlaceSide(BaseAction):
         gripper_center = gripper + "Center"
         block = sym2frame[self.block_sym]
 
+        transientStep = 0.1
+
         place_block_side = ry.CtrlSet()
         place_block_side.addObjective(
-            C.feature(ry.FS.distance, [block, gripper_center], [1e1]),
+            C.feature(ry.FS.positionDiff, [block, gripper_center], [1e-1]),
             ry.OT.eq, -1)
 
         # block should be placed on table, doesnt matter where in x-y plane
         place_block_side.addObjective(
             C.feature(ry.FS.position, [block], [1e3], free_place),
-            ry.OT.sos, 0.005)
+            ry.OT.sos, transientStep)
 
         place_block_side.addObjective(
-            C.feature(ry.FS.scalarProductZZ, [block, "table"], [1e1], [1]),
-            ry.OT.sos, 0.005)
+            C.feature(ry.FS.scalarProductZZ, [block, "table"], [1e2], [1]),
+            ry.OT.sos, transientStep)
 
         # needs to be holding the block
         place_block_side.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)

@@ -115,7 +115,7 @@ class RLGS:
         self.robust_set_of_chains = get_robust_set_of_chains(self.C, action_tree, self.goal_controller,
                                                              verbose=False)
         # first plan we want to execute
-        self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ry.CtrlSolver(self.C, 0.1, 2), True)
+        self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ry.CtrlSolver(self.C, 0.1, 2), False)
 
 
         tau = 0.01
@@ -221,7 +221,7 @@ class RLGS:
                     print(f"{edge} cannot be initiated!")
 
         # if no plan is feasible, return false
-        return None
+        return []
 
     def cheat_update_obj(self, object_infos):
         for obj_name, obj_info in object_infos.items():

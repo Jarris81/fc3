@@ -19,6 +19,7 @@ class InterferenceTemplate:
     def reset(self):
         self.count = 0
 
+
 class NoInterference(InterferenceTemplate):
 
     def __init__(self):
@@ -37,3 +38,4 @@ class ResetPosition(InterferenceTemplate):
 
             box = C.frame(self.frame_name)
             box.setPosition(self.pos)
+            box.setQuaternion([1, 0, 0, 0])

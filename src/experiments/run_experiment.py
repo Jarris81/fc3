@@ -37,7 +37,7 @@ def get_obj_info(S, C, scene_objects):
     return obj_infos
 
 
-def run_experiment(experiment_name, use_real_robot, use_config_only, interference_num=0, verbose=False):
+def run_experiment(experiment_name, interference_num, use_config_only, use_real_robot, verbose=False):
     C = None
     action_list = []
     planner = None
@@ -141,6 +141,7 @@ def run_experiment(experiment_name, use_real_robot, use_config_only, interferenc
         bot.waitGripperIdle()
 
 
+    # Loop
     for t in range(10000):
 
         if add_interference:
@@ -205,15 +206,22 @@ if __name__ == '__main__':
     parser.add_option("-i", "--interference", dest="interference_num", default=0,
                       help="Define interference")
 
-    parser.add_option("-c", "--config_only", dest="use_config_only", default=False,
-                      help="True if only use config, dont simulate real robot")
-
-    parser.add_option("-r", "--real", dest="use_real_robot", default=True,
-                      help="True if use a real robot")
+    parser.add_option("-m", "--run_mode", dest="run_mode", default="config",
+                      help="run mode: config, sim, or real")
 
     (options, args) = parser.parse_args()
+
+    option_config_only = True
+    option_real_robot = False
+
+    if options.run_mode == "sim":
+        option_config_only = False
+    elif options.run_mode == "real":
+        option_config_only = False
+        option_real_robot = True
+
     run_experiment(options.experiment_name,
-                   options.use_real_robot,
-                   options.use_config_only,
-                   int(options.interference_num),
-                   options.verbose)
+                   interference_num=int(options.interference_num),
+                   use_config_only=option_config_only,
+                   use_real_robot=option_real_robot,
+                   verbose=options.verbose)
