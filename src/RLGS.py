@@ -33,7 +33,7 @@ class RLGS:
 
         # stuff for execution
         self.is_done = False
-        self.feasy_check_rate = 10  # every 50 steps check for feasibility
+        self.feasy_check_rate = 20  # every 50 steps check for feasibility
         self.gripper_action = None
 
         self.q = None
@@ -115,7 +115,7 @@ class RLGS:
         self.robust_set_of_chains = get_robust_set_of_chains(self.C, action_tree, self.goal_controller,
                                                              verbose=False)
         # first plan we want to execute
-        self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ry.CtrlSolver(self.C, 0.1, 2), True)
+        self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ry.CtrlSolver(self.C, 0.1, 2), False)
 
 
         tau = 0.01
@@ -132,7 +132,7 @@ class RLGS:
         return True
 
     def is_goal_fulfilled(self):
-        ctrl = ry.CtrlSolver(self.C, 0.1, 1)
+        ctrl = ry.CtrlSolver(self.C, 0.1, 2)
         return self.goal_controller.canBeInitiated(ctrl, self.eqPrecision)
 
     def is_no_plan_feasible(self):
@@ -175,7 +175,8 @@ class RLGS:
                 # leave loop, we have the controller
                 break
             else:
-                self.log(f"Cannot be initiated: {name}")
+                pass
+                # self.log(f"Cannot be initiated: {name}")
         # check feasibility of chain
         if not t % self.feasy_check_rate and len(self.active_robust_reverse_plan):
             # check rest of chain for feasibility
@@ -221,7 +222,7 @@ class RLGS:
                     print(f"{edge} cannot be initiated!")
 
         # if no plan is feasible, return false
-        return None
+        return []
 
     def cheat_update_obj(self, object_infos):
         for obj_name, obj_info in object_infos.items():

@@ -123,7 +123,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     komo.optimize()
 
     # we always need this, otherwise wrong calculation
-    komo.getReport(True)
+    komo.getReport(True, False)
     df_transient = pd.read_csv("z.costReport", index_col=None)
 
     df_transient = df_transient[[col for col in df_transient.columns if

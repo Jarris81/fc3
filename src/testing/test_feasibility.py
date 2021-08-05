@@ -98,7 +98,7 @@ if __name__ == '__main__':
     komo.view(False, "result")
     print("constraints:", komo.getConstraintViolations())
     print("costs:", komo.getCosts())
-    komo.getReport(True)
+    komo.getReport(True, False)
 
     komo.view_play(1, True)
 

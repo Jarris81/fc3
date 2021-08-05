@@ -113,7 +113,7 @@ class GrabBlock(BaseAction):
 
         height_block = C.getFrame(block).getSize()[2]
 
-        transient_step = 0.01
+        transient_step = 0.005
 
         align_over = ry.CtrlSet()
         align_over.addObjective(
@@ -588,7 +588,7 @@ class GrabStick(BaseAction):
         return add_action_name(self.name, controllers)
 
 
-class PullBlockStick(BaseAction):
+class PullBlockToGoal(BaseAction):
 
     def __init__(self):
         super().__init__(__class__.__name__)
@@ -610,13 +610,13 @@ class PullBlockStick(BaseAction):
         ]
 
         self.add_effects = [
-            pred.HandEmpty(self.gripper_sym)
+            pred.BlockAtGoal(self.block_sym)
         ]
 
-        self.delete_effects = self.preconditions
+        self.delete_effects = []
 
     def get_grounded_control_set(self, C, frames):
-        transientStep = 0.1
+        transientStep = 0.01
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         stick = sym2frame[self.stick_sym]
@@ -633,8 +633,8 @@ class PullBlockStick(BaseAction):
         stick = sym2frame[self.stick_sym]
         stick_handle = stick + "Handle"
 
-        block_pos_init = C.getFrame(block).getPosition()
-        block_pos_init[1] = block_pos_init[1] - 0.3
+        block_pos_goal = constants.goal_block_pos
+        # block_pos_goal[1] = block_pos_goal[1] - 0.3
 
         align_pos_rel = [-0.03, 0.05, 0.0]
 
@@ -652,24 +652,31 @@ class PullBlockStick(BaseAction):
         #     ry.OT.sos, transientStep)
 
         attach_handle_stick = ry.CtrlSet()
-        attach_handle_stick.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), False)
+        attach_handle_stick.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (stick, block), False)
         attach_handle_stick.addObjective(
             C.feature(ry.FS.positionRel, [stick_handle, block], [1e1], align_pos_rel),
             ry.OT.eq, -1)
 
         pull_back = ry.CtrlSet()
-        pull_back.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
+        pull_back.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (stick, block), True)
 
         pull_back.addObjective(
-            C.feature(ry.FS.position, [block], [1e1], block_pos_init),
+            C.feature(ry.FS.position, [block], [1e1], block_pos_goal),
             ry.OT.sos, transientStep)
 
-        for ctrl in [move_to_block, attach_handle_stick, pull_back]:
+        detach_block = ry.CtrlSet()
+        detach_block.addObjective(
+            C.feature(ry.FS.position, [block], [1e1], block_pos_goal),
+            ry.OT.eq, -1)
+
+        detach_block.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (stick, block), False)
+
+        for ctrl in [move_to_block, attach_handle_stick, pull_back, detach_block]:
             ctrl.addObjective(
-                C.feature(ry.FS.positionRel, [gripper_center, stick], [1e1], grab_pos),
+                C.feature(ry.FS.positionRel, [gripper_center, stick], [1e0], grab_pos),
                 ry.OT.eq, -1)
             ctrl.addObjective(
-                C.feature(ry.FS.scalarProductZZ, ["world", stick], [1e1], [1]),
+                C.feature(ry.FS.scalarProductZZ, ["world", stick], [1e0], [1]),
                 ry.OT.eq, -1)
 
             ctrl.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, stick), True)
@@ -687,8 +694,64 @@ class PullBlockStick(BaseAction):
         controllers = [
             ("move_to_block", move_to_block),
             ("attach_handle_stick", attach_handle_stick),
-            ("pull_back", pull_back)
+            ("pull_back", pull_back),
+            ("detach_block", detach_block)
         ]
+        return add_action_name(self.name, controllers)
+
+
+class PlaceStick(BaseAction):
+
+    def __init__(self):
+        super().__init__(__class__.__name__)
+
+        self.gripper_sym = "G"
+        self.stick_sym = "S"
+
+        self.symbols_types = {
+            self.gripper_sym: constants.type_gripper,
+            self.stick_sym: constants.type_stick,
+        }
+
+        self.symbols = self.symbols_types.keys()
+
+        self.preconditions = [
+            pred.InHand(self.gripper_sym, self.stick_sym)
+        ]
+
+        self.add_effects = [
+            pred.HandEmpty(self.gripper_sym),
+            pred.IsFree(self.stick_sym)
+        ]
+
+        self.delete_effects = self.preconditions
+
+
+    def get_grounded_control_set(self, C, frames):
+        transientStep = 0.01
+        sym2frame = _get_sym2frame(self.symbols, frames)
+
+        stick = sym2frame[self.stick_sym]
+
+        # get stick length
+        stick_frame = C.getFrame(stick)
+        stick_length = stick_frame.getSize()[1]
+
+        grab_pos = (0, -stick_length / 3, 0)
+
+        gripper = sym2frame[self.gripper_sym]
+        gripper_center = gripper + "Center"
+        stick = sym2frame[self.stick_sym]
+        stick_handle = stick + "Handle"
+
+        open_stick = ry.CtrlSet()
+
+        open_stick.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, stick), False)
+
+        controllers = [
+            ("open_stick", open_stick),
+        ]
+
         return add_action_name(self.name, controllers)
 
 
