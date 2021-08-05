@@ -232,6 +232,13 @@ class StickPullPlanner:
         block_at_goal.ground_predicate(B=scene_obj[constants.type_block][0])
         self.goal.append(block_at_goal.get_grounded_predicate())
 
+        # empty hands
+        for gripper in scene_obj[constants.type_gripper]:
+            init_hand_empty = pred.HandEmpty("G")
+            init_hand_empty.ground_predicate(G=gripper)
+            self.goal.append(init_hand_empty.get_grounded_predicate())
+
+
         # define problem here
         prob = Problem(
             domain,
@@ -251,7 +258,7 @@ class StickPullPlanner:
             plan, state_plan, G = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=5,
                                                     root_state_plan=state_plan, verbose=True)
 
-            G = backwards_tree_exploration(prob, goal=self.goal, verbose=True, max_depth=4)
+            G = backwards_tree_exploration(prob, goal=self.goal, verbose=True, max_depth=3)
             # need to reverse plan
             plan = plan[::-1]
         if self.verbose:
@@ -270,10 +277,14 @@ class StickPullPlanner:
         constants.goal_block_pos = goal_place
         goals_block_at_goal = [x for x in self.goal if x[0] == pred.BlockAtGoal.__name__]
         block = "b1"
+        stick = "stick"
         goal_feature.addObjective(
             C.feature(ry.FS.position, [block], [1e0], goal_place),
             ry.OT.eq, -1)
-        goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", block), True)
+        goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", stick), True)
+        goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (stick, block), True)
+
+        # goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", stick), True)
         # goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("L_gripper", block), True)
 
         return goal_feature
@@ -290,7 +301,7 @@ if __name__ == '__main__':
     action_list = [
         actions.GrabBlock(),
         actions.PlaceGoal(),
-        actions.PullBlockStick(),
+        actions.PullBlockToGoal(),
         actions.GrabStick()
     ]
 

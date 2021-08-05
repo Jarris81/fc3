@@ -100,20 +100,21 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
             actions.GrabBlock(),
             actions.PlaceGoal(),
             actions.GrabStick(),
-            actions.PullBlockStick()
+            actions.PullBlockToGoal(),
+            actions.PlaceStick()
         ]
         planner = planners.StickPullPlanner()
-        x_flip_pos_b1 = C.frame("b1").getPosition()
-        x_flip_pos_b1[0] = x_flip_pos_b1[0] * -1
+        x_new_pos_b1 = C.frame("b1").getPosition()
+        x_new_pos_b1[0] = x_new_pos_b1[0] - 0.3
         interference_list.extend((
             # b1 is knocked of tower while gripper is moving to b1
-            ResetPosition(5, 7, "b1", x_flip_pos_b1),
+            ResetPosition(40, 42, "b1", x_new_pos_b1),
         ))
 
     #
     # Bottle Open
     #
-    elif experiment_name == "botle_open":
+    elif experiment_name == "bottle_open":
         C, scene_objects = setup_env.setup_bottle_open_env()
         action_list = [
 
@@ -139,7 +140,6 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
 
         bot.gripperOpen(0.08, 0.1)
         bot.waitGripperIdle()
-
 
     # Loop
     for t in range(10000):

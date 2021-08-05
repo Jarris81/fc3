@@ -33,7 +33,7 @@ class RLGS:
 
         # stuff for execution
         self.is_done = False
-        self.feasy_check_rate = 10  # every 50 steps check for feasibility
+        self.feasy_check_rate = 20  # every 50 steps check for feasibility
         self.gripper_action = None
 
         self.q = None
@@ -132,7 +132,7 @@ class RLGS:
         return True
 
     def is_goal_fulfilled(self):
-        ctrl = ry.CtrlSolver(self.C, 0.1, 1)
+        ctrl = ry.CtrlSolver(self.C, 0.1, 2)
         return self.goal_controller.canBeInitiated(ctrl, self.eqPrecision)
 
     def is_no_plan_feasible(self):
@@ -175,7 +175,8 @@ class RLGS:
                 # leave loop, we have the controller
                 break
             else:
-                self.log(f"Cannot be initiated: {name}")
+                pass
+                # self.log(f"Cannot be initiated: {name}")
         # check feasibility of chain
         if not t % self.feasy_check_rate and len(self.active_robust_reverse_plan):
             # check rest of chain for feasibility

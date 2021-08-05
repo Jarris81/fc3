@@ -2,16 +2,17 @@ import libry as ry
 import libpybot as pybot
 import time
 import actions
-from util import setup_env
+from util import setup_env, constants
 from robustness import get_robust_chain
 from planners import TowerPlanner
+
 
 if __name__ == '__main__':
 
     C, block_names = setup_env.setup_stick_pull_env()
 
     grab_stick = actions.GrabStick()
-    pull_block = actions.PullBlockStick()
+    pull_block = actions.PullBlockToGoal()
 
     grab_block = actions.GrabBlock()
     place_block_place = actions.PlaceOn()
@@ -47,10 +48,13 @@ if __name__ == '__main__':
         gripper_take, gripper_give = gripper_give, gripper_take
 
     robust_plan = []
+    constants.goal_block_pos = constants.goal_stick_pull_block_pos
+
 
     #test block pull
     robust_plan.extend(grab_stick.get_grounded_control_set(C, ["R_gripper", "stick"]))
     robust_plan.extend(pull_block.get_grounded_control_set(C, ["R_gripper", "b1", "stick"]))
+
 
     #robust_plan.extend(grab_block.get_grounded_control_set(C, ["R_gripper", "b1"]))
     # robust_plan.extend(grab_bottle.get_grounded_control_set(C, ["R_gripper", "bottle"]))
