@@ -158,4 +158,4 @@ vid/
 *.ppm
 
 %% intellij files
-.idea/*
+%%.idea/*

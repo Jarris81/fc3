@@ -76,7 +76,7 @@ def setup_hand_over_env():
 
 def setup_stick_pull_env():
     positions = (
-        (-0.5, -0.1),
+        (-0.8, -0.1),
     )
 
     C, scene_objects = _setup(dual=False, num_blocks=1, positions=positions)
@@ -84,7 +84,7 @@ def setup_stick_pull_env():
     stick_length = 0.5
     stick_th = 0.03
 
-    stick_x, stick_y = 0.4, 0.1
+    stick_x, stick_y = -0.1, 0.1
 
     stick = C.addFrame("stick")
     stick.setPosition((stick_x, stick_y, table_height+stick_th/2))

@@ -108,7 +108,7 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
         x_new_pos_b1[0] = x_new_pos_b1[0] - 0.3
         interference_list.extend((
             # b1 is knocked of tower while gripper is moving to b1
-            ResetPosition(40, 42, "b1", x_new_pos_b1),
+            ResetPosition(30, 32, "b1", x_new_pos_b1),
         ))
 
     #

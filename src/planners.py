@@ -283,8 +283,7 @@ class StickPullPlanner:
             ry.OT.eq, -1)
         goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", stick), True)
         goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (stick, block), True)
-
-        # goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", stick), True)
+        goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", block), True)
         # goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("L_gripper", block), True)
 
         return goal_feature
