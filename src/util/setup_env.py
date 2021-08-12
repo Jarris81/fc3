@@ -6,19 +6,16 @@ import time
 
 path_to_repo = "/home/jason/git/thesis_2020/"
 
-table_height = 0.635
+table_height = 0.68
 
 
 def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2)),  block_size=(.06, .06, .06, 0.001)):
     # scene = "rai/testing/KOMO/switches/model2.g"
-
+    scene = "rai-robotModels/scenarios/pandasTable.g"
     scene_objects = {constants.type_gripper: ["R_gripper"], constants.type_block: []}
 
     if dual:
-        scene = "rai-robotModels/scenarios/pandasTable.g"
         scene_objects[constants.type_gripper].append("L_gripper")
-    else:
-        scene = "rai-robotModels/scenarios/pandaSingle.g"
 
     # setup configuration (what robot knows)
     C = ry.Config()
@@ -56,9 +53,9 @@ def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2)),  block_size=(.06,
 
 def setup_tower_env():
     positions = (
-        (-0.6, -0.2),
-        (-0.4, -0.1),
-        (-0.6, -0.5)
+        (0.1, 0.2),
+        (0.4, 0.1),
+        (0.6, 0.2)
 
     )
 
@@ -76,7 +73,7 @@ def setup_hand_over_env():
 
 def setup_stick_pull_env():
     positions = (
-        (-0.5, -0.1),
+        (0.8, 0.5),
     )
 
     C, scene_objects = _setup(dual=False, num_blocks=1, positions=positions)
@@ -84,7 +81,7 @@ def setup_stick_pull_env():
     stick_length = 0.5
     stick_th = 0.03
 
-    stick_x, stick_y = -0.1, 0.1
+    stick_x, stick_y = 0.9, -0.1
 
     stick = C.addFrame("stick")
     stick.setPosition((stick_x, stick_y, table_height+stick_th/2))

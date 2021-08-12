@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     bot = pybot.BotOp(C, False)
     q_start = C.getJointState()
-    q_start = q_start.reshape(1, 7)
+    q_start = q_start.reshape(1, 14)
     bot.move(q_start, [2])
 
     ref_tau = 0.05
