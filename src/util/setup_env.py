@@ -67,7 +67,7 @@ def setup_tower_env():
 
 def setup_hand_over_env():
     positions = (
-        (0.6, 0.1),
+        (0.0, 0.0),
     )
     C, scene_objects = _setup(dual=True, num_blocks=1, positions=positions)
 
@@ -76,7 +76,7 @@ def setup_hand_over_env():
 
 def setup_stick_pull_env():
     positions = (
-        (-0.8, -0.1),
+        (-0.5, -0.1),
     )
 
     C, scene_objects = _setup(dual=False, num_blocks=1, positions=positions)

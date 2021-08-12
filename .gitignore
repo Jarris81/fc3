@@ -159,3 +159,6 @@ vid/
 
 %% intellij files
 %%.idea/*
+
+%% no pics
+*.png
