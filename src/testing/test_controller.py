@@ -29,9 +29,13 @@ if __name__ == '__main__':
 
     C.view()
 
+    print([x for x in C.getFrameNames()if "gripper" in x])
 
-    lfinger1 = C.getFrame("L_panda_finger_joint2")
-    rfingerjoin = C.getFrame("L_panda_finger_joint1")
+    # time.sleep(10)
+
+
+    # lfinger1 = C.getFrame("L_panda_finger_joint2")
+    # rfingerjoin = C.getFrame("L_panda_finger_joint1")
 
     # for t in range(10):
     #     lfinger1.setRelativePosition((t / 100, 0, 0))
@@ -52,8 +56,8 @@ if __name__ == '__main__':
 
 
     #test block pull
-    robust_plan.extend(grab_stick.get_grounded_control_set(C, ["R_gripper", "stick"]))
-    robust_plan.extend(pull_block.get_grounded_control_set(C, ["R_gripper", "b1", "stick"]))
+    robust_plan.extend(grab_stick.get_grounded_control_set(C, ["r_gripper", "stick"]))
+    robust_plan.extend(pull_block.get_grounded_control_set(C, ["r_gripper", "b1", "stick"]))
 
 
     #robust_plan.extend(grab_block.get_grounded_control_set(C, ["R_gripper", "b1"]))

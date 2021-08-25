@@ -8,21 +8,17 @@ from robustness import get_robust_set_of_chains
 from util.visualize_search import draw_search_graph
 
 
-class RLGS:
+class SimpleSystem:
 
     def __init__(self, C,
-                 use_robust=True,
-                 use_feasy=True,
-                 use_multi=True,
                  verbose=False,
                  show_plts=False):
-
         # what the robot knows
         self.C = C
-        self.use_feasy = use_feasy
-        self.use_robust = use_robust
-        self.use_multi = use_multi
         self.verbose = verbose
+
+        # action tree received from planner
+        self.action_tree = None
 
         # store plan and action tree here
         self.scene_objects = {}
@@ -55,21 +51,9 @@ class RLGS:
 
         self.log = self.log_default
 
-    def move_home(self):
-
-        ctrl = ry.CtrlSolver(self.C, 0.1, 2)
-        ctrl.set(self.home_controller)
-        ctrl.update(self.C.getJointState(), [], self.C)
-        return ctrl.solve(self.C)
-
-    def is_home(self):
-        # ctrl = ry.CtrlSolver(self.C, 0.1, 2)
-        # TODO: not working, convergence should be
-        # return self.home_controller.isConverged(ctrl, self.eqPrecision)
-        q_home = self.q_home
-        q_cur = self.C.getJointState()
-        is_home = np.allclose(self.C.getJointState(), self.q_home, self.eqPrecision, self.eqPrecision)
-        return is_home
+    def log_default(self, msg):
+        if self.verbose:
+            print(msg)
 
     def setup(self, action_list, planner, scene_objects):
 
@@ -79,7 +63,7 @@ class RLGS:
         # put all objects into one dictionary with types
         self.scene_objects = scene_objects
 
-        plan, __, state_plan, action_tree = planner.get_plan(action_list, self.scene_objects)
+        plan, __, state_plan, self.action_tree = planner.get_tree(action_list, self.scene_objects, forward=False)
 
         self.goal_controller = planner.get_goal_controller(self.C)
 
@@ -96,30 +80,65 @@ class RLGS:
 
         # setup control sets
         name2con = {x.name: x for x in action_list}
-        grounded_actions = nx.get_edge_attributes(action_tree, "action")
+        grounded_actions = nx.get_edge_attributes(self.action_tree, "action")
         grounded_ctrlsets = dict()
 
-        for edge in action_tree.edges():
+        for edge in self.action_tree.edges():
             grounded_action = grounded_actions[edge]
             relevant_frames = grounded_action.sig[1:]
             controller = name2con[grounded_action.sig[0]]  # the actual controller
             grounded_ctrlsets[edge] = controller.get_grounded_control_set(self.C, relevant_frames)
 
         # each edge (action) gets and ctrlset
-        nx.set_edge_attributes(action_tree, grounded_ctrlsets, "ctrlset")
+        nx.set_edge_attributes(self.action_tree, grounded_ctrlsets, "ctrlset")
 
         # draw the action tree
-        draw_search_graph(plan, state_plan, action_tree)
+        draw_search_graph(plan, state_plan, self.action_tree)
+
+        #
+        # self.controllers =
+
+
+    # def step(self, t, tau):
+
+
+
+
+class RLGS(SimpleSystem):
+
+    def __init__(self, C, use_robust=True, use_feasy=True, use_multi=True, verbose=False, show_plts=False):
+
+        # what the robot knows
+        super().__init__(C, verbose, show_plts)
+        self.C = C
+        self.use_feasy = use_feasy
+        self.use_robust = use_robust
+        self.use_multi = use_multi
+        self.verbose = verbose
+
+        # store plan and action tree here
+        self.scene_objects = {}
+        self.robust_set_of_chains = []
+        self.active_robust_reverse_plan = []
+        self.goal_controller = ry.CtrlSet()
+        self.no_plan_feasible = False
+
+        # stuff for execution
+        self.feasy_check_rate = 20  # every 50 steps check for feasibility
+
+    def setup(self, action_list, planner, scene_objects):
+
+        super().setup(action_list, planner, scene_objects)
 
         # get robust tree/ set of chains
-        self.robust_set_of_chains = get_robust_set_of_chains(self.C, action_tree, self.goal_controller,
+        self.robust_set_of_chains = get_robust_set_of_chains(self.C, self.action_tree, self.goal_controller,
                                                              verbose=False)
         # first plan we want to execute
         self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ry.CtrlSolver(self.C, 0.1, 2), False)
 
 
         tau = 0.01
-        for name, x in nx.get_edge_attributes(action_tree, "implicit_ctrlsets").items():
+        for name, x in nx.get_edge_attributes(self.action_tree, "implicit_ctrlsets").items():
             for name, y in x:
                 pass
                 y.add_qControlObjective(2, 1e-3 * np.sqrt(tau),

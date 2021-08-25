@@ -109,7 +109,6 @@ class GrabBlock(BaseAction):
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         gripper = sym2frame[self.gripper_sym]
-        gripper_center = gripper + "Center"
         block = sym2frame[self.block_sym]
 
         height_block = C.getFrame(block).getSize()[2]
@@ -118,7 +117,7 @@ class GrabBlock(BaseAction):
 
         align_over = ry.CtrlSet()
         align_over.addObjective(
-            C.feature(ry.FS.positionRel, [gripper_center, block], [1e2], [0, 0, height_block]),
+            C.feature(ry.FS.positionRel, [gripper, block], [1e2], [0, 0, height_block]),
             ry.OT.sos, transient_step)
         align_over.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, gripper], [1e1]),
@@ -130,11 +129,11 @@ class GrabBlock(BaseAction):
 
         cage_block = ry.CtrlSet()
         cage_block.addObjective(
-            C.feature(ry.FS.positionRel, [gripper_center, block], [1e0, 1e0, 0]),
+            C.feature(ry.FS.positionRel, [gripper, block], [1e0, 1e0, 0]),
             ry.OT.eq, -1)
         # move close to block
         cage_block.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper_center, block], [1e2]),
+            C.feature(ry.FS.positionDiff, [gripper, block], [1e2]),
             ry.OT.sos, transient_step*2e-1)
         cage_block.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, gripper], [1e1]),
@@ -159,7 +158,7 @@ class GrabBlock(BaseAction):
         #  block needs to be close to block
         grab = ry.CtrlSet()
         grab.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper_center, block], [1e1]),
+            C.feature(ry.FS.positionDiff, [gripper, block], [1e1]),
             ry.OT.eq, -1)
         # condition, nothing is in hand of gripper
         grab.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
@@ -389,14 +388,13 @@ class PlaceSide(BaseAction):
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         gripper = sym2frame[self.gripper_sym]
-        gripper_center = gripper + "Center"
         block = sym2frame[self.block_sym]
 
         transientStep = 0.1
 
         place_block_side = ry.CtrlSet()
         place_block_side.addObjective(
-            C.feature(ry.FS.positionDiff, [block, gripper_center], [1e-1]),
+            C.feature(ry.FS.positionDiff, [block, gripper], [1e-1]),
             ry.OT.eq, -1)
 
         # block should be placed on table, doesnt matter where in x-y plane
@@ -550,7 +548,6 @@ class GrabStick(BaseAction):
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         gripper = sym2frame[self.gripper_sym]
-        gripper_center = gripper + "Center"
         stick = sym2frame[self.stick_sym]
 
         # get stick length
@@ -562,7 +559,7 @@ class GrabStick(BaseAction):
         move_to = ry.CtrlSet()
         # move close to block
         move_to.addObjective(
-            C.feature(ry.FS.positionRel, [gripper_center, stick], [1e1] * 3, grab_pos),
+            C.feature(ry.FS.positionRel, [gripper, stick], [1e1] * 3, grab_pos),
             ry.OT.sos, transientStep=transient_step)
         # align axis with block
         move_to.addObjective(
@@ -575,7 +572,7 @@ class GrabStick(BaseAction):
         #  block needs to be close to block
         grab = ry.CtrlSet()
         grab.addObjective(
-            C.feature(ry.FS.positionRel, [gripper_center, stick], [1e1], grab_pos),
+            C.feature(ry.FS.positionRel, [gripper, stick], [1e1], grab_pos),
             ry.OT.eq, -1)
         # condition, nothing is in hand of gripper
         grab.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, stick), True)
@@ -631,7 +628,6 @@ class PullBlockToGoal(BaseAction):
         grab_pos = (0, -stick_length / 3, 0)
 
         gripper = sym2frame[self.gripper_sym]
-        gripper_center = gripper + "Center"
         block = sym2frame[self.block_sym]
         stick = sym2frame[self.stick_sym]
         stick_handle = stick + "Handle"
@@ -671,7 +667,6 @@ class PullBlockToGoal(BaseAction):
             ry.OT.sos, transientStep)
 
 
-
         attach_handle_stick = ry.CtrlSet()
         attach_handle_stick.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (stick, block), False)
         attach_handle_stick.addObjective(
@@ -700,7 +695,7 @@ class PullBlockToGoal(BaseAction):
 
         for ctrl in [hover_stick, stick_to_block, attach_handle_stick, pull_back, detach_block]:
             ctrl.addObjective(
-                C.feature(ry.FS.positionRel, [gripper_center, stick], [1e0], grab_pos),
+                C.feature(ry.FS.positionRel, [gripper, stick], [1e0], grab_pos),
                 ry.OT.eq, -1)
             ctrl.addObjective(
                 C.feature(ry.FS.scalarProductZZ, ["world", stick], [1e0], [1]),
@@ -768,7 +763,6 @@ class PlaceStick(BaseAction):
         grab_pos = (0, -stick_length / 3, 0)
 
         gripper = sym2frame[self.gripper_sym]
-        gripper_center = gripper + "Center"
         stick = sym2frame[self.stick_sym]
         stick_handle = stick + "Handle"
 
@@ -821,10 +815,8 @@ class HandOver(BaseAction):
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         gripper_give = sym2frame[self.gripper_give_sym]
-        gripper_give_center = gripper_give + "Center"
 
         gripper_take = sym2frame[self.gripper_take_sym]
-        gripper_take_center = gripper_take + "Center"
 
         block = sym2frame[self.block_sym]
 
@@ -837,7 +829,7 @@ class HandOver(BaseAction):
             C.feature(ry.FS.position, [block], [1e1], hand_over_pos_1),
             ry.OT.sos, speed)
         align_1.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper_give_center, block], [1e0]),
+            C.feature(ry.FS.positionDiff, [gripper_give, block], [1e0]),
             ry.OT.eq, -1)
 
         direction = 1 if gripper_give == "R_gripper" else -1
@@ -876,7 +868,7 @@ class HandOver(BaseAction):
             C.feature(ry.FS.position, [block], [1e1], hand_over_pos_1),
             ry.OT.eq, -1)
         cage.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper_give_center, block], [1e1]),
+            C.feature(ry.FS.positionDiff, [gripper_give, block], [1e1]),
             ry.OT.eq, -1)
 
         cage.addObjective(
@@ -890,14 +882,14 @@ class HandOver(BaseAction):
         #     ry.OT.sos, speed)
 
         cage.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper_take_center, block], [1e3]),
+            C.feature(ry.FS.positionDiff, [gripper_take, block], [1e3]),
             ry.OT.sos, speed / 10)
 
         hand_over_1 = ry.CtrlSet()
         hand_over_2 = ry.CtrlSet()
 
         hand_over_1.addObjective(
-            C.feature(ry.FS.positionRel, [block, gripper_give_center], [1e1]),
+            C.feature(ry.FS.positionRel, [block, gripper_give], [1e1]),
             ry.OT.eq, -1)
 
         hand_over_1.addObjective(
@@ -921,7 +913,7 @@ class HandOver(BaseAction):
 
         for hand_o in [hand_over_1, hand_over_2]:
             hand_o.addObjective(
-                C.feature(ry.FS.positionRel, [gripper_take_center, block], [1e1]),
+                C.feature(ry.FS.positionRel, [gripper_take, block], [1e1]),
                 ry.OT.eq, -1)
 
             # hand_o.addObjective(

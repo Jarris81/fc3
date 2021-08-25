@@ -133,13 +133,13 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
     if not use_config_only:
 
         bot = pybot.BotOp(C, use_real_robot)
-        bot.home(C)
-        while bot.getTimeToEnd() > 0:
-            bot.step(C, .1)
-            time.sleep(.1)
-
-        bot.gripperOpen(0.08, 0.1)
-        bot.waitGripperIdle()
+    #     bot.home(C)
+    #     while bot.getTimeToEnd() > 0:
+    #         bot.step(C, .1)
+    #         time.sleep(.1)
+    #
+    #     bot.gripperOpen(0.08, 0.1)
+    #     bot.waitGripperIdle()
 
     # Loop
     for t in range(10000):
@@ -158,7 +158,7 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
             elif gripper_action is False:
                 bot.gripperOpen(0.08, 0.1)
 
-            bot.waitGripperIdle()
+            # bot.waitGripperIdle()
 
             # move the real bot
             bot.moveLeap(q, 2)

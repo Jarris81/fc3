@@ -145,7 +145,7 @@ def setup_bottle_open_env():
 
     C.attach("bottle", "cap")
 
-    scene_objects = {constants.type_gripper: ["R_gripper"], constants.type_bottle: ["bottle"]}
+    scene_objects = {constants.type_gripper: ["L_gripper"], constants.type_bottle: ["bottle"]}
 
     return C, scene_objects
 

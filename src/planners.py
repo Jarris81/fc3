@@ -19,7 +19,7 @@ class TowerPlanner:
         self.verbose = verbose
         self.goal = []
 
-    def get_plan(self, control_actions, scene_obj, forward=False):
+    def get_tree(self, control_actions, scene_obj, forward=False):
 
         # get simple action from all controllers
         domain = Domain((x.get_simple_action() for x in control_actions))
@@ -121,7 +121,7 @@ class HandOverPlanner:
         self.verbose = verbose
         self.goal = []
 
-    def get_plan(self, control_actions, scene_obj, forward=False):
+    def get_tree(self, control_actions, scene_obj, forward=False):
 
         domain = Domain((x.get_simple_action() for x in control_actions))
 
@@ -161,28 +161,22 @@ class HandOverPlanner:
             goal=self.goal
         )
 
-        G = None
-        state_plan = None
+        action_tree = None
 
         # generate plan
         if forward:
-            plan = planner(prob, verbose=self.verbose)
+            action_tree = planner(prob, verbose=self.verbose)
+
         else:
             action_plan, state_plan, __ = backwards_planner(prob, goal=self.goal, action_tree=False, verbose=True)
-            plan, state_plan, G = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=5,
+            plan, state_plan, action_tree = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=5,
                                                     root_state_plan=state_plan, verbose=True)
 
-            G = backwards_tree_exploration(prob, goal=self.goal, verbose=True, max_depth=3)
+            action_tree = backwards_tree_exploration(prob, goal=self.goal, verbose=True, max_depth=3)
             # need to reverse plan
             plan = plan[::-1]
-        if self.verbose:
-            if plan is None:
-                print('No Plan!')
-            else:
-                for action in plan:
-                    print(action)
 
-        return plan, self.goal, state_plan, G
+        return action_tree
 
     def get_goal_controller(self, C):
         goal_controller = ry.CtrlSet()
