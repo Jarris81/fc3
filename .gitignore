@@ -158,6 +158,5 @@ vid/
 *.ppm
 
 %% intellij files
-.idea/*
 %% no pics
 *.png
