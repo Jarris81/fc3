@@ -10,6 +10,8 @@ from RLGS import RLGS
 from interference import ResetPosition, NoInterference
 import util.setup_env as setup_env
 
+from tracking import Tracker
+
 import libpybot as pybot
 
 """
@@ -37,7 +39,7 @@ def get_obj_info(S, C, scene_objects):
     return obj_infos
 
 
-def run_experiment(experiment_name, interference_num, use_config_only, use_real_robot, verbose=False):
+def run_experiment(experiment_name, interference_num, use_config_only, use_real_robot, tracking, verbose=False):
     C = None
     action_list = []
     planner = None
@@ -123,7 +125,11 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
     current_interference = interference_list[interference_num]
     C.view()
 
-    rlgs = RLGS(C, verbose=True)
+    tracker = Tracker(C, ["b1"], 5) if tracking else None
+    if tracker:
+        tracker.update(0)
+
+    rlgs = RLGS(C, verbose=False)
     if not rlgs.setup(action_list, planner, scene_objects):
         print("Plan is not feasible!")
         C.view_close()
@@ -132,17 +138,21 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
     # Setup the real or simulated robot here
     if not use_config_only:
 
-        bot = pybot.BotOp(C, use_real_robot)
+        bot = pybot.BotOp(C, use_real_robot, "BOTH", "ROBOTIQ")
     #     bot.home(C)
     #     while bot.getTimeToEnd() > 0:
     #         bot.step(C, .1)
     #         time.sleep(.1)
     #
-    #     bot.gripperOpen(0.08, 0.1)
-    #     bot.waitGripperIdle()
+        bot.gripperOpen("RIGHT", 1, 1)
+        while not bot.gripperDone("RIGHT"):
+            print("gripper is not done")
+            time.sleep(0.1)
 
     # Loop
     for t in range(10000):
+        if tracker:
+            tracker.update(t)
 
         if add_interference:
             current_interference.do_interference(C, t)
@@ -153,10 +163,16 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
         if not use_config_only:
 
             if gripper_action is True:
-                bot.gripperClose(10, 0.01, 0.1)
+                bot.gripperClose("RIGHT", 0.5, 0.01, 0.1)
+
+                while not bot.gripperDone("RIGHT"):
+                    time.sleep(0.1)
 
             elif gripper_action is False:
-                bot.gripperOpen(0.08, 0.1)
+                bot.gripperOpen("RIGHT", 1, 0.1)
+
+                while not bot.gripperDone("RIGHT"):
+                    time.sleep(0.1)
 
             # bot.waitGripperIdle()
 
@@ -196,8 +212,7 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
 if __name__ == '__main__':
     parser = OptionParser()
 
-    parser.add_option("-q", "--quiet",
-                      action="store_false", dest="verbose", default=False,
+    parser.add_option("-v", "--verbose", dest="verbose", default=False,
                       help="don't print status messages to stdout")
 
     parser.add_option("-s", "--scenario", dest="experiment_name", default=True,
@@ -208,6 +223,9 @@ if __name__ == '__main__':
 
     parser.add_option("-m", "--run_mode", dest="run_mode", default="config",
                       help="run mode: config, sim, or real")
+
+    parser.add_option("-t", "--tracking", dest="tracking", default=True,
+                      help="use tracking with Optitrack")
 
     (options, args) = parser.parse_args()
 
@@ -224,4 +242,5 @@ if __name__ == '__main__':
                    interference_num=int(options.interference_num),
                    use_config_only=option_config_only,
                    use_real_robot=option_real_robot,
+                   tracking=options.tracking,
                    verbose=options.verbose)

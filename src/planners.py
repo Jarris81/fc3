@@ -80,7 +80,7 @@ class TowerPlanner:
                 for action in plan:
                     print(action)
 
-        return plan, self.goal, state_plan1, G
+        return G
 
     def get_goal_controller(self, C):
         goal_feature = ry.CtrlSet()
@@ -109,7 +109,7 @@ class TowerPlanner:
             #     C.feature(ry.FS.vectorZDiff, [block, block_place_on], [1e1]),
             #     ry.OT.eq, -1)
 
-            goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", block), True)
+            goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("r_gripper", block), True)
 
         return goal_feature
 
@@ -202,7 +202,7 @@ class StickPullPlanner:
         self.verbose = verbose
         self.goal = []
 
-    def get_plan(self, control_actions, scene_obj, forward=False):
+    def get_tree(self, control_actions, scene_obj, forward=False):
 
         domain = Domain((x.get_simple_action() for x in control_actions))
 
@@ -262,7 +262,7 @@ class StickPullPlanner:
                 for action in plan:
                     print(action)
 
-        return plan, self.goal, state_plan, G
+        return G
 
     def get_goal_controller(self, C):
         goal_feature = ry.CtrlSet()
@@ -275,9 +275,9 @@ class StickPullPlanner:
         goal_feature.addObjective(
             C.feature(ry.FS.position, [block], [1e0], goal_place),
             ry.OT.eq, -1)
-        goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", stick), True)
+        goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("r_gripper", stick), True)
         goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (stick, block), True)
-        goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", block), True)
+        goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("r_gripper", block), True)
         # goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("L_gripper", block), True)
 
         return goal_feature

@@ -20,7 +20,7 @@ class SimpleSystem:
         # action tree received from planner
         self.action_tree = None
 
-        # store plan and action tree here
+        # store plan and action tree hereRotation
         self.scene_objects = {}
         self.robust_set_of_chains = []
         self.active_robust_reverse_plan = []
@@ -63,20 +63,20 @@ class SimpleSystem:
         # put all objects into one dictionary with types
         self.scene_objects = scene_objects
 
-        plan, __, state_plan, self.action_tree = planner.get_tree(action_list, self.scene_objects, forward=False)
+        self.action_tree = planner.get_tree(action_list, self.scene_objects, forward=False)
 
         self.goal_controller = planner.get_goal_controller(self.C)
 
         # if there is a plan, print it out, otherwise leave
-        if plan:
-            if self.verbose:
-                print("Found the following plan:")
-                for action in plan:
-                    print(action)
-        else:
-            print("No plan found!")
-            print("Aborting")
-            return
+        # if plan:
+        #     if self.verbose:
+        #         print("Found the following plan:")
+        #         for action in plan:
+        #             print(action)
+        # else:
+        #     print("No plan found!")
+        #     print("Aborting")
+        #     return
 
         # setup control sets
         name2con = {x.name: x for x in action_list}
@@ -93,15 +93,14 @@ class SimpleSystem:
         nx.set_edge_attributes(self.action_tree, grounded_ctrlsets, "ctrlset")
 
         # draw the action tree
-        draw_search_graph(plan, state_plan, self.action_tree)
+        # draw_search_graph(plan, state_plan, self.action_tree)
 
         #
         # self.controllers =
 
-
-    # def step(self, t, tau):
-
-
+    def is_home(self):
+        is_home = np.allclose(self.C.getJointState(), self.q_home, self.eqPrecision, self.eqPrecision)
+        return is_home
 
 
 class RLGS(SimpleSystem):
@@ -132,9 +131,10 @@ class RLGS(SimpleSystem):
 
         # get robust tree/ set of chains
         self.robust_set_of_chains = get_robust_set_of_chains(self.C, self.action_tree, self.goal_controller,
-                                                             verbose=False)
+                                                             verbose=self.verbose)
         # first plan we want to execute
-        self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ry.CtrlSolver(self.C, 0.1, 2), False)
+        self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ry.CtrlSolver(self.C, 0.1, 2),
+                                                                         verbose=self.verbose)
 
 
         tau = 0.01

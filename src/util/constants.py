@@ -17,3 +17,6 @@ b_on_b = "block_on_block"  # condition block is on block
 goal_handover_block_pos = (0.5, 0.3, 0.71)
 goal_stick_pull_block_pos = (0.8, 0.2, 0.71)
 goal_block_pos = None
+
+
+table_height = 0.67

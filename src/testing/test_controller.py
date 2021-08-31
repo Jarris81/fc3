@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
     #test block pull
     robust_plan.extend(grab_stick.get_grounded_control_set(C, ["r_gripper", "stick"]))
-    robust_plan.extend(pull_block.get_grounded_control_set(C, ["r_gripper", "b1", "stick"]))
+    robust_plan.extend(pull_block.get_grounded_control_set(C, ["l_gripper", "b1", "stick"]))
 
 
     #robust_plan.extend(grab_block.get_grounded_control_set(C, ["R_gripper", "b1"]))
@@ -74,16 +74,18 @@ if __name__ == '__main__':
         pass
         # a.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e-1]), ry.OT.ineq)
 
-    bot = pybot.BotOp(C, False)
-    q_start = C.getJointState()
-    q_start = q_start.reshape(1, 14)
-    bot.move(q_start, [2])
+    bot = pybot.BotOp(C, True, "BOTH", "ROBOTIQ")
+    #q_start = C.getJointState()
+    #q_start = q_start.reshape(1, 14)
+    #bot.move(q_start, [2])
 
     ref_tau = 0.05
 
     while bot.getTimeToEnd() > 0:
         bot.step(C, .1)
         time.sleep(.1)
+
+    #bot.gripperOpen("RIGHT", 1.0, 0.2)
 
     do_once = True
     q_old = C.getJointState()
@@ -97,6 +99,8 @@ if __name__ == '__main__':
             if c.canBeInitiated(ctrl, eqPrecision):
                 ctrl.set(c)
                 print(f"Inting controller: {name}")
+                if name == "GrabStick_grab":
+                    bot.gripperClose("RIGHT", 10, 0.2, 0.2)
                 # if t > 500 and do_once:
                 #     C.attach("world", "cap")
                 #     do_once = False

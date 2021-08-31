@@ -6,3 +6,6 @@ networkx~=2.5.1
 pydot~=1.4.2
 matplotlib~=3.4.2
 pandas~=1.2.4
+graphviz~=0.17
+pydot~=1.4.2
+editdistance~=0.5.3

@@ -4,7 +4,7 @@ import util.constants as constants
 from os.path import join
 import time
 
-path_to_repo = "/home/jason/git/thesis_2020/"
+path_to_botop = "/home/jasonharris/git/botop/"
 
 table_height = 0.68
 
@@ -12,14 +12,14 @@ table_height = 0.68
 def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2)),  block_size=(.06, .06, .06, 0.001)):
     # scene = "rai/testing/KOMO/switches/model2.g"
     scene = "rai-robotModels/scenarios/pandasTable.g"
-    scene_objects = {constants.type_gripper: ["R_gripper"], constants.type_block: []}
+    scene_objects = {constants.type_gripper: ["r_gripper"], constants.type_block: []}
 
     if dual:
-        scene_objects[constants.type_gripper].append("L_gripper")
+        scene_objects[constants.type_gripper].append("l_gripper")
 
     # setup configuration (what robot knows)
     C = ry.Config()
-    C.addFile(path_to_repo + scene)
+    C.addFile(path_to_botop + scene)
 
     color = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0],
              [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
@@ -114,7 +114,7 @@ def setup_bottle_open_env():
 
     # setup configuration (what robot knows)
     C = ry.Config()
-    C.addFile(path_to_repo + scene)
+    C.addFile(path_to_botop + scene)
 
     color = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0],
              [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
@@ -145,7 +145,7 @@ def setup_bottle_open_env():
 
     C.attach("bottle", "cap")
 
-    scene_objects = {constants.type_gripper: ["L_gripper"], constants.type_bottle: ["bottle"]}
+    scene_objects = {constants.type_gripper: ["l_gripper"], constants.type_bottle: ["bottle"]}
 
     return C, scene_objects
 

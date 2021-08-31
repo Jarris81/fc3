@@ -469,7 +469,6 @@ class PlaceGoal(BaseAction):
         speed = 0.1
 
         gripper = sym2frame[self.gripper_sym]
-        gripper_center = gripper + "Center"
         block = sym2frame[self.block_sym]
 
         place_block_pos = ry.CtrlSet()
@@ -486,7 +485,7 @@ class PlaceGoal(BaseAction):
         #     C.feature(ry.FS.scalarProductYZ, [block, "world"], [1e1]),
         #     ry.OT.sos, speed)
         place_block_pos.addObjective(
-            C.feature(ry.FS.positionDiff, [block, gripper_center], [1e1]),
+            C.feature(ry.FS.positionDiff, [block, gripper], [1e1]),
             ry.OT.eq, -1)
 
         # needs to be holding the block
