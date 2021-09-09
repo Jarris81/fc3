@@ -1,3 +1,5 @@
+import numpy as np
+
 """
 Logic space for planner
 """
@@ -19,4 +21,5 @@ goal_stick_pull_block_pos = (0.8, 0.2, 0.71)
 goal_block_pos = None
 
 
-table_height = 0.67
+table_height = 0.65
+

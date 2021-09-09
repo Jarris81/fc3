@@ -50,6 +50,8 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
     add_verbose = False
     add_interference = True
 
+    tracker = None
+
     #
     # Tower Experiment
     #
@@ -66,6 +68,8 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
         # add interference
         ori_pos_b2 = C.frame("b2").getPosition()
         infeasible_pos_b1 = (0.6, 0.6, 0.68)
+
+
 
         interference_list.extend((
             # b2 is knocked of tower while gripper is moving to b1
@@ -93,6 +97,8 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
             # b1 is knocked of tower while gripper is moving to b1
             ResetPosition(5, 7, "b1", x_flip_pos_b1),
         ))
+
+        tracker = Tracker(C, ["b1"], 1) if tracking else None
     #
     # Stick Pull
     #
@@ -113,6 +119,8 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
             ResetPosition(30, 32, "b1", x_new_pos_b1),
         ))
 
+        tracker = Tracker(C, ["b1", "stick"], 1) if tracking else None
+
     #
     # Bottle Open
     #
@@ -123,11 +131,12 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
         ]
 
     current_interference = interference_list[interference_num]
-    C.view()
 
-    tracker = Tracker(C, ["b1"], 5) if tracking else None
+    tracker = Tracker(C, [x for y in scene_objects.values() for x in y], 1) if tracking else None
     if tracker:
         tracker.update(0)
+
+    C.view()
 
     rlgs = RLGS(C, verbose=False)
     if not rlgs.setup(action_list, planner, scene_objects):

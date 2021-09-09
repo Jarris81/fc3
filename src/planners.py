@@ -102,7 +102,7 @@ class TowerPlanner:
             dist = (height_block + height_block_place_on) / 2
 
             goal_feature.addObjective(
-                C.feature(ry.FS.positionRel, [block, block_place_on], [5], [0, 0, dist]),
+                C.feature(ry.FS.positionRel, [block, block_place_on], [1], [0, 0, dist]),
                 ry.OT.eq, -1)
             # should have z-axis in same direction
             # goal_feature.addObjective(

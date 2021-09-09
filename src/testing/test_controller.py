@@ -3,13 +3,11 @@ import libpybot as pybot
 import time
 import actions
 from util import setup_env, constants
-from robustness import get_robust_chain
-from planners import TowerPlanner
-
+from tracking import Tracker
 
 if __name__ == '__main__':
 
-    C, block_names = setup_env.setup_stick_pull_env()
+    C, scene_objects = setup_env.setup_stick_pull_env()
 
     grab_stick = actions.GrabStick()
     pull_block = actions.PullBlockToGoal()
@@ -29,10 +27,9 @@ if __name__ == '__main__':
 
     C.view()
 
-    print([x for x in C.getFrameNames()if "gripper" in x])
+    print([x for x in C.getFrameNames() if "gripper" in x])
 
     # time.sleep(10)
-
 
     # lfinger1 = C.getFrame("L_panda_finger_joint2")
     # rfingerjoin = C.getFrame("L_panda_finger_joint1")
@@ -54,42 +51,47 @@ if __name__ == '__main__':
     robust_plan = []
     constants.goal_block_pos = constants.goal_stick_pull_block_pos
 
-
-    #test block pull
+    # test block pull
     robust_plan.extend(grab_stick.get_grounded_control_set(C, ["r_gripper", "stick"]))
-    robust_plan.extend(pull_block.get_grounded_control_set(C, ["l_gripper", "b1", "stick"]))
+    robust_plan.extend(pull_block.get_grounded_control_set(C, ["r_gripper", "b1", "stick"]))
 
-
-    #robust_plan.extend(grab_block.get_grounded_control_set(C, ["R_gripper", "b1"]))
+    # robust_plan.extend(grab_block.get_grounded_control_set(C, ["R_gripper", "b1"]))
     # robust_plan.extend(grab_bottle.get_grounded_control_set(C, ["R_gripper", "bottle"]))
     # robust_plan.extend(open_bottle.get_grounded_control_set(C, ["R_gripper", "L_gripper", "bottle"]))
     # robust_plan.extend(place_block_place.get_grounded_control_set(C, ["R_gripper", "b1", "b2"]))
 
     # Test handover
-    #robust_plan.extend(grab_block.get_grounded_control_set(C, [gripper_give, "b1"]))
-    #robust_plan.extend(handover.get_grounded_control_set(C, [gripper_give, gripper_take, "b1"]))
-    #robust_plan.extend(place_pos.get_grounded_control_set(C, [gripper_take, "b1"]))
+    # robust_plan.extend(grab_block.get_grounded_control_set(C, [gripper_give, "b1"]))
+    # robust_plan.extend(handover.get_grounded_control_set(C, [gripper_give, gripper_take, "b1"]))
+    # robust_plan.extend(place_pos.get_grounded_control_set(C, [gripper_take, "b1"]))
 
     for name, a in robust_plan:
         pass
         # a.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e-1]), ry.OT.ineq)
 
     bot = pybot.BotOp(C, True, "BOTH", "ROBOTIQ")
-    #q_start = C.getJointState()
-    #q_start = q_start.reshape(1, 14)
-    #bot.move(q_start, [2])
+    # q_start = C.getJointState()
+    # q_start = q_start.reshape(1, 14)
+    # bot.move(q_start, [2])
 
     ref_tau = 0.05
+
+    bot.gripperOpen("RIGHT", 1, 1)
 
     while bot.getTimeToEnd() > 0:
         bot.step(C, .1)
         time.sleep(.1)
 
-    #bot.gripperOpen("RIGHT", 1.0, 0.2)
+    # bot.gripperOpen("RIGHT", 1.0, 0.2)
 
     do_once = True
     q_old = C.getJointState()
+
+    tracker = Tracker(C, [x for y in scene_objects.values() for x in y], 1)
+
     for t in range(0, 10000):
+
+        tracker.update(t)
 
         q_real = C.getJointState()
         # create a new solver everytime
@@ -113,7 +115,6 @@ if __name__ == '__main__':
         # cap = C.frame("cap").info()
         # bottle = C.frame("bottle").info()
         # a = 1
-
 
         # print(q.reshape(1, 7))
         # C.setJointState(q)

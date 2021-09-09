@@ -6,10 +6,8 @@ import time
 
 path_to_botop = "/home/jasonharris/git/botop/"
 
-table_height = 0.68
 
-
-def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2)),  block_size=(.06, .06, .06, 0.001)):
+def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2))):
     # scene = "rai/testing/KOMO/switches/model2.g"
     scene = "rai-robotModels/scenarios/pandasTable.g"
     scene_objects = {constants.type_gripper: ["r_gripper"], constants.type_block: []}
@@ -24,6 +22,12 @@ def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2)),  block_size=(.06,
     color = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [1, 1, 0],
              [1, 0.5, 0], [0.5, 0, 1], [0, 1, 0.5], [0, 0.5, 1], [0.5, 1, 0]]
 
+    block_sizes = [
+        (.06, .06, .06,),
+        (.07, .08, .06),
+        (.09, .14, .05),
+    ]
+
 
 
     # create blocks
@@ -34,7 +38,7 @@ def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2)),  block_size=(.06,
         scene_objects[constants.type_block].append(name)
 
         pos_xy = positions[o]
-        pos_block = (*pos_xy, block_size[2] / 2 + table_height)
+        pos_block = (*pos_xy, block_sizes[o][2] / 2 + constants.table_height)
 
         # quick hack to see if predicate is feasible
         # if o == 0:
@@ -44,7 +48,7 @@ def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2)),  block_size=(.06,
         block.setQuaternion([1, 0, 0, 0])
         block.setColor(color[o])
         block.setMass(1)
-        block.setShape(ry.ST.box, size=block_size[:-1])  # 0.001
+        block.setShape(ry.ST.box, size=block_sizes[o])  # 0.001
         block.setContact(1)
 
     # S = C.simulation(ry.SimulatorEngine.bullet, True)
@@ -84,7 +88,7 @@ def setup_stick_pull_env():
     stick_x, stick_y = 0.9, -0.1
 
     stick = C.addFrame("stick")
-    stick.setPosition((stick_x, stick_y, table_height+stick_th/2))
+    stick.setPosition((stick_x, stick_y, constants.table_height+stick_th/2))
     stick.setQuaternion([1, 0, 0, 0])
     stick.setColor((0, 0, 1))
     stick.setMass(1)
@@ -96,7 +100,7 @@ def setup_stick_pull_env():
     stick_handle = C.addFrame("stickHandle", parent="stick")
     stick_handle.setPosition((stick_x - (handle_length-stick_th)/2,
                               stick_y + (stick_length-stick_th)/2,
-                              table_height+stick_th/2))
+                              constants.table_height+stick_th/2))
     stick_handle.setQuaternion([1, 0, 0, 0])
     stick_handle.setColor((0, 0, 1))
     stick_handle.setMass(1)
@@ -124,8 +128,8 @@ def setup_bottle_open_env():
 
     pos = 0.0, 0.2
 
-    position_bottle = (*pos, table_height + bottle_height / 2)
-    position_cap = (*pos, table_height + bottle_height + cap_height / 2)
+    position_bottle = (*pos, constants.table_height + bottle_height / 2)
+    position_cap = (*pos, constants.table_height + bottle_height + cap_height / 2)
 
     bottle = C.addFrame("bottle")
     bottle.setPosition(position_bottle)
