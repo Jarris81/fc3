@@ -87,7 +87,7 @@ if __name__ == '__main__':
     do_once = True
     q_old = C.getJointState()
 
-    tracker = Tracker(C, [x for y in scene_objects.values() for x in y], 1)
+    tracker = Tracker(C, [x for y in scene_objects.values() for x in y], 2)
 
     for t in range(0, 10000):
 

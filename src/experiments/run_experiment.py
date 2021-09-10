@@ -132,7 +132,13 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
 
     current_interference = interference_list[interference_num]
 
-    tracker = Tracker(C, [x for y in scene_objects.values() for x in y], 1) if tracking else None
+
+    # Tracking Setup if specified
+    tracker = Tracker(C,
+                      [x for y in scene_objects.values() for x in y],
+                      1) \
+        if tracking else None
+
     if tracker:
         tracker.update(0)
 
@@ -183,10 +189,10 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
                 while not bot.gripperDone("RIGHT"):
                     time.sleep(0.1)
 
-            # bot.waitGripperIdle()
-
             # move the real bot
             bot.moveLeap(q, 2)
+
+            # update config
             bot.step(C, 0.1)
         else:
             C.setJointState(q)
@@ -233,7 +239,7 @@ if __name__ == '__main__':
     parser.add_option("-m", "--run_mode", dest="run_mode", default="config",
                       help="run mode: config, sim, or real")
 
-    parser.add_option("-t", "--tracking", dest="tracking", default=True,
+    parser.add_option("-t", "--tracking", dest="tracking", default=False,
                       help="use tracking with Optitrack")
 
     (options, args) = parser.parse_args()

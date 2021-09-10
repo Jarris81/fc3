@@ -4,6 +4,7 @@ import predicates as pred
 from util import constants
 import numpy as np
 
+transient_step = 0.05
 
 def _get_unset_effects(predicate, all_objects, obj_type):
     obj_count = len(all_objects[obj_type]) - 1
@@ -113,18 +114,18 @@ class GrabBlock(BaseAction):
 
         height_block = C.getFrame(block).getSize()[2]
 
-        transient_step = 0.1
+        align_over_dist = 2*height_block
 
         align_over = ry.CtrlSet()
         align_over.addObjective(
-            C.feature(ry.FS.positionRel, [gripper, block], [1e2], [0, 0, height_block]),
+            C.feature(ry.FS.positionRel, [gripper, block], [1e1], [0, 0, align_over_dist]),
             ry.OT.sos, transient_step)
         align_over.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, gripper], [1e1]),
             ry.OT.sos, transient_step)
         align_over.addObjective(
             C.feature(ry.FS.scalarProductXX, [block, gripper], [1e2]),
-            ry.OT.sos, transient_step*2)
+            ry.OT.sos, transient_step)
         align_over.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
 
         cage_block = ry.CtrlSet()
@@ -297,15 +298,13 @@ class PlaceOn(BaseAction):
         dist = (height_block + height_block_place_on) / 2
         dist2 = dist * 2
 
-        transient_step = 0.05
-
         align_over = ry.CtrlSet()
         align_over.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e1]),
             ry.OT.sos, transient_step)
         align_over.addObjective(
-            C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e2], [0, 0, 0.12]),
-            ry.OT.sos, transient_step/3)
+            C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e1], [0, 0, 0.15]),
+            ry.OT.sos, transient_step)
         align_over.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
         place_on_block = ry.CtrlSet()
