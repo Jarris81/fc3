@@ -189,8 +189,14 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
                 while not bot.gripperDone("RIGHT"):
                     time.sleep(0.1)
 
-            # move the real bot
-            bot.moveLeap(q, 2)
+                q[8] -= 0.5
+                bot.moveLeap(q, 2)
+                # update config
+                while bot.step(C, 0.1):
+                    pass
+            else:
+                # move the real bot
+                bot.moveLeap(q, 2)
 
             # update config
             bot.step(C, 0.1)

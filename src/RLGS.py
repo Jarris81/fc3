@@ -265,5 +265,9 @@ class RLGS(SimpleSystem):
     def set_log_function(self, log_function):
         self.log = log_function
 
+    def move_up_safely(self):
+
+        #TODO
+
 
 

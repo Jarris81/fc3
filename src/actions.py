@@ -4,7 +4,7 @@ import predicates as pred
 from util import constants
 import numpy as np
 
-transient_step = 0.05
+transient_step = 0.1
 
 def _get_unset_effects(predicate, all_objects, obj_type):
     obj_count = len(all_objects[obj_type]) - 1
@@ -135,10 +135,10 @@ class GrabBlock(BaseAction):
         # move close to block
         cage_block.addObjective(
             C.feature(ry.FS.positionDiff, [gripper, block], [1e2]),
-            ry.OT.sos, transient_step*2e-1)
+            ry.OT.sos, transient_step/5)
         cage_block.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, gripper], [1e1]),
-            ry.OT.sos, transient_step*2e-1)
+            ry.OT.sos, transient_step/5)
         cage_block.addObjective(
             C.feature(ry.FS.scalarProductXX, [block, gripper], [1e0]),
             ry.OT.eq, -1)
@@ -209,8 +209,6 @@ class GrabBottle(BaseAction):
         bottle = sym2frame[self.bottle_sym]
 
         bottle_radius = C.getFrame(bottle).getSize()[1]
-
-        transient_step = 0.1
 
         align_side = ry.CtrlSet()
         align_side.addObjective(
@@ -316,11 +314,11 @@ class PlaceOn(BaseAction):
             ry.OT.eq, -1)
         place_on_block.addObjective(
             C.feature(ry.FS.positionRel, [block, block_placed_on], [1e2], [0., 0., dist]),
-            ry.OT.sos, transient_step * 1e-1)
+            ry.OT.sos, transient_step / 5)
         # should have z-axis in same direction
         place_on_block.addObjective(
             C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e0]),
-            ry.OT.sos, transient_step * 1e-1)
+            ry.OT.sos, transient_step)
         # align axis with block
         place_on_block.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
@@ -382,14 +380,12 @@ class PlaceSide(BaseAction):
         self.delete_effects = self.preconditions
 
     def get_grounded_control_set(self, C, frames):
-        free_place = (-0.4, -0.0, 0.68)
+        free_place = (0.4, 0.4, constants.table_height+0.03)
         table_pos = (-0.2, -0.2, 0)
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         gripper = sym2frame[self.gripper_sym]
         block = sym2frame[self.block_sym]
-
-        transientStep = 0.1
 
         place_block_side = ry.CtrlSet()
         place_block_side.addObjective(
@@ -398,12 +394,12 @@ class PlaceSide(BaseAction):
 
         # block should be placed on table, doesnt matter where in x-y plane
         place_block_side.addObjective(
-            C.feature(ry.FS.position, [block], [1e3], free_place),
-            ry.OT.sos, transientStep)
+            C.feature(ry.FS.position, [block], [1e1], free_place),
+            ry.OT.sos, transient_step)
 
         place_block_side.addObjective(
-            C.feature(ry.FS.scalarProductZZ, [block, "table"], [1e2], [1]),
-            ry.OT.sos, transientStep)
+            C.feature(ry.FS.scalarProductZZ, [block, "table"], [1e0], [1]),
+            ry.OT.sos, transient_step)
 
         # needs to be holding the block
         place_block_side.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
