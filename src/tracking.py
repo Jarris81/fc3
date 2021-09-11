@@ -73,15 +73,17 @@ class Tracker:
 
 if __name__ == '__main__':
 
-    C, scene_objects = setup_env.setup_tower_env()
+    C, scene_objects = setup_env.setup_stick_pull_env()
 
     test = C.frame("test")
     C.view()
 
-    tracker = Tracker(C, ["b1"], 1)
+    tracker = Tracker(C, ["b1","stick"], 1)
     for t in range(100000):
         tracker.update(t)
 
         time.sleep(0.01)
+
+        print(C.frame("b1").getPosition())
 
     pass

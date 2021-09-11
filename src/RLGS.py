@@ -265,9 +265,30 @@ class RLGS(SimpleSystem):
     def set_log_function(self, log_function):
         self.log = log_function
 
-    def move_up_safely(self):
+    def move_up_safely(self, gripper):
 
-        #TODO
+        gripper_up_pos = self.C.frame(gripper).getPosition()
+
+        gripper_up_pos[2] += 0.3
+
+        ctrl = ry.CtrlSolver(self.C, 0.1, 2)
+        transient_step = 0.1
+
+        move_up = ry.CtrlSet()
+        move_up.addObjective(
+            self.C.feature(ry.FS.position, [gripper], [1e2], gripper_up_pos),
+            ry.OT.sos, transient_step / 5)
+
+        move_up.addObjective(
+            self.C.feature(ry.FS.vectorZDiff, ["world", gripper], [1e1]),
+            ry.OT.sos, transient_step / 5)
+
+        ctrl.set(move_up)
+
+        while not np.allclose(self.C.frame(gripper).getPosition(),gripper_up_pos):
+            ctrl.update([], [], self.C)
+            q = ctrl.solve(self.C)
+
 
 
 

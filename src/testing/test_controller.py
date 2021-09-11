@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     tau = 0.1
 
-    gripper_take, gripper_give = "L_gripper", "R_gripper"
+    gripper_take, gripper_give = "l_gripper", "r_gripper"
 
     if False:
         gripper_take, gripper_give = gripper_give, gripper_take
@@ -78,16 +78,15 @@ if __name__ == '__main__':
 
     bot.gripperOpen("RIGHT", 1, 1)
 
-    while bot.getTimeToEnd() > 0:
-        bot.step(C, .1)
-        time.sleep(.1)
+    while not bot.gripperDone("RIGHT"):
+        time.sleep(0.1)
 
     # bot.gripperOpen("RIGHT", 1.0, 0.2)
 
     do_once = True
     q_old = C.getJointState()
 
-    tracker = Tracker(C, [x for y in scene_objects.values() for x in y], 2)
+    tracker = Tracker(C, [x for y in scene_objects.values() for x in y], 1)
 
     for t in range(0, 10000):
 
@@ -100,9 +99,16 @@ if __name__ == '__main__':
         for i, (name, c) in enumerate(robust_plan[::-1]):
             if c.canBeInitiated(ctrl, eqPrecision):
                 ctrl.set(c)
-                print(f"Inting controller: {name}")
+                print(name)
                 if name == "GrabStick_grab":
-                    bot.gripperClose("RIGHT", 10, 0.2, 0.2)
+                    bot.gripperClose("RIGHT", 1, 0.01, 0.1)
+
+                    while not bot.gripperDone("RIGHT"):
+                        time.sleep(0.1)
+
+                if name == "PullBlockToGoal_attach_handle_stick":
+                    print("was attached!")
+
                 # if t > 500 and do_once:
                 #     C.attach("world", "cap")
                 #     do_once = False

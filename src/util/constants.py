@@ -17,9 +17,11 @@ b_on_b = "block_on_block"  # condition block is on block
 
 
 goal_handover_block_pos = (0.5, 0.3, 0.71)
-goal_stick_pull_block_pos = (0.8, 0.2, 0.71)
+goal_stick_pull_block_pos = (0.6, 0.0, 0.68)
 goal_block_pos = None
 
 
 table_height = 0.65
+
+robotiq_tcp_z_offset = 0.025
 

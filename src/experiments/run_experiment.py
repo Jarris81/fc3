@@ -154,11 +154,11 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
     if not use_config_only:
 
         bot = pybot.BotOp(C, use_real_robot, "BOTH", "ROBOTIQ")
-    #     bot.home(C)
-    #     while bot.getTimeToEnd() > 0:
-    #         bot.step(C, .1)
-    #         time.sleep(.1)
-    #
+        # bot.home(C)
+        # while bot.getTimeToEnd() > 0:
+        #     bot.step(C, .1)
+        #     time.sleep(.1)
+
         bot.gripperOpen("RIGHT", 1, 1)
         while not bot.gripperDone("RIGHT"):
             print("gripper is not done")
@@ -188,18 +188,13 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
 
                 while not bot.gripperDone("RIGHT"):
                     time.sleep(0.1)
-
-                q[8] -= 0.5
-                bot.moveLeap(q, 2)
-                # update config
-                while bot.step(C, 0.1):
-                    pass
             else:
+                pass
                 # move the real bot
-                bot.moveLeap(q, 2)
 
             # update config
-            bot.step(C, 0.1)
+            bot.moveLeap(q, 2)
+            bot.step(C, 0.05)
         else:
             C.setJointState(q)
             time.sleep(tau)

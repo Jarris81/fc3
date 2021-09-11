@@ -124,7 +124,7 @@ class GrabBlock(BaseAction):
             C.feature(ry.FS.vectorZDiff, [block, gripper], [1e1]),
             ry.OT.sos, transient_step)
         align_over.addObjective(
-            C.feature(ry.FS.scalarProductXX, [block, gripper], [1e2]),
+            C.feature(ry.FS.scalarProductXX, [block, gripper], [1e1]),
             ry.OT.sos, transient_step)
         align_over.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
 
@@ -159,7 +159,7 @@ class GrabBlock(BaseAction):
         #  block needs to be close to block
         grab = ry.CtrlSet()
         grab.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper, block], [1e0], [0, 0, 0.025]),
+            C.feature(ry.FS.positionDiff, [gripper, block], [1e0], [0, 0, constants.robotiq_tcp_z_offset]),
             ry.OT.eq, -1)
         # condition, nothing is in hand of gripper
         grab.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
@@ -537,8 +537,6 @@ class GrabStick(BaseAction):
         self.delete_effects = self.preconditions
 
     def get_grounded_control_set(self, C, frames):
-        transient_step = 0.1
-
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         gripper = sym2frame[self.gripper_sym]
@@ -548,28 +546,27 @@ class GrabStick(BaseAction):
         stick_frame = C.getFrame(stick)
         stick_length = stick_frame.getSize()[1]
 
-        grab_pos = (0, -stick_length / 3, 0)
+        grab_pos = (0, 0.05, constants.robotiq_tcp_z_offset)
 
         move_to = ry.CtrlSet()
         # move close to block
         move_to.addObjective(
-            C.feature(ry.FS.positionRel, [gripper, stick], [1e1] * 3, grab_pos),
+            C.feature(ry.FS.positionRel, [gripper, stick], [1e1], grab_pos),
             ry.OT.sos, transientStep=transient_step)
         # align axis with block
         move_to.addObjective(
             C.feature(ry.FS.scalarProductZZ, [gripper, stick], [1e1], [1]),
-            ry.OT.sos, transientStep=transient_step*2)
+            ry.OT.sos, transientStep=transient_step)
         move_to.addObjective(
             C.feature(ry.FS.scalarProductYX, [gripper, stick], [1e1]),
-            ry.OT.sos, transientStep=transient_step*2)
+            ry.OT.sos, transientStep=transient_step)
 
         #  block needs to be close to block
         grab = ry.CtrlSet()
         grab.addObjective(
-            C.feature(ry.FS.positionRel, [gripper, stick], [1e1], grab_pos),
+            C.feature(ry.FS.positionRel, [gripper, stick], [1e0], grab_pos),
             ry.OT.eq, -1)
         # condition, nothing is in hand of gripper
-        grab.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, stick), True)
         grab.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, stick), False)
 
         # return tuple of controllers
@@ -610,7 +607,6 @@ class PullBlockToGoal(BaseAction):
         self.delete_effects = []
 
     def get_grounded_control_set(self, C, frames):
-        transientStep = 0.1
         sym2frame = _get_sym2frame(self.symbols, frames)
 
         stick = sym2frame[self.stick_sym]
@@ -619,7 +615,8 @@ class PullBlockToGoal(BaseAction):
         stick_frame = C.getFrame(stick)
         stick_length = stick_frame.getSize()[1]
 
-        grab_pos = (0, -stick_length / 3, 0)
+        pull_angle = 0.5
+
 
         gripper = sym2frame[self.gripper_sym]
         block = sym2frame[self.block_sym]
@@ -636,38 +633,44 @@ class PullBlockToGoal(BaseAction):
         hover_stick = ry.CtrlSet()
         # move close to block
         hover_stick.addObjective(
-            C.feature(ry.FS.positionRel, [stick_handle, block], [1e2] * 3, hover_pos_rel),
-            ry.OT.sos, transientStep / 2)
+            C.feature(ry.FS.positionDiff, [stick_handle, block], [1e2] * 3, hover_pos_rel),
+            ry.OT.sos, transient_step / 2)
 
         # align axis with block
         hover_stick.addObjective(
-            C.feature(ry.FS.scalarProductYY, [stick_handle, block], [1e2], [1]),
-            ry.OT.sos, transientStep)
+            C.feature(ry.FS.scalarProductXY, [stick_handle, "world"], [1e2], [pull_angle]),
+            ry.OT.sos, transient_step)
+
+        hover_stick.addObjective(
+            C.feature(ry.FS.scalarProductZZ, ["world", stick], [1e1], [1]),
+            ry.OT.sos, -1)
+
+        hover_stick.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, stick), True)
 
         stick_to_block = ry.CtrlSet()
 
         # move close to block
         stick_to_block.addObjective(
-            C.feature(ry.FS.positionRel, [stick_handle, block], [1e2] * 3, align_pos_rel),
-            ry.OT.sos, transientStep/2)
+            C.feature(ry.FS.positionDiff, [stick_handle, block], [1e2] * 3, align_pos_rel),
+            ry.OT.sos, transient_step/2)
 
         stick_to_block.addObjective(
-            C.feature(ry.FS.positionDiff, [stick_handle, block], [1e1, 1e1, 0], align_pos_rel),
+            C.feature(ry.FS.positionDiff, [stick_handle, block], [1e0, 1e0, 0], align_pos_rel),
             ry.OT.eq, -1)
 
         # align axis with block
         stick_to_block.addObjective(
-            C.feature(ry.FS.scalarProductYY, [stick_handle, block], [1e2], [1]),
-            ry.OT.sos, transientStep)
+            C.feature(ry.FS.scalarProductXY, [stick_handle, "world"], [1e2], [pull_angle]),
+            ry.OT.sos, transient_step)
 
 
         attach_handle_stick = ry.CtrlSet()
         attach_handle_stick.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (stick, block), False)
         attach_handle_stick.addObjective(
-            C.feature(ry.FS.positionRel, [stick_handle, block], [1e1], align_pos_rel),
+            C.feature(ry.FS.positionDiff, [stick_handle, block], [1e0], align_pos_rel),
             ry.OT.eq, -1)
         attach_handle_stick.addObjective(
-            C.feature(ry.FS.scalarProductYY, [stick_handle, block], [1e0], [1]),
+            C.feature(ry.FS.scalarProductXY, [stick_handle, "world"], [1e0], [pull_angle]),
             ry.OT.eq, -1)
 
         pull_back = ry.CtrlSet()
@@ -675,9 +678,10 @@ class PullBlockToGoal(BaseAction):
 
         pull_back.addObjective(
             C.feature(ry.FS.position, [block], [1e2], block_pos_goal),
-            ry.OT.sos, transientStep)
+            ry.OT.sos, transient_step)
+
         pull_back.addObjective(
-            C.feature(ry.FS.scalarProductYY, [stick_handle, "world"], [1e0], [1]),
+            C.feature(ry.FS.scalarProductXY, [stick_handle, block], [1e0], [pull_angle]),
             ry.OT.eq, -1)
 
         detach_block = ry.CtrlSet()
@@ -687,12 +691,9 @@ class PullBlockToGoal(BaseAction):
 
         detach_block.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (stick, block), False)
 
-        for ctrl in [hover_stick, stick_to_block, attach_handle_stick, pull_back, detach_block]:
+        for ctrl in [stick_to_block, attach_handle_stick, pull_back, detach_block]:
             ctrl.addObjective(
-                C.feature(ry.FS.positionRel, [gripper, stick], [1e0], grab_pos),
-                ry.OT.eq, -1)
-            ctrl.addObjective(
-                C.feature(ry.FS.scalarProductZZ, ["world", stick], [1e0], [1]),
+                C.feature(ry.FS.scalarProductZZ, ["world", stick], [1e-1], [1]),
                 ry.OT.eq, -1)
 
             ctrl.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, stick), True)
@@ -712,7 +713,7 @@ class PullBlockToGoal(BaseAction):
             ("stick_to_block", stick_to_block),
             ("attach_handle_stick", attach_handle_stick),
             ("pull_back", pull_back),
-            ("detach_block", detach_block)
+            #("detach_block", detach_block)
         ]
         return add_action_name(self.name, controllers)
 
