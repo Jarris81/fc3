@@ -61,26 +61,21 @@ class TowerPlanner:
             goal=self.goal
         )
 
-        G = None
         state_plan1 = None
 
         # generate plan
         if forward:
-            plan = planner(prob, verbose=self.verbose)
+            action_tree = planner(prob, verbose=self.verbose)
         else:
             action_plan, state_plan1, __ = backwards_planner(prob, goal=self.goal, action_tree=False, verbose=True)
-            plan, state_plan1, G = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=1,
+            plan, state_plan1, action_tree = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=1,
                                                      root_state_plan=state_plan1, verbose=True)
             # need to reverse plan
             plan = plan[::-1]
         if self.verbose:
-            if plan is None:
+            if action_tree is None:
                 print('No Plan!')
-            else:
-                for action in plan:
-                    print(action)
-
-        return G
+        return action_tree
 
     def get_goal_controller(self, C):
         goal_feature = ry.CtrlSet()
@@ -189,8 +184,8 @@ class HandOverPlanner:
         goal_controller.addObjective(
             C.feature(ry.FS.position, [block], [1e0], goal_place),
             ry.OT.eq, -1)
-        goal_controller.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("R_gripper", block), True)
-        goal_controller.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("L_gripper", block), True)
+        goal_controller.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("r_gripper", block), True)
+        goal_controller.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("l_gripper", block), True)
 
         return goal_controller
 

@@ -4,7 +4,7 @@ import util.constants as constants
 from os.path import join
 import time
 
-path_to_botop = "/home/jasonharris/git/botop/"
+path_to_botop = "../../../botop/"
 
 
 def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2))):
@@ -57,7 +57,7 @@ def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2))):
 
 def setup_tower_env():
     positions = (
-        (0.1, 0.4),
+        (0.7, 0.4),
         (0.4, 0.3),
         (0.6, 0.2)
 
@@ -68,7 +68,7 @@ def setup_tower_env():
 
 def setup_hand_over_env():
     positions = (
-        (0.0, 0.0),
+        (0.4, 0.0),
     )
     C, scene_objects = _setup(dual=True, num_blocks=1, positions=positions)
 
@@ -77,7 +77,7 @@ def setup_hand_over_env():
 
 def setup_stick_pull_env():
     positions = (
-        (0.6, 0.3),
+        (0.8, 0.3),
     )
 
     C, scene_objects = _setup(dual=False, num_blocks=1, positions=positions)

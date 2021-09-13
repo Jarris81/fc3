@@ -479,9 +479,9 @@ class PlaceGoal(BaseAction):
         # place_block_pos.addObjective(
         #     C.feature(ry.FS.scalarProductYZ, [block, "world"], [1e1]),
         #     ry.OT.sos, speed)
-        place_block_pos.addObjective(
-            C.feature(ry.FS.positionDiff, [block, gripper], [1e1]),
-            ry.OT.eq, -1)
+        # place_block_pos.addObjective(
+        #     C.feature(ry.FS.positionDiff, [block, gripper], [1e0]),
+        #     ry.OT.eq, -1)
 
         # needs to be holding the block
         place_block_pos.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
@@ -827,7 +827,7 @@ class HandOver(BaseAction):
             C.feature(ry.FS.positionDiff, [gripper_give, block], [1e0]),
             ry.OT.eq, -1)
 
-        direction = 1 if gripper_give == "R_gripper" else -1
+        direction = 1 if gripper_give == "l_gripper" else -1
         align_1.addObjective(
             C.feature(ry.FS.scalarProductXZ, ["world", gripper_give], [1e1], [direction]),
             ry.OT.sos, speed)

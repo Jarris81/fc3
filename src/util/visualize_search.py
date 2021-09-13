@@ -2,7 +2,7 @@ import networkx as nx
 import pydot
 import matplotlib.pyplot as plt
 
-def draw_search_graph(plan, state_plan, G, filename="action_tree.png"):
+def draw_search_graph(G, filename="action_tree.png"):
 
     pyg = nx.nx_pydot.to_pydot(G)
 
@@ -16,16 +16,6 @@ def draw_search_graph(plan, state_plan, G, filename="action_tree.png"):
 
     for e in edges:
         graph.add_edge(e)
-
-    for s in state_plan:
-        pyg.get_node(str(s.id))[0].set_shape("box")
-        node = pydot.Node(str(s.id))
-        # graph.add_node(node)
-        #
-        # if last_state:
-        #     graph.add_edge(pydot.Edge(node, last_state))
-        #
-        # last_state = node
 
     for edge in pyg.get_edges():
         #edge.set("label", )

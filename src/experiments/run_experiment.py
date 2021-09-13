@@ -1,18 +1,13 @@
 import time
-import sys
-import libry as ry
-import random
 from optparse import OptionParser
 
 import actions
 import planners
-from RLGS import RLGS
+from execution_models import RLGS, SimpleSystem, RLDSClone
 from interference import ResetPosition, NoInterference
 import util.setup_env as setup_env
 
 from tracking import Tracker
-
-import libpybot as pybot
 
 """
 Build a tower with the provided plan. 
@@ -22,24 +17,7 @@ interference in the real world.
 """
 
 
-def get_obj_info(S, C, scene_objects):
-    obj_infos = {}
-
-    all_objects = [x for y in scene_objects for x in scene_objects[y]]
-    for block in all_objects:
-        if "gripper" in block:
-            continue
-        shape = C.frame(block).info()["shape"]
-        info = {"pos": S.getGroundTruthPosition(block),
-                "size": S.getGroundTruthSize(block),
-                "rot_max": S.getGroundTruthRotationMatrix(block),
-                "shape": shape}
-        obj_infos[block] = info
-
-    return obj_infos
-
-
-def run_experiment(experiment_name, interference_num, use_config_only, use_real_robot, tracking, verbose=False):
+def run_experiment(model_name, experiment_name, interference_num, use_real_robot, tracking, verbose=False):
     C = None
     action_list = []
     planner = None
@@ -68,8 +46,6 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
         # add interference
         ori_pos_b2 = C.frame("b2").getPosition()
         infeasible_pos_b1 = (0.6, 0.6, 0.68)
-
-
 
         interference_list.extend((
             # b2 is knocked of tower while gripper is moving to b1
@@ -132,6 +108,13 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
 
     current_interference = interference_list[interference_num]
 
+    exec_model = None
+    if model_name == "rlgs":
+        exec_model = RLGS(C, verbose=verbose, use_real_robot=use_real_robot)
+    elif model_name == "simple":
+        exec_model = SimpleSystem(C, verbose=verbose, use_real_robot=use_real_robot)
+    elif model_name == "rlds_clone":
+        exec_model = RLDSClone(C, verbose=verbose, use_real_robot=use_real_robot)
 
     # Tracking Setup if specified
     tracker = Tracker(C,
@@ -144,119 +127,54 @@ def run_experiment(experiment_name, interference_num, use_config_only, use_real_
 
     C.view()
 
-    rlgs = RLGS(C, verbose=False)
-    if not rlgs.setup(action_list, planner, scene_objects):
+    if not exec_model.setup(action_list, planner, scene_objects):
         print("Plan is not feasible!")
         C.view_close()
         return
 
-    # Setup the real or simulated robot here
-    if not use_config_only:
+    # run do the task
+    exec_model.run()
 
-        bot = pybot.BotOp(C, use_real_robot, "BOTH", "ROBOTIQ")
-        # bot.home(C)
-        # while bot.getTimeToEnd() > 0:
-        #     bot.step(C, .1)
-        #     time.sleep(.1)
-
-        bot.gripperOpen("RIGHT", 1, 1)
-        while not bot.gripperDone("RIGHT"):
-            print("gripper is not done")
-            time.sleep(0.1)
-
-    # Loop
-    for t in range(10000):
-        if tracker:
-            tracker.update(t)
-
-        if add_interference:
-            current_interference.do_interference(C, t)
-
-        # get the next q values of robot
-        q, gripper_action = rlgs.step(t, tau)
-
-        if not use_config_only:
-
-            if gripper_action is True:
-                bot.gripperClose("RIGHT", 0.5, 0.01, 0.1)
-
-                while not bot.gripperDone("RIGHT"):
-                    time.sleep(0.1)
-
-            elif gripper_action is False:
-                bot.gripperOpen("RIGHT", 1, 0.1)
-
-                while not bot.gripperDone("RIGHT"):
-                    time.sleep(0.1)
-            else:
-                pass
-                # move the real bot
-
-            # update config
-            bot.moveLeap(q, 2)
-            bot.step(C, 0.05)
-        else:
-            C.setJointState(q)
-            time.sleep(tau)
-
-        if rlgs.is_goal_fulfilled() or rlgs.is_no_plan_feasible():
-            break
-
-    if rlgs.is_no_plan_feasible():
-        print("No Plan is feasible, abort")
-    elif rlgs.is_goal_fulfilled():
+    if exec_model.is_goal_fulfilled():
         print("Plan finished!")
     else:
         print("Plan not finished!")
 
-    if not use_config_only:
-        # move the robot home
-        bot.home(C)
-        while bot.getTimeToEnd() > 0:
-            bot.step(C, 0)
-
-    else:
-        while not rlgs.is_home():
-            q = rlgs.move_home()
-            C.setJointState(q)
-            time.sleep(tau)
+    exec_model.move_home()
 
     time.sleep(5)
     C.view_close()
 
 
 if __name__ == '__main__':
+    choices_model = ["simple", "rlgs", "rlds_clone"]
+    choices_scenario = ["tower", "hand_over", "stick"]
+
     parser = OptionParser()
 
-    parser.add_option("-v", "--verbose", dest="verbose", default=False,
+    parser.add_option("-m", "--model", dest="model_name", default="rlgs",
+                      help="Which system to use", type="choice", choices=choices_model)
+
+    parser.add_option("-v", "--verbose", dest="verbose", default=False, action="store_true",
                       help="don't print status messages to stdout")
 
-    parser.add_option("-s", "--scenario", dest="experiment_name", default=True,
-                      help="Define the experiment")
+    parser.add_option("-s", "--scenario", dest="experiment_name",
+                      help="Define the experiment", type="choice", choices=choices_scenario)
 
     parser.add_option("-i", "--interference", dest="interference_num", default=0,
-                      help="Define interference")
+                      help="Define interference", type="int")
 
-    parser.add_option("-m", "--run_mode", dest="run_mode", default="config",
-                      help="run mode: config, sim, or real")
+    parser.add_option("-r", "--use_real_robot", dest="use_real_robot", default=False, action="store_true",
+                      help="use real robots or simulate")
 
-    parser.add_option("-t", "--tracking", dest="tracking", default=False,
+    parser.add_option("-t", "--tracking", dest="tracking", default=False, action="store_true",
                       help="use tracking with Optitrack")
 
     (options, args) = parser.parse_args()
 
-    option_config_only = True
-    option_real_robot = False
-
-    if options.run_mode == "sim":
-        option_config_only = False
-    elif options.run_mode == "real":
-        option_config_only = False
-        option_real_robot = True
-
-    run_experiment(options.experiment_name,
-                   interference_num=int(options.interference_num),
-                   use_config_only=option_config_only,
-                   use_real_robot=option_real_robot,
+    run_experiment(model_name=options.model_name,
+                   experiment_name=options.experiment_name,
+                   interference_num=options.interference_num,
+                   use_real_robot=options.use_real_robot,
                    tracking=options.tracking,
                    verbose=options.verbose)
