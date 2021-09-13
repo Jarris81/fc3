@@ -7,7 +7,7 @@ from execution_models import RLGS, SimpleSystem, RLDSClone
 from interference import ResetPosition, NoInterference
 import util.setup_env as setup_env
 
-from tracking import Tracker
+
 
 """
 Build a tower with the provided plan. 
@@ -25,10 +25,7 @@ def run_experiment(model_name, experiment_name, interference_num, use_real_robot
     tau = 0.01
     interference_list = [NoInterference()]
 
-    add_verbose = False
-    add_interference = True
 
-    tracker = None
 
     #
     # Tower Experiment
@@ -74,7 +71,6 @@ def run_experiment(model_name, experiment_name, interference_num, use_real_robot
             ResetPosition(5, 7, "b1", x_flip_pos_b1),
         ))
 
-        tracker = Tracker(C, ["b1"], 1) if tracking else None
     #
     # Stick Pull
     #
@@ -95,7 +91,6 @@ def run_experiment(model_name, experiment_name, interference_num, use_real_robot
             ResetPosition(30, 32, "b1", x_new_pos_b1),
         ))
 
-        tracker = Tracker(C, ["b1", "stick"], 1) if tracking else None
 
     #
     # Bottle Open
@@ -116,23 +111,15 @@ def run_experiment(model_name, experiment_name, interference_num, use_real_robot
     elif model_name == "rlds_clone":
         exec_model = RLDSClone(C, verbose=verbose, use_real_robot=use_real_robot)
 
-    # Tracking Setup if specified
-    tracker = Tracker(C,
-                      [x for y in scene_objects.values() for x in y],
-                      1) \
-        if tracking else None
-
-    if tracker:
-        tracker.update(0)
-
     C.view()
 
-    if not exec_model.setup(action_list, planner, scene_objects):
+    if not exec_model.init_system(action_list, planner, scene_objects):
         print("Plan is not feasible!")
         C.view_close()
         return
 
     # run do the task
+    exec_model.setup()
     exec_model.run()
 
     if exec_model.is_goal_fulfilled():

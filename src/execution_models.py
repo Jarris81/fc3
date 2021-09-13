@@ -9,6 +9,8 @@ from robustness import get_robust_set_of_chains
 from util.visualize_search import draw_search_graph
 import libpybot as pybot
 
+from tracking import Tracker
+
 
 class SimpleSystem:
     """
@@ -18,11 +20,13 @@ class SimpleSystem:
     def __init__(self, C,
                  verbose=False,
                  show_plts=False,
-                 use_real_robot=False):
+                 use_real_robot=False,
+                 use_tracking=False):
         # what the robot knows
         self.C = C
         self.verbose = verbose
         self.use_real_robot = use_real_robot
+        self.use_tracking = use_tracking
 
         # action tree received from planner
         self.action_tree = None
@@ -48,6 +52,9 @@ class SimpleSystem:
         # robot operator
         self.botop = None
 
+        # tracking system (OptiTrack)
+        self.tracker = None
+
         # gripper to robot index
         self.gripper2index = {"l_gripper": 0, "r_gripper": 1}
 
@@ -55,7 +62,7 @@ class SimpleSystem:
         if self.verbose:
             print(msg)
 
-    def setup(self, action_list, planner, scene_objects) -> bool:
+    def init_system(self, action_list, planner, scene_objects) -> bool:
 
         self.q = self.C.getJointState()
         self.q_old = self.q
@@ -97,14 +104,20 @@ class SimpleSystem:
         ctrl = ry.CtrlSolver(self.C, 0.1, 2)
         return self.goal_controller.canBeInitiated(ctrl, self.eqPrecision)
 
+    def setup(self):
+        self.botop = pybot.BotOp(self.C, self.use_real_robot, "both", "ROBOTIQ")
+
+        self.tracker = Tracker(self.C,
+                               [x for y in self.scene_objects.values() for x in y],
+                               1) \
+            if self.use_tracking else None
+
     def run(self):
 
-        # TODO Check if everything was setup
-
-        self.botop = pybot.BotOp(self.C, self.use_real_robot, "both", "ROBOTIQ")
 
         t_start = self.botop.get_t()
         while not self._is_done():
+            if self.tracker: self.tracker.update(self.botop.get_t())
             self._step(self.botop.get_t())
 
         t_total = self.botop.get_t() - t_start
@@ -140,15 +153,13 @@ class SimpleSystem:
 
             # Handle symbolic commands here
             for ctrlCommand in curr_c.getSymbolicCommands():
-                self.handle_symbolic_commands(ctrlCommand)
+                self._handle_symbolic_commands(ctrlCommand)
 
         self.q = q_real
         self.q_old = self.q_old
 
         self.botop.moveLeap(q_target, 2)
         self.botop.step(self.C, 0.05)
-
-
 
     def _move_up_safely(self, gripper):
 
@@ -190,17 +201,22 @@ class SimpleSystem:
 
         return self.is_goal_fulfilled()
 
-    def handle_symbolic_commands(self, ctrlCommand):
+    def _handle_symbolic_commands(self, ctrlCommand):
+        """
+        Define what should happen if a symbolic command is executed
+        """
         if ctrlCommand.isCondition():
-            return
+            return  # only do stuff if it is not a condition
 
         elif ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
+            self.botop.hold(True, False)
             self.botop.gripperClose(
                 self.gripper2index[ctrlCommand.getFrameNames()[0]], 0.5, 0.01, 0.1)
             while not self.botop.gripperDone(1):
                 time.sleep(0.1)
 
         elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
+            self.botop.hold(True, True)
             self.botop.gripperOpen(
                 self.gripper2index[ctrlCommand.getFrameNames()[0]], 1, 0.1)
             while not self.botop.gripperDone(1):
@@ -240,9 +256,9 @@ class RLGS(SimpleSystem):
         # stuff for execution
         self.feasy_check_rate = 20  # every 50 steps check for feasibility
 
-    def setup(self, action_list, planner, scene_objects):
+    def init_system(self, action_list, planner, scene_objects):
 
-        super().setup(action_list, planner, scene_objects)
+        super().init_system(action_list, planner, scene_objects)
 
         # del self.active_plan
 
@@ -294,9 +310,15 @@ class RLGS(SimpleSystem):
                 ctrl.update(q_real, q_dot, self.C)
                 q_target = ctrl.solve(self.C)
 
+                self.q = q_real
+                self.q_old = self.q_old
+
+                self.botop.moveLeap(q_target, 2)
+                self.botop.step(self.C, 0.01)
+
                 # Handle symbolic commands here
                 for ctrlCommand in c.getSymbolicCommands():
-                    self.handle_symbolic_commands(ctrlCommand)
+                    self._handle_symbolic_commands(ctrlCommand)
 
                 # leave loop, we have the controller
                 break
@@ -318,11 +340,6 @@ class RLGS(SimpleSystem):
             self.log("No controller can be initiated or current plan is not feasible!")
             self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ctrl)
 
-        self.q = q_real
-        self.q_old = self.q_old
-
-        self.botop.moveLeap(q_target, 2)
-        self.botop.step(self.C, 0.05)
 
     def get_feasible_reverse_plan(self, ctrl):
         # find a new feasible plan
@@ -359,10 +376,6 @@ class RLGS(SimpleSystem):
             # obj.setQuaternion(rot.as_quat())
             return
 
-    def set_gripper_width(self, gripper):
-
-        self.C.setJointState()
-
     def log_default(self, msg):
         if self.verbose:
             print(msg)
@@ -379,5 +392,3 @@ class RLDSClone(RLGS):
 
     def __init__(self, C, verbose=False, use_real_robot=False):
         super().__init__(C, use_feasy=False, verbose=verbose, use_real_robot=use_real_robot)
-
-
