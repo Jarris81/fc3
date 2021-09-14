@@ -62,7 +62,9 @@ class SimpleSystem:
         if self.verbose:
             print(msg)
 
-    def init_system(self, action_list, planner, scene_objects) -> bool:
+    def init_system(self, action_list, planner, scene_objects) -> (bool, float):
+
+        t_start = time.time()
 
         self.q = self.C.getJointState()
         self.q_old = self.q
@@ -90,11 +92,7 @@ class SimpleSystem:
         # each edge (action) gets and ctrlset
         nx.set_edge_attributes(self.action_tree, grounded_ctrlsets, "ctrlset")
 
-        draw_search_graph(self.action_tree, "simple_plan.png")
-
-        # convert all to a plan
-
-        return True
+        return True, time.time()-t_start
 
     def move_home(self):
 
@@ -112,17 +110,19 @@ class SimpleSystem:
                                1) \
             if self.use_tracking else None
 
-    def run(self):
-
+    def run(self, run_interference):
 
         t_start = self.botop.get_t()
         while not self._is_done():
             if self.tracker: self.tracker.update(self.botop.get_t())
+            if not self.use_real_robot: run_interference.do_interference(self.C, self.botop.get_t())
             self._step(self.botop.get_t())
 
         t_total = self.botop.get_t() - t_start
 
         self.log(f"Task took {t_total}s.")
+
+        return t_total
 
     def _step(self, t):
 
@@ -233,6 +233,7 @@ class RLGS(SimpleSystem):
     def __init__(self, C,
                  use_real_robot=False,
                  use_feasy=True,
+                 use_tracking=False,
                  verbose=False,
                  show_plts=False):
 
@@ -257,7 +258,7 @@ class RLGS(SimpleSystem):
         self.feasy_check_rate = 20  # every 50 steps check for feasibility
 
     def init_system(self, action_list, planner, scene_objects):
-
+        t_start = time.time()
         super().init_system(action_list, planner, scene_objects)
 
         # del self.active_plan
@@ -279,7 +280,7 @@ class RLGS(SimpleSystem):
 
                 # y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e0]), ry.OT.ineq)
 
-        return True
+        return True, time.time()-t_start
 
     def is_no_plan_feasible(self):
         return self.no_plan_feasible
@@ -390,5 +391,5 @@ class RLGS(SimpleSystem):
 
 class RLDSClone(RLGS):
 
-    def __init__(self, C, verbose=False, use_real_robot=False):
+    def __init__(self, C, verbose=False, use_real_robot=False, use_tracking=False):
         super().__init__(C, use_feasy=False, verbose=verbose, use_real_robot=use_real_robot)

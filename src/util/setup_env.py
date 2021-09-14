@@ -28,8 +28,6 @@ def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2))):
         (.09, .14, .05),
     ]
 
-
-
     # create blocks
     for o in range(num_blocks):
         name = f"b{o + 1}"
@@ -60,7 +58,6 @@ def setup_tower_env():
         (0.7, 0.4),
         (0.4, 0.3),
         (0.6, 0.2)
-
     )
 
     return _setup(num_blocks=3, positions=positions)
@@ -68,7 +65,7 @@ def setup_tower_env():
 
 def setup_hand_over_env():
     positions = (
-        (0.4, 0.0),
+        constants.handover_b1_pos_xy,
     )
     C, scene_objects = _setup(dual=True, num_blocks=1, positions=positions)
 

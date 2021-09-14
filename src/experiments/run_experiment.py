@@ -1,13 +1,15 @@
 import time
+import pandas as pd
 from optparse import OptionParser
-
 import actions
 import planners
 from execution_models import RLGS, SimpleSystem, RLDSClone
-from interference import ResetPosition, NoInterference
+import interferences
 import util.setup_env as setup_env
+import os
 
-
+choices_model = ["simple", "rlgs", "rlds_clone"]
+choices_scenario = ["tower", "hand_over",  "stick"]
 
 """
 Build a tower with the provided plan. 
@@ -17,126 +19,112 @@ interference in the real world.
 """
 
 
-def run_experiment(model_name, experiment_name, interference_num, use_real_robot, tracking, verbose=False):
-    C = None
-    action_list = []
-    planner = None
-    scene_objects = {}
-    tau = 0.01
-    interference_list = [NoInterference()]
+experiment_configs = {
+        "tower": {
+            "scene": setup_env.setup_tower_env(),
+            "planner": planners.TowerPlanner(),
+            "actions": [actions.GrabBlock(), actions.PlaceOn(), actions.PlaceSide()],
+            "interferences": interferences.get_tower_interferences()
+        },
+        "hand_over": {
+            "scene": setup_env.setup_hand_over_env(),
+            "planner": planners.HandOverPlanner(),
+            "actions": [actions.GrabBlock(), actions.PlaceGoal(), actions.HandOver()],
+            "interferences": interferences.get_hand_over_interferences(),
+        },
+        "stick": {
+            "scene": setup_env.setup_stick_pull_env(),
+            "planner": planners.StickPullPlanner(),
+            "actions": [actions.GrabBlock(), actions.PlaceGoal(), actions.GrabStick(),
+                        actions.PullBlockToGoal(), actions.PlaceStick()],
+            "interferences": interferences.get_stick_interferences(),
+        }
+    }
 
 
+def run_experiment(model_name, scenario, interference_num, use_real_robot, tracking,
+                   verbose=False, record=True):
 
-    #
-    # Tower Experiment
-    #
-    if experiment_name == "tower":
+    scenario_config = experiment_configs[scenario]
+    C, scene_objects = scenario_config["scene"]
+    action_list = scenario_config["actions"]
+    planner = scenario_config["planner"]
+    interference = scenario_config["interferences"][interference_num]
 
-        C, scene_objects = setup_env.setup_tower_env()
-        action_list = [
-            actions.GrabBlock(),
-            actions.PlaceOn(),
-            actions.PlaceSide()
-        ]
-        planner = planners.TowerPlanner()
-
-        # add interference
-        ori_pos_b2 = C.frame("b2").getPosition()
-        infeasible_pos_b1 = (0.6, 0.6, 0.68)
-
-        interference_list.extend((
-            # b2 is knocked of tower while gripper is moving to b1
-            ResetPosition(190, 192, "b2", ori_pos_b2),
-            # b2 is knocked of tower while gripper is holding b1
-            ResetPosition(150, 262, "b2", ori_pos_b2),
-            # b1 is moved out of reach
-            ResetPosition(50, 52, "b1", infeasible_pos_b1)
-        ))
-
-    #
-    # Hand Over
-    #
-    elif experiment_name == "hand_over":
-        C, scene_objects = setup_env.setup_hand_over_env()
-        action_list = [
-            actions.GrabBlock(),
-            actions.PlaceGoal(),
-            actions.HandOver()
-        ]
-        planner = planners.HandOverPlanner()
-        x_flip_pos_b1 = C.frame("b1").getPosition()
-        x_flip_pos_b1[0] = x_flip_pos_b1[0] * -1
-        interference_list.extend((
-            # b1 is knocked of tower while gripper is moving to b1
-            ResetPosition(5, 7, "b1", x_flip_pos_b1),
-        ))
-
-    #
-    # Stick Pull
-    #
-    elif experiment_name == "stick_pull":
-        C, scene_objects = setup_env.setup_stick_pull_env()
-        action_list = [
-            actions.GrabBlock(),
-            actions.PlaceGoal(),
-            actions.GrabStick(),
-            actions.PullBlockToGoal(),
-            actions.PlaceStick()
-        ]
-        planner = planners.StickPullPlanner()
-        x_new_pos_b1 = C.frame("b1").getPosition()
-        x_new_pos_b1[1] += 0.3
-        interference_list.extend((
-            # b1 is knocked of tower while gripper is moving to b1
-            ResetPosition(30, 32, "b1", x_new_pos_b1),
-        ))
-
-
-    #
-    # Bottle Open
-    #
-    elif experiment_name == "bottle_open":
-        C, scene_objects = setup_env.setup_bottle_open_env()
-        action_list = [
-
-        ]
-
-    current_interference = interference_list[interference_num]
-
-    exec_model = None
+    # Choose model
     if model_name == "rlgs":
-        exec_model = RLGS(C, verbose=verbose, use_real_robot=use_real_robot)
+        exec_model_func = RLGS
     elif model_name == "simple":
-        exec_model = SimpleSystem(C, verbose=verbose, use_real_robot=use_real_robot)
+        exec_model_func = SimpleSystem
     elif model_name == "rlds_clone":
-        exec_model = RLDSClone(C, verbose=verbose, use_real_robot=use_real_robot)
-
-    C.view()
-
-    if not exec_model.init_system(action_list, planner, scene_objects):
-        print("Plan is not feasible!")
-        C.view_close()
+        exec_model_func = RLDSClone
+    else:
+        print(f"Model {model_name} is not implemented!")
         return
 
-    # run do the task
-    exec_model.setup()
-    exec_model.run()
+    exec_model = exec_model_func(C, verbose=verbose, use_real_robot=use_real_robot, use_tracking=tracking)
+    C.view()
 
-    if exec_model.is_goal_fulfilled():
+    init_complete, init_time = exec_model.init_system(action_list, planner, scene_objects)
+    exec_time = 0
+
+    if not init_complete:
+        print("Plan is not feasible!")
+        C.view_close()
+    else:
+        # setup the task
+        exec_model.setup()
+        exec_time = exec_model.run(interference)
+
+    goal_full = exec_model.is_goal_fulfilled()
+    if goal_full:
         print("Plan finished!")
     else:
         print("Plan not finished!")
 
-    exec_model.move_home()
-
-    time.sleep(5)
+    if use_real_robot:
+        exec_model.move_home()
     C.view_close()
 
+    if record:
+        experiment_results = {
+            "exec_time": exec_time,
+            'setup_time': init_time,
+            "goal_reached": str(goal_full),
+            "scenario": scenario,
+            'model_name': model_name,
+            'interference_num': interference_num,
+            'interference_desc': interference.description,
+            'date': time.strftime("%Y%m%d%H%M"),
+            'real_robot': str(use_real_robot),
+
+        }
+        log_experiment_row(experiment_results)
+
+
+def log_experiment_row(data):
+    df = pd.DataFrame(data, index=[0])
+
+    def assure_path_exists(path):
+        directory = os.path.dirname(path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+    path = f"../../data/experiments.csv"
+    assure_path_exists(path)
+    is_new_file = os.path.exists(path)
+    df.to_csv(path, mode='a', header=not is_new_file, index=False)
+
+
+def run_all_experiments(count=1, use_real_robot=False):
+    for model in choices_model:
+        for scenario in choices_scenario:
+            for interference in range(len(experiment_configs[scenario]["interferences"])):
+                for i in range(count):
+                    # run_experiment(model, scenario, interference_num=inter, record=True, use_real_robot=use_real_robot, tracking=False)
+                    os.system(f"python {os.getcwd()}/run_experiment.py --{model=} --{scenario=} --{interference=}")
 
 if __name__ == '__main__':
-    choices_model = ["simple", "rlgs", "rlds_clone"]
-    choices_scenario = ["tower", "hand_over", "stick"]
-
     parser = OptionParser()
 
     parser.add_option("-m", "--model", dest="model_name", default="rlgs",
@@ -155,13 +143,21 @@ if __name__ == '__main__':
                       help="use real robots or simulate")
 
     parser.add_option("-t", "--tracking", dest="tracking", default=False, action="store_true",
-                      help="use tracking with Optitrack")
+                      help="use tracking with OptiTrack")
+
+    parser.add_option("-a", "--all", dest="run_all", default=False, action="store_true",
+                      help="run all experiments")
 
     (options, args) = parser.parse_args()
 
-    run_experiment(model_name=options.model_name,
-                   experiment_name=options.experiment_name,
-                   interference_num=options.interference_num,
-                   use_real_robot=options.use_real_robot,
-                   tracking=options.tracking,
-                   verbose=options.verbose)
+    if options.run_all:
+        run_all_experiments(count=1,
+                            use_real_robot=options.use_real_robot)
+
+    else:
+        run_experiment(model_name=options.model_name,
+                       scenario=options.experiment_name,
+                       interference_num=options.interference_num,
+                       use_real_robot=options.use_real_robot,
+                       tracking=options.tracking,
+                       verbose=options.verbose)

@@ -122,6 +122,10 @@ class HandOverPlanner:
 
         init = list()
 
+        # hack, remove the left gripper from scene objects for forward approaches
+        if forward:
+            scene_obj[constants.type_gripper].remove("l_gripper")
+
         # empty hands
         for gripper in scene_obj[constants.type_gripper]:
             init_hand_empty = pred.HandEmpty("G")
@@ -136,12 +140,6 @@ class HandOverPlanner:
 
         # normal goal predicates
         self.goal = list()
-
-        # hands should be free
-        # for gripper in scene_obj[dt.type_gripper]:
-        #     goal_hand_empty = pred.HandEmpty("G")
-        #     goal_hand_empty.ground_predicate(G=gripper)
-        #     self.goal.append(goal_hand_empty.get_grounded_predicate())
 
         # first block should be at position
         block_at_goal = pred.BlockAtGoal("B")
@@ -161,15 +159,14 @@ class HandOverPlanner:
         # generate plan
         if forward:
             action_tree = planner(prob, verbose=self.verbose)
+            # hack: check which
 
         else:
-            action_plan, state_plan, __ = backwards_planner(prob, goal=self.goal, action_tree=False, verbose=True)
-            plan, state_plan, action_tree = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=5,
-                                                    root_state_plan=state_plan, verbose=True)
+            # action_plan, state_plan, __ = backwards_planner(prob, goal=self.goal, action_tree=False, verbose=True)
+            # plan, state_plan, action_tree = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=5,
+            #                                         root_state_plan=state_plan, verbose=True)
 
             action_tree = backwards_tree_exploration(prob, goal=self.goal, verbose=True, max_depth=3)
-            # need to reverse plan
-            plan = plan[::-1]
 
         return action_tree
 
@@ -236,18 +233,15 @@ class StickPullPlanner:
             goal=self.goal
         )
 
-        G = None
-        state_plan = None
-
         # generate plan
         if forward:
-            plan = planner(prob, verbose=self.verbose)
+            action_tree = planner(prob, verbose=self.verbose)  # is only path actually
         else:
             action_plan, state_plan, __ = backwards_planner(prob, goal=self.goal, action_tree=False, verbose=True)
-            plan, state_plan, G = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=5,
+            plan, state_plan, action_tree = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=5,
                                                     root_state_plan=state_plan, verbose=True)
 
-            G = backwards_tree_exploration(prob, goal=self.goal, verbose=True, max_depth=3)
+            action_tree = backwards_tree_exploration(prob, goal=self.goal, verbose=True, max_depth=3)
             # need to reverse plan
             plan = plan[::-1]
         if self.verbose:
@@ -257,7 +251,7 @@ class StickPullPlanner:
                 for action in plan:
                     print(action)
 
-        return G
+        return action_tree
 
     def get_goal_controller(self, C):
         goal_feature = ry.CtrlSet()

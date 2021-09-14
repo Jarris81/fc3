@@ -4,6 +4,5 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/pyddl" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/rai" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/rai-robotModels" vcs="Git" />
   </component>
 </project>

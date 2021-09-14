@@ -162,3 +162,5 @@ vid/
 *.png
 
 .ipynb_checkpoints
+
+/data
