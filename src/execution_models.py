@@ -17,12 +17,13 @@ class SimpleSystem:
     Simple Linear/Sequential Execution Model and Template for others
     """
 
-    def __init__(self, C, use_real_robot, use_tracking, verbose=False, show_plts=False):
+    def __init__(self, C, use_real_robot, use_tracking, verbose=False, show_plots=False):
         # what the robot knows
         self.C = C
         self.verbose = verbose
         self.use_real_robot = use_real_robot
         self.use_tracking = use_tracking
+        self.show_plots = show_plots
 
         # action tree received from planner
         self.action_tree = None
@@ -62,14 +63,20 @@ class SimpleSystem:
             print(msg)
 
     def init_system(self, action_list, planner, scene_objects) -> (bool, float):
+        # put all objects into one dictionary with types
+        self.scene_objects = scene_objects
+        self.tracker = Tracker(self.C,
+                               [x for y in self.scene_objects.values() for x in y],
+                               1) \
+            if self.use_tracking else None
+        if self.tracker: self.tracker.update(0)
 
         t_start = time.time()
 
         self.q = self.C.getJointState()
         self.q_old = self.q
 
-        # put all objects into one dictionary with types
-        self.scene_objects = scene_objects
+
 
         self.action_tree = planner.get_tree(action_list, self.scene_objects, forward=self._use_single_path)
 
@@ -91,7 +98,7 @@ class SimpleSystem:
         # each edge (action) gets and ctrlset
         nx.set_edge_attributes(self.action_tree, grounded_ctrlsets, "ctrlset")
 
-        return True, time.time()-t_start
+        return True, time.time() - t_start
 
     def move_home(self):
 
@@ -103,14 +110,6 @@ class SimpleSystem:
 
     def setup(self):
         self.botop = pybot.BotOp(self.C, self.use_real_robot, "both", "ROBOTIQ")
-
-        self.tracker = Tracker(self.C,
-                               [x for y in self.scene_objects.values() for x in y],
-                               1) \
-            if self.use_tracking else None
-        if self.tracker:
-            self.tracker.update(0)
-
         self.botop.gripperOpen(self.gripper2index["r_gripper"], 1, 1)
         while not self.botop.gripperDone(1):
             time.sleep(0.01)
@@ -120,8 +119,7 @@ class SimpleSystem:
         t_start = self.botop.get_t()
         while not self._is_done():
             if self.tracker: self.tracker.update(self.botop.get_t())
-            # if not self.use_real_robot: run_interference.do_interference(self.C, self.botop.get_t())
-
+            if not self.use_real_robot: run_interference.do_interference(self.C, self.botop.get_t())
 
             self._step(self.botop.get_t())
 
@@ -218,19 +216,21 @@ class SimpleSystem:
             return  # only do stuff if it is not a condition
 
         elif ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
-            gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
-            self.botop.gripperClose(gripper_index, 0.5, 0.01, 0.1)
-            while not self.botop.gripperDone(gripper_index):
-                time.sleep(0.1)
+            if ctrlCommand.getFrameNames()[0] in self.gripper2index:
+                gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
+                self.botop.gripperClose(gripper_index, 1, 0.01, 0.1)
+                while not self.botop.gripperDone(gripper_index):
+                    time.sleep(0.1)
 
         elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
-            gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
-            self.botop.gripperOpen(gripper_index, 1, 0.1)
-            while not self.botop.gripperDone(gripper_index):
-                time.sleep(0.1)
+            if ctrlCommand.getFrameNames()[0] in self.gripper2index:
+                gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
+                self.botop.gripperOpen(gripper_index, 1, 0.1)
+                while not self.botop.gripperDone(gripper_index):
+                    time.sleep(0.1)
 
-            # Cheating, but for now always move up after placing something
-            self._move_up_safely(ctrlCommand.getFrameNames()[0])
+                # Cheating, but for now always move up after placing something
+                self._move_up_safely(ctrlCommand.getFrameNames()[0])
 
 
 class RLGS(SimpleSystem):
@@ -243,11 +243,11 @@ class RLGS(SimpleSystem):
                  use_feasy=True,
                  use_tracking=False,
                  verbose=False,
-                 show_plts=False):
+                 show_plots=False):
 
         # what the robot knows
         super().__init__(C, use_real_robot=use_real_robot,
-                         show_plts=show_plts,
+                         show_plots=show_plots,
                          verbose=verbose,
                          use_tracking=use_tracking)
 
@@ -264,7 +264,8 @@ class RLGS(SimpleSystem):
         self.no_plan_feasible = False
 
         # stuff for execution
-        self.feasy_check_rate = 20  # every 50 steps check for feasibility
+        self.feasy_check_rate = 5  # every second steps check for feasibility
+        self.last_feasy_check = 0
 
     def init_system(self, action_list, planner, scene_objects):
         t_start = time.time()
@@ -274,7 +275,7 @@ class RLGS(SimpleSystem):
 
         # get robust tree/ set of chains
         self.robust_set_of_chains = get_robust_set_of_chains(self.C, self.action_tree, self.goal_controller,
-                                                             verbose=self.verbose)
+                                                             verbose=self.show_plots)
         # first plan we want to execute
         self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ry.CtrlSolver(self.C, 0.1, 2))
 
@@ -289,7 +290,9 @@ class RLGS(SimpleSystem):
 
                 # y.addObjective(self.C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e0]), ry.OT.ineq)
 
-        return True, time.time()-t_start
+        draw_search_graph(self.action_tree, "action_tree.png")
+
+        return True, time.time() - t_start
 
     def is_no_plan_feasible(self):
         return self.no_plan_feasible
@@ -313,44 +316,45 @@ class RLGS(SimpleSystem):
                 self.log(f"Initiating: {name}")
                 ctrl.set(c)
                 is_any_controller_feasible = True
-                is_current_plan_feasible = True
                 self.current_active_controller_index = i
 
-                q_dot = self.q - self.q_old
+                q_dot = []#self.q - self.q_old
                 ctrl.update(q_real, q_dot, self.C)
                 q_target = ctrl.solve(self.C)
 
                 self.q = q_real
                 self.q_old = self.q_old
 
-                # always make a step
-                self.botop.moveLeap(q_target, 2)
-                self.botop.step(self.C, self.leap_step)
-
                 # Handle symbolic commands here
                 for ctrlCommand in c.getSymbolicCommands():
                     self._handle_symbolic_commands(ctrlCommand)
 
-                # no need to continue
                 break
             else:
                 pass
                 # self.log(f"Cannot be initiated: {name}")
 
+        # always make a step
+        self.botop.moveLeap(q_target, 2)
+        self.botop.step(self.C, self.leap_step)
 
         # check feasibility of chain
-        if self.use_feasy and not t % self.feasy_check_rate and len(self.active_robust_reverse_plan):
+        if self.use_feasy and \
+                t - self.last_feasy_check > self.feasy_check_rate and \
+                len(self.active_robust_reverse_plan) and \
+                not is_any_controller_feasible:
             # check rest of controller chain for feasibility
             residual_plan = self.active_robust_reverse_plan[self.current_active_controller_index::-1]
             is_current_plan_feasible, _ = check_switch_chain_feasibility(self.C, residual_plan,
                                                                          self.goal_controller,
-                                                                         self.scene_objects, verbose=self.verbose)
+                                                                         self.scene_objects,
+                                                                         verbose=self.verbose)
 
-        # if current plan is not feasible, check other plans
-        if self.use_feasy and (
-                not is_any_controller_feasible or not is_current_plan_feasible) and not t % self.feasy_check_rate:
-            self.log("No controller can be initiated or current plan is not feasible!")
-            self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ctrl)
+            # if current plan is not feasible, check other plans
+            if not is_current_plan_feasible:
+                self.log("Current Plan is not feasible!")
+                self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ctrl)
+                self.last_feasy_check = t
 
     def get_feasible_reverse_plan(self, ctrl):
         # find a new feasible plan
@@ -362,7 +366,7 @@ class RLGS(SimpleSystem):
                     is_feasible, komo_feasy = check_switch_chain_feasibility(self.C, residual_plan,
                                                                              self.goal_controller,
                                                                              self.scene_objects,
-                                                                             verbose=self.verbose)
+                                                                             verbose=False)
                     if is_feasible:
                         if self.verbose:
                             print("new plan found!")
@@ -402,4 +406,4 @@ class RLGS(SimpleSystem):
 class RLDSClone(RLGS):
 
     def __init__(self, C, verbose=False, use_real_robot=False, use_tracking=False):
-        super().__init__(C, use_feasy=False, verbose=verbose, use_real_robot=use_real_robot)
+        super().__init__(C, use_feasy=False, verbose=verbose, use_real_robot=use_real_robot, use_tracking=use_tracking)

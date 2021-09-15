@@ -28,8 +28,6 @@ class Tracker:
 
         self.info = {frame: {"avg_pos": np.zeros(3), "count": 0} for frame in self.frame_names}
 
-        self.avg_rate = 100
-
         self.last_update = -1000
 
         self.dummy_frame_name = "opti_dummy"
@@ -37,8 +35,7 @@ class Tracker:
 
     def update(self, t):
 
-        # if t-self.last_update > self.rate:
-        if True:
+        if t-self.last_update > self.rate:
 
             self.mc.waitForNextFrame()
 
@@ -64,21 +61,8 @@ class Tracker:
                 dummy_frame.setRelativePosition(pos)
                 dummy_frame.setRelativeQuaternion(quat)
 
-                #
                 frame.setPosition(dummy_frame.getPosition())
                 frame.setQuaternion(dummy_frame.getQuaternion())
-
-                #
-                self.info[frame_name]["count"] += 1
-                self.info[frame_name]["avg_pos"] += (pos - self.info[frame_name]["avg_pos"]) / self.info[frame_name][
-                    "count"]
-
-                # if not step % self.avg_rate:
-                #     print(self.info[frame_name]["avg_pos"])
-                #     self.info[frame_name]["avg_pos"] = 0
-                #     self.info[frame_name]["count"] = 0
-
-                self.last_update = t
 
     def _check_angular_velocity(self):
         pass
@@ -86,17 +70,17 @@ class Tracker:
 
 if __name__ == '__main__':
 
-    C, scene_objects = setup_env.setup_tower_env()
+    C, scene_objects = setup_env.setup_stick_pull_env()
 
     C.view()
 
-    tracker = Tracker(C, ["b1", "b2", "b3"], 1)
+    tracker = Tracker(C, ["b1", "stick"], 1)
     for t in range(100000):
         tracker.update(t)
 
         time.sleep(0.01)
 
-        # print(C.frame("b1").getPosition())
-        print(C.frame("b3").getQuaternion())
+        # print(C.frame("stick").getPosition())
+        print(C.frame("stick").getQuaternion())
 
     pass

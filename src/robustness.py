@@ -112,7 +112,7 @@ def get_robust_chain(C, controllers, goal_controller, tolerance=1e-1, verbose=Fa
 
     for i, (edge, name, ctrlset) in enumerate(reversed(controllers)):
 
-        # verbose = True if edge == (2, 0) or edge == (4, 2) else False
+        # verbose = True if edge == (8, 3) else False
 
         if i == 0:
             action_next = goal_controller

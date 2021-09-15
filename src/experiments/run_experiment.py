@@ -62,11 +62,12 @@ def run_experiment(model_name, scenario, interference_num, use_real_robot, track
         print(f"Model {model_name} is not implemented!")
         return
 
-    exec_model = exec_model_func(C, verbose=verbose, use_real_robot=use_real_robot, use_tracking=tracking)
-    C.view()
+    exec_model = exec_model_func(C, verbose=True, use_real_robot=use_real_robot, use_tracking=tracking)
 
     init_complete, init_time = exec_model.init_system(action_list, planner, scene_objects)
     exec_time = 0
+
+    C.view()
 
     if not init_complete:
         print("Plan is not feasible!")

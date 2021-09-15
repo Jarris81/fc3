@@ -25,6 +25,8 @@ if __name__ == '__main__':
 
     # TowerPlanner.get_goal_controller(self.)
 
+    use_real_robot = True
+
     C.view()
 
     print([x for x in C.getFrameNames() if "gripper" in x])
@@ -69,16 +71,16 @@ if __name__ == '__main__':
         pass
         # a.addObjective(C.feature(ry.FS.accumulatedCollisions, ["ALL"], [1e-1]), ry.OT.ineq)
 
-    bot = pybot.BotOp(C, True, "BOTH", "ROBOTIQ")
+    bot = pybot.BotOp(C, use_real_robot, "BOTH", "ROBOTIQ")
     # q_start = C.getJointState()
     # q_start = q_start.reshape(1, 14)
     # bot.move(q_start, [2])
 
     ref_tau = 0.05
 
-    bot.gripperOpen("RIGHT", 1, 1)
+    bot.gripperOpen(1, 1, 1)
 
-    while not bot.gripperDone("RIGHT"):
+    while not bot.gripperDone(1):
         time.sleep(0.1)
 
     # bot.gripperOpen("RIGHT", 1.0, 0.2)
@@ -90,7 +92,8 @@ if __name__ == '__main__':
 
     for t in range(0, 10000):
 
-        tracker.update(t)
+        if use_real_robot:
+            tracker.update(t)
 
         q_real = C.getJointState()
         # create a new solver everytime
@@ -101,9 +104,9 @@ if __name__ == '__main__':
                 ctrl.set(c)
                 print(name)
                 if name == "GrabStick_grab":
-                    bot.gripperClose("RIGHT", 1, 0.01, 0.1)
+                    bot.gripperClose(1, 1, 0.01, 0.1)
 
-                    while not bot.gripperDone("RIGHT"):
+                    while not bot.gripperDone(1):
                         time.sleep(0.1)
 
                 if name == "PullBlockToGoal_attach_handle_stick":

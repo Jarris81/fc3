@@ -1,0 +1,25 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="exp_tower_real" type="PythonConfigurationType" factoryName="Python">
+    <module name="thesis_2020" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="PARENT_ENVS" value="true" />
+    <envs>
+      <env name="PYTHONUNBUFFERED" value="1" />
+      <env name="LD_LIBRARY_PATH" value="$PROJECT_DIR$/../../../jason/opt/physx3.4/lib" />
+    </envs>
+    <option name="SDK_HOME" value="$USER_HOME$/anaconda3/envs/thesis/bin/python" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/experiments" />
+    <option name="IS_MODULE_SDK" value="false" />
+    <option name="ADD_CONTENT_ROOTS" value="true" />
+    <option name="ADD_SOURCE_ROOTS" value="true" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/experiments/run_experiment.py" />
+    <option name="PARAMETERS" value="--scenario=tower --interference=0 --use_real_robot --tracking" />
+    <option name="SHOW_COMMAND_LINE" value="false" />
+    <option name="EMULATE_TERMINAL" value="false" />
+    <option name="MODULE_MODE" value="false" />
+    <option name="REDIRECT_INPUT" value="false" />
+    <option name="INPUT_FILE" value="" />
+    <method v="2" />
+  </configuration>
+</component>

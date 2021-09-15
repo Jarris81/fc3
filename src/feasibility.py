@@ -14,7 +14,7 @@ def _get_ctrlset_description(C, ctrlset):
             f"{f.getFS()}, {f.getFrameNames(C)}, {o.get_OT()}, {f.getScale()}, {f.getTarget()}, {o.getOriginalTarget()}")
 
 
-def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0.1, verbose=False):
+def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0.1, verbose=False, show_plots=False):
     # plan is feasible until proven otherwise
     plan_is_feasible = True
 
@@ -169,7 +169,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
                 print(f'{df.name} {features[i_col]} at switch #{i_row} is not feasible!')
 
     # Visualize some results
-    if verbose:
+    if show_plots:
         # create a figure with two plot
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
         df_transient.plot(ax=ax1, title="Transient Features")

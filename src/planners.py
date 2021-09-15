@@ -67,7 +67,7 @@ class TowerPlanner:
         else:
             action_plan, state_plan1, __ = backwards_planner(prob, goal=self.goal, action_tree=False, verbose=True)
             plan, state_plan1, action_tree = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=1,
-                                                     root_state_plan=state_plan1, verbose=True)
+                                                               root_state_plan=state_plan1, verbose=True)
             # need to reverse plan
         if self.verbose:
             if action_tree is None:
@@ -221,7 +221,6 @@ class StickPullPlanner:
             init_hand_empty.ground_predicate(G=gripper)
             self.goal.append(init_hand_empty.get_grounded_predicate())
 
-
         # define problem here
         prob = Problem(
             domain,
@@ -236,7 +235,7 @@ class StickPullPlanner:
         else:
             action_plan, state_plan, __ = backwards_planner(prob, goal=self.goal, action_tree=False, verbose=True)
             plan, state_plan, action_tree = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=5,
-                                                    root_state_plan=state_plan, verbose=True)
+                                                              root_state_plan=state_plan, verbose=True)
 
             action_tree = backwards_tree_exploration(prob, goal=self.goal, verbose=True, max_depth=3)
             # need to reverse plan
@@ -253,18 +252,18 @@ class StickPullPlanner:
     def get_goal_controller(self, C):
         goal_feature = ry.CtrlSet()
         # TODO put this in some domain class
-        goal_place = constants.goal_stick_pull_block_pos
+        goal_place = C.getFrame("b1").getPosition()
+        goal_place[1] -= 0.2
         constants.goal_block_pos = goal_place
         goals_block_at_goal = [x for x in self.goal if x[0] == pred.BlockAtGoal.__name__]
         block = "b1"
         stick = "stick"
         goal_feature.addObjective(
-            C.feature(ry.FS.position, [block], [1e0], goal_place),
+            C.feature(ry.FS.position, [block], [1e0, 1e0, 1e0], goal_place),
             ry.OT.eq, -1)
         goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("r_gripper", stick), True)
         goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (stick, block), True)
         goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("r_gripper", block), True)
-        # goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("L_gripper", block), True)
 
         return goal_feature
 
@@ -293,7 +292,7 @@ if __name__ == '__main__':
     # Parse arguments
     opts, args = parser.parse_args()
     planner = StickPullPlanner()
-    plan, goal, state_plan, G = planner.get_plan(action_list, objects)
+    plan, goal, state_plan, G = planner.get_tree(action_list, objects)
 
     for a in plan:
         print(a)
