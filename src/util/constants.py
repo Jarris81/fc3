@@ -16,7 +16,13 @@ hand_empty = "empty"  # condition a hand is free
 b_on_b = "block_on_block"  # condition block is on block
 
 
-goal_handover_block_pos = (0.5, 0.3, 0.71)
+tower_b1_pos_xy = (0.7, 0.4)
+tower_b2_pos_xy = (0.4, 0.3)
+tower_b3_pos_xy = (0.6, 0.2)
+
+handover_b1_pos_xy = (0.8, 0.3)
+
+goal_handover_block_pos = (handover_b1_pos_xy[0], handover_b1_pos_xy[1]-0.3, 0.71)
 goal_stick_pull_block_pos = (0.6, 0.0, 0.68)
 goal_block_pos = None
 

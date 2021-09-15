@@ -160,3 +160,7 @@ vid/
 %% intellij files
 %% no pics
 *.png
+
+.ipynb_checkpoints
+
+/data

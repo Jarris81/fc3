@@ -827,7 +827,7 @@ class HandOver(BaseAction):
             C.feature(ry.FS.positionDiff, [gripper_give, block], [1e0]),
             ry.OT.eq, -1)
 
-        direction = 1 if gripper_give == "R_gripper" else -1
+        direction = 1 if gripper_give == "l_gripper" else -1
         align_1.addObjective(
             C.feature(ry.FS.scalarProductXZ, ["world", gripper_give], [1e1], [direction]),
             ry.OT.sos, speed)
