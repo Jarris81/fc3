@@ -9,7 +9,7 @@ path_to_botop = "../../../botop/"
 
 def _setup(dual=False, num_blocks=1, positions=((-0.6, -0.2))):
     # scene = "rai/testing/KOMO/switches/model2.g"
-    scene = "rai-robotModels/scenarios/pandasTable.g"
+    scene = "rai-robotModels/scenarios/pandasTable-calibrated.g"
     scene_objects = {constants.type_gripper: ["r_gripper"], constants.type_block: []}
 
     if dual:

@@ -61,8 +61,6 @@ class TowerPlanner:
             goal=self.goal
         )
 
-        state_plan1 = None
-
         # generate plan
         if forward:
             action_tree = planner(prob, verbose=self.verbose)
@@ -71,7 +69,6 @@ class TowerPlanner:
             plan, state_plan1, action_tree = backwards_planner(prob, goal=self.goal, action_tree=True, max_diff=1,
                                                      root_state_plan=state_plan1, verbose=True)
             # need to reverse plan
-            plan = plan[::-1]
         if self.verbose:
             if action_tree is None:
                 print('No Plan!')

@@ -27,7 +27,5 @@ goal_stick_pull_block_pos = (0.6, 0.0, 0.68)
 goal_block_pos = None
 
 
-table_height = 0.65
-
-robotiq_tcp_z_offset = 0.025
+table_height = 0.62
 

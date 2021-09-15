@@ -159,5 +159,5 @@ if __name__ == '__main__':
                        scenario=options.experiment_name,
                        interference_num=options.interference_num,
                        use_real_robot=options.use_real_robot,
-                       tracking=options.tracking,
+                       tracking=options.tracking and options.use_real_robot,
                        verbose=options.verbose)

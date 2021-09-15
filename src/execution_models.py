@@ -17,11 +17,7 @@ class SimpleSystem:
     Simple Linear/Sequential Execution Model and Template for others
     """
 
-    def __init__(self, C,
-                 verbose=False,
-                 show_plts=False,
-                 use_real_robot=False,
-                 use_tracking=False):
+    def __init__(self, C, use_real_robot, use_tracking, verbose=False, show_plts=False):
         # what the robot knows
         self.C = C
         self.verbose = verbose
@@ -51,6 +47,9 @@ class SimpleSystem:
 
         # robot operator
         self.botop = None
+
+        # leap step when using the leap controller
+        self.leap_step = 0.1
 
         # tracking system (OptiTrack)
         self.tracker = None
@@ -109,13 +108,21 @@ class SimpleSystem:
                                [x for y in self.scene_objects.values() for x in y],
                                1) \
             if self.use_tracking else None
+        if self.tracker:
+            self.tracker.update(0)
+
+        self.botop.gripperOpen(self.gripper2index["r_gripper"], 1, 1)
+        while not self.botop.gripperDone(1):
+            time.sleep(0.01)
 
     def run(self, run_interference):
 
         t_start = self.botop.get_t()
         while not self._is_done():
             if self.tracker: self.tracker.update(self.botop.get_t())
-            if not self.use_real_robot: run_interference.do_interference(self.C, self.botop.get_t())
+            # if not self.use_real_robot: run_interference.do_interference(self.C, self.botop.get_t())
+
+
             self._step(self.botop.get_t())
 
         t_total = self.botop.get_t() - t_start
@@ -159,15 +166,15 @@ class SimpleSystem:
         self.q_old = self.q_old
 
         self.botop.moveLeap(q_target, 2)
-        self.botop.step(self.C, 0.05)
+        self.botop.step(self.C, self.leap_step)
 
     def _move_up_safely(self, gripper):
 
         gripper_up_pos = self.C.frame(gripper).getPosition()
-        gripper_up_pos[2] += 0.1  # move up 10 cm
+        gripper_up_pos[2] += 0.05  # move up 5 cm
 
         ctrl = ry.CtrlSolver(self.C, 0.1, 2)
-        transient_step = 0.1
+        transient_step = 0.05
 
         move_up = ry.CtrlSet()
         tau = 0.01
@@ -175,7 +182,7 @@ class SimpleSystem:
                                       self.C)  # TODO this will make some actions unfeasible (PlaceSide)
         move_up.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
         move_up.addObjective(
-            self.C.feature(ry.FS.position, [gripper], [1e2], gripper_up_pos),
+            self.C.feature(ry.FS.position, [gripper], [1e1], gripper_up_pos),
             ry.OT.sos, transient_step / 5)
 
         move_up.addObjective(
@@ -184,7 +191,7 @@ class SimpleSystem:
 
         ctrl.set(move_up)
 
-        while not np.allclose(self.C.frame(gripper).getPosition(), gripper_up_pos):
+        while not np.allclose(self.C.frame(gripper).getPosition(), gripper_up_pos, atol=1e-2):
             q_real = self.C.getJointState()
             q_dot = self.q - self.q_old
 
@@ -192,10 +199,12 @@ class SimpleSystem:
             q_target = ctrl.solve(self.C)
 
             self.botop.moveLeap(q_target, 2)
-            self.botop.step(self.C, 0.05)
+            self.botop.step(self.C, self.leap_step)
 
             self.q = q_real
             self.q_old = self.q_old
+
+        return
 
     def _is_done(self):
 
@@ -209,18 +218,17 @@ class SimpleSystem:
             return  # only do stuff if it is not a condition
 
         elif ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
-            self.botop.hold(True, False)
-            self.botop.gripperClose(
-                self.gripper2index[ctrlCommand.getFrameNames()[0]], 0.5, 0.01, 0.1)
-            while not self.botop.gripperDone(1):
+            gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
+            self.botop.gripperClose(gripper_index, 0.5, 0.01, 0.1)
+            while not self.botop.gripperDone(gripper_index):
                 time.sleep(0.1)
 
         elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
-            self.botop.hold(True, True)
-            self.botop.gripperOpen(
-                self.gripper2index[ctrlCommand.getFrameNames()[0]], 1, 0.1)
-            while not self.botop.gripperDone(1):
+            gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
+            self.botop.gripperOpen(gripper_index, 1, 0.1)
+            while not self.botop.gripperDone(gripper_index):
                 time.sleep(0.1)
+
             # Cheating, but for now always move up after placing something
             self._move_up_safely(ctrlCommand.getFrameNames()[0])
 
@@ -240,7 +248,8 @@ class RLGS(SimpleSystem):
         # what the robot knows
         super().__init__(C, use_real_robot=use_real_robot,
                          show_plts=show_plts,
-                         verbose=verbose)
+                         verbose=verbose,
+                         use_tracking=use_tracking)
 
         # Robust system
         self.use_feasy = use_feasy
@@ -314,18 +323,20 @@ class RLGS(SimpleSystem):
                 self.q = q_real
                 self.q_old = self.q_old
 
+                # always make a step
                 self.botop.moveLeap(q_target, 2)
-                self.botop.step(self.C, 0.01)
+                self.botop.step(self.C, self.leap_step)
 
                 # Handle symbolic commands here
                 for ctrlCommand in c.getSymbolicCommands():
                     self._handle_symbolic_commands(ctrlCommand)
 
-                # leave loop, we have the controller
+                # no need to continue
                 break
             else:
                 pass
                 # self.log(f"Cannot be initiated: {name}")
+
 
         # check feasibility of chain
         if self.use_feasy and not t % self.feasy_check_rate and len(self.active_robust_reverse_plan):
@@ -340,7 +351,6 @@ class RLGS(SimpleSystem):
                 not is_any_controller_feasible or not is_current_plan_feasible) and not t % self.feasy_check_rate:
             self.log("No controller can be initiated or current plan is not feasible!")
             self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ctrl)
-
 
     def get_feasible_reverse_plan(self, ctrl):
         # find a new feasible plan

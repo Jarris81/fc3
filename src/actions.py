@@ -2,7 +2,6 @@ import libry as ry
 from pyddl import Action, neg
 import predicates as pred
 from util import constants
-import numpy as np
 
 transient_step = 0.1
 
@@ -114,7 +113,7 @@ class GrabBlock(BaseAction):
 
         height_block = C.getFrame(block).getSize()[2]
 
-        align_over_dist = 2*height_block
+        align_over_dist = 1.5*height_block
 
         align_over = ry.CtrlSet()
         align_over.addObjective(
@@ -159,7 +158,7 @@ class GrabBlock(BaseAction):
         #  block needs to be close to block
         grab = ry.CtrlSet()
         grab.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper, block], [1e0], [0, 0, constants.robotiq_tcp_z_offset]),
+            C.feature(ry.FS.positionDiff, [gripper, block], [1e0]),
             ry.OT.eq, -1)
         # condition, nothing is in hand of gripper
         grab.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), True)
@@ -301,7 +300,7 @@ class PlaceOn(BaseAction):
             C.feature(ry.FS.vectorZDiff, [block, block_placed_on], [1e1]),
             ry.OT.sos, transient_step)
         align_over.addObjective(
-            C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e1], [0, 0, 0.15]),
+            C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e1], [0, 0, 2*dist]),
             ry.OT.sos, transient_step)
         align_over.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
 
@@ -313,7 +312,7 @@ class PlaceOn(BaseAction):
             C.feature(ry.FS.positionDiff, [block, block_placed_on], [1e0, 1e0, 0]),
             ry.OT.eq, -1)
         place_on_block.addObjective(
-            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e2], [0., 0., dist]),
+            C.feature(ry.FS.positionRel, [block, block_placed_on], [1e1], [0., 0., dist]),
             ry.OT.sos, transient_step / 5)
         # should have z-axis in same direction
         place_on_block.addObjective(
@@ -547,7 +546,7 @@ class GrabStick(BaseAction):
         stick_frame = C.getFrame(stick)
         stick_length = stick_frame.getSize()[1]
 
-        grab_pos = (0, -0.1, constants.robotiq_tcp_z_offset)
+        grab_pos = (0, -0.1, 0)
 
         move_to = ry.CtrlSet()
         # move close to block
