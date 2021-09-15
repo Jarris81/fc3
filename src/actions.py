@@ -461,7 +461,6 @@ class PlaceGoal(BaseAction):
         goal_place = constants.goal_block_pos
         sym2frame = _get_sym2frame(self.symbols, frames)
 
-        speed = 0.1
 
         gripper = sym2frame[self.gripper_sym]
         block = sym2frame[self.block_sym]
@@ -471,17 +470,17 @@ class PlaceGoal(BaseAction):
         # block should be placed on table, doesnt matter where in x-y plane
         place_block_pos.addObjective(
             C.feature(ry.FS.position, [block], [1e2], goal_place),
-            ry.OT.sos, speed)
+            ry.OT.sos, transient_step)
 
         place_block_pos.addObjective(
-            C.feature(ry.FS.scalarProductZZ, [gripper, "world"], [1e3], [1]),
-            ry.OT.sos, speed * 10)
+            C.feature(ry.FS.scalarProductZZ, [gripper, "world"], [1e2], [1]),
+            ry.OT.sos, transient_step)
         # place_block_pos.addObjective(
         #     C.feature(ry.FS.scalarProductYZ, [block, "world"], [1e1]),
         #     ry.OT.sos, speed)
-        place_block_pos.addObjective(
-            C.feature(ry.FS.positionDiff, [block, gripper], [1e1]),
-            ry.OT.eq, -1)
+        # place_block_pos.addObjective(
+        #     C.feature(ry.FS.positionDiff, [block, gripper], [1e0]),
+        #     ry.OT.eq, -1)
 
         # needs to be holding the block
         place_block_pos.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
@@ -494,7 +493,7 @@ class PlaceGoal(BaseAction):
 
         # necessary, so that the block is only released when on ground, and not mid-air
         open_gripper.addObjective(
-            C.feature(ry.FS.position, [block], [1], goal_place),
+            C.feature(ry.FS.position, [block], [1e0], goal_place),
             ry.OT.eq, -1)
         # open_gripper.addObjective(
         #     C.feature(ry.FS.scalarProductZZ, [gripper, "world"], [1e1], [1]),
@@ -502,6 +501,8 @@ class PlaceGoal(BaseAction):
 
         open_gripper.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
         open_gripper.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
+
+        # TODo add overhead
 
         controllers = [
             ("place_block_pos", place_block_pos),
@@ -546,7 +547,7 @@ class GrabStick(BaseAction):
         stick_frame = C.getFrame(stick)
         stick_length = stick_frame.getSize()[1]
 
-        grab_pos = (0, 0.05, constants.robotiq_tcp_z_offset)
+        grab_pos = (0, -0.1, constants.robotiq_tcp_z_offset)
 
         move_to = ry.CtrlSet()
         # move close to block
@@ -663,7 +664,6 @@ class PullBlockToGoal(BaseAction):
             C.feature(ry.FS.scalarProductXY, [stick_handle, "world"], [1e2], [pull_angle]),
             ry.OT.sos, transient_step)
 
-
         attach_handle_stick = ry.CtrlSet()
         attach_handle_stick.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (stick, block), False)
         attach_handle_stick.addObjective(
@@ -678,7 +678,7 @@ class PullBlockToGoal(BaseAction):
 
         pull_back.addObjective(
             C.feature(ry.FS.position, [block], [1e2], block_pos_goal),
-            ry.OT.sos, transient_step)
+            ry.OT.sos, transient_step/2)
 
         pull_back.addObjective(
             C.feature(ry.FS.scalarProductXY, [stick_handle, block], [1e0], [pull_angle]),
@@ -693,7 +693,7 @@ class PullBlockToGoal(BaseAction):
 
         for ctrl in [stick_to_block, attach_handle_stick, pull_back, detach_block]:
             ctrl.addObjective(
-                C.feature(ry.FS.scalarProductZZ, ["world", stick], [1e-1], [1]),
+                C.feature(ry.FS.scalarProductZZ, ["world", stick], [1e0], [1]),
                 ry.OT.eq, -1)
 
             ctrl.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, stick), True)
@@ -713,7 +713,7 @@ class PullBlockToGoal(BaseAction):
             ("stick_to_block", stick_to_block),
             ("attach_handle_stick", attach_handle_stick),
             ("pull_back", pull_back),
-            #("detach_block", detach_block)
+            ("detach_block", detach_block)
         ]
         return add_action_name(self.name, controllers)
 
