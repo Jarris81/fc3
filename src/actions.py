@@ -831,31 +831,21 @@ class HandOver(BaseAction):
         #     ry.OT.eq, -1)
 
         direction = 1 if gripper_give == "r_gripper" else -1
+
+        hand_over_pos_align_take = list(hand_over_pos_1)
+        hand_over_pos_align_take[0] -= direction*0.1
+
         align_1.addObjective(
             C.feature(ry.FS.scalarProductXZ, ["world", gripper_give], [1e1], [direction]),
             ry.OT.sos, transient_step)
-        
 
-        # align_2 = ry.CtrlSet()
-        # align_2.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_give, block), True)
-        #
-        # # immediate objectives
-        # align_2.addObjective(
-        #     C.feature(ry.FS.position, [block], [1e1], hand_over_pos_1),
-        #     ry.OT.eq, -1)
-        # align_2.addObjective(
-        #     C.feature(ry.FS.scalarProductXZ, ["world", gripper_give], [1e1], [direction]),
-        #     ry.OT.eq, -1)
-        #
-        # align_2.addObjective(
-        #     C.feature(ry.FS.positionRel, [gripper_take, gripper_give], [1e1], [0, 0, -0.2]),
-        #     ry.OT.sos, speed)
-        # align_2.addObjective(
-        #     C.feature(ry.FS.scalarProductZZ, [gripper_give, gripper_take], [1e1], [-1]),
-        #     ry.OT.sos, speed)
-        # align_2.addObjective(
-        #     C.feature(ry.FS.scalarProductXX, [gripper_give, gripper_take], [1e1]),
-        #     ry.OT.sos, speed)
+        align_1.addObjective(
+            C.feature(ry.FS.scalarProductXZ, ["world", gripper_take], [1e1], [-direction]),
+            ry.OT.sos, transient_step)
+
+        align_1.addObjective(
+            C.feature(ry.FS.position, [gripper_take], [1e1], hand_over_pos_align_take),
+            ry.OT.sos, transient_step)
 
         cage = ry.CtrlSet()
         cage.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper_give, block), True)
@@ -870,23 +860,19 @@ class HandOver(BaseAction):
         cage.addObjective(
             C.feature(ry.FS.position, [block], [1e0], hand_over_pos_1),
             ry.OT.eq, -1)
-        # cage.addObjective(
-        #     C.feature(ry.FS.positionDiff, [gripper_give, block], [1e0]),
-        #     ry.OT.eq, -1)
+        cage.addObjective(
+            C.feature(ry.FS.positionDiff, [gripper_take, block], [1e3]),
+            ry.OT.sos, transient_step / 10)
 
         cage.addObjective(
             C.feature(ry.FS.scalarProductZZ, [gripper_give, gripper_take], [1e2], [-1]),
             ry.OT.sos, transient_step)
         cage.addObjective(
             C.feature(ry.FS.scalarProductXX, [gripper_give, gripper_take], [1e2]),
-            ry.OT.sos, transient_step)
+            ry.OT.sos, transient_step*2)
         # cage.addObjective(
         #     C.feature(ry.FS.scalarProductYY, [gripper_take, "world"], [1e1]),
         #     ry.OT.sos, speed)
-
-        cage.addObjective(
-            C.feature(ry.FS.positionDiff, [gripper_take, block], [1e3]),
-            ry.OT.sos, transient_step / 5)
 
         hand_over_1 = ry.CtrlSet()
         hand_over_2 = ry.CtrlSet()

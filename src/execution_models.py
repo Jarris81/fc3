@@ -224,6 +224,7 @@ class SimpleSystem:
         elif ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
             if ctrlCommand.getFrameNames()[0] in self.gripper2index:
                 gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
+                self.botop.hold(True, True)
                 self.botop.gripperClose(gripper_index, 1, 0.01, 0.1)
                 while not self.botop.gripperDone(gripper_index):
                     time.sleep(0.1)
@@ -231,6 +232,7 @@ class SimpleSystem:
         elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
             if ctrlCommand.getFrameNames()[0] in self.gripper2index:
                 gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
+                self.botop.hold(True, True)
                 self.botop.gripperOpen(gripper_index, 1, 0.1)
                 while not self.botop.gripperDone(gripper_index):
                     time.sleep(0.1)
