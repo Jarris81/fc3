@@ -7,7 +7,7 @@ from tracking import Tracker
 
 if __name__ == '__main__':
 
-    C, scene_objects = setup_env.setup_stick_pull_env()
+    C, scene_objects = setup_env.setup_hand_over_env()
 
     grab_stick = actions.GrabStick()
     pull_block = actions.PullBlockToGoal()
@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     # TowerPlanner.get_goal_controller(self.)
 
-    use_real_robot = True
+    use_real_robot = False
 
     C.view()
 
@@ -51,11 +51,14 @@ if __name__ == '__main__':
         gripper_take, gripper_give = gripper_give, gripper_take
 
     robust_plan = []
-    constants.goal_block_pos = constants.goal_stick_pull_block_pos
+
+
+
 
     # test block pull
-    robust_plan.extend(grab_stick.get_grounded_control_set(C, ["r_gripper", "stick"]))
-    robust_plan.extend(pull_block.get_grounded_control_set(C, ["r_gripper", "b1", "stick"]))
+    # constants.goal_block_pos = constants.goal_stick_pull_block_pos
+    # robust_plan.extend(grab_stick.get_grounded_control_set(C, ["r_gripper", "stick"]))
+    # robust_plan.extend(pull_block.get_grounded_control_set(C, ["r_gripper", "b1", "stick"]))
 
     # robust_plan.extend(grab_block.get_grounded_control_set(C, ["R_gripper", "b1"]))
     # robust_plan.extend(grab_bottle.get_grounded_control_set(C, ["R_gripper", "bottle"]))
@@ -63,9 +66,12 @@ if __name__ == '__main__':
     # robust_plan.extend(place_block_place.get_grounded_control_set(C, ["R_gripper", "b1", "b2"]))
 
     # Test handover
-    # robust_plan.extend(grab_block.get_grounded_control_set(C, [gripper_give, "b1"]))
-    # robust_plan.extend(handover.get_grounded_control_set(C, [gripper_give, gripper_take, "b1"]))
-    # robust_plan.extend(place_pos.get_grounded_control_set(C, [gripper_take, "b1"]))
+    constants.goal_block_pos = constants.goal_handover_block_pos
+    robust_plan.extend(grab_block.get_grounded_control_set(C, [gripper_give, "b1"]))
+    robust_plan.extend(handover.get_grounded_control_set(C, [gripper_give, gripper_take, "b1"]))
+    robust_plan.extend(place_pos.get_grounded_control_set(C, [gripper_take, "b1"]))
+
+
 
     for name, a in robust_plan:
         pass
@@ -88,7 +94,8 @@ if __name__ == '__main__':
     do_once = True
     q_old = C.getJointState()
 
-    tracker = Tracker(C, [x for y in scene_objects.values() for x in y], 1)
+    if use_real_robot:
+        tracker = Tracker(C, [x for y in scene_objects.values() for x in y], 1)
 
     for t in range(0, 10000):
 

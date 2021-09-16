@@ -3,6 +3,9 @@ import time
 import numpy as np
 import networkx as nx
 
+import util.constants as constants
+
+
 def is_equal_feature(f1, f2, C):
     """
     Checks if two features are equal.
@@ -112,7 +115,7 @@ def get_robust_chain(C, controllers, goal_controller, tolerance=1e-1, verbose=Fa
 
     for i, (edge, name, ctrlset) in enumerate(reversed(controllers)):
 
-        # verbose = True if edge == (8, 3) else False
+        # verbose = True if edge == (2, 0) else False
 
         if i == 0:
             action_next = goal_controller
@@ -129,7 +132,7 @@ def get_robust_chain(C, controllers, goal_controller, tolerance=1e-1, verbose=Fa
         komo.addSquaredQuaternionNorms([], 3.)
 
         for o in ctrlset.getObjectives():
-            #if o.get_OT() == ry.OT.sos:
+            # if o.get_OT() == ry.OT.sos:
             f = o.feat()
             komo.addObjective([1], f.getFS(), f.getFrameNames(C), o.get_OT(), f.getScale(), f.getTarget())
 
@@ -169,7 +172,7 @@ def get_robust_chain(C, controllers, goal_controller, tolerance=1e-1, verbose=Fa
                     frames = follow_feat.getFrameNames(C)
                     # TODO dirty fix, should use scene objects
                     only_objects = all([True
-                                        if "R_gripper" not in x and "L_gripper" not in x
+                                        if constants.r_gripper_name not in x and constants.l_gripper_name not in x
                                         else False for x in frames])
 
                     if only_objects:
@@ -190,7 +193,7 @@ def get_robust_chain(C, controllers, goal_controller, tolerance=1e-1, verbose=Fa
                     implicit_scs.append(sym_obj)
 
         if verbose:
-            print("-"*20)
+            print("-" * 20)
             print(f"Implicit Features for {name}:")
         # add implicit objectives to current controller as transient objectives
         for implicit_feature, obj_type in implicit_features_tuples:
@@ -214,7 +217,6 @@ def get_robust_chain(C, controllers, goal_controller, tolerance=1e-1, verbose=Fa
 
 
 def get_leaf_paths(G):
-
     leaves = []
     edge_paths = []
 
@@ -234,7 +236,6 @@ def get_leaf_paths(G):
 
 
 def get_robust_set_of_chains(C, tree, goal_controller, verbose=False):
-
     edges = nx.edges(tree)
 
     # ori_edge_plan = [(s.id, t.id) for s, t in zip(state_plan[1:], state_plan[:-1])]
@@ -261,11 +262,11 @@ def get_robust_set_of_chains(C, tree, goal_controller, verbose=False):
     set_of_chains = []
     # go over every leaf path, and build implicit conditions for each
     for path in get_leaf_paths(tree):
-        #path = get_leaf_paths(tree)[8]
+        # path = get_leaf_paths(tree)[8]
         original_controllers = []
         print(path)
         sub_goal = goal_controller
-        #go from bact to up
+        # go from bact to up
         for edge in path[::-1]:
             if len(implicit_ctrlsets[edge]) != 0:
                 # need to take the first controller,

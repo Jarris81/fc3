@@ -172,6 +172,7 @@ class HandOverPlanner:
         # TODO put this in some domain class
         goal_place = constants.goal_handover_block_pos
         constants.goal_block_pos = goal_place
+        print(constants.goal_block_pos)
 
         goals_block_at_goal = [x for x in self.goal if x[0] == pred.BlockAtGoal.__name__]
         block = "b1"

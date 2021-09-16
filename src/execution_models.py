@@ -166,42 +166,48 @@ class SimpleSystem:
         self.botop.moveLeap(q_target, 2)
         self.botop.step(self.C, self.leap_step)
 
-    def _move_up_safely(self, gripper):
+    def _move_away_safely(self, gripper, block):
 
-        gripper_up_pos = self.C.frame(gripper).getPosition()
-        gripper_up_pos[2] += 0.05  # move up 5 cm
+        safe_dist = 0.1
 
-        ctrl = ry.CtrlSolver(self.C, 0.1, 2)
         transient_step = 0.05
 
         move_up = ry.CtrlSet()
-        tau = 0.01
-        move_up.add_qControlObjective(2, 1e-3 * np.sqrt(tau),
-                                      self.C)  # TODO this will make some actions unfeasible (PlaceSide)
-        move_up.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
+        # move_up.add_qControlObjective(2, 1e-3 * np.sqrt(tau),
+        #                               self.C)  # TODO this will make some actions unfeasible (PlaceSide)
+        # move_up.add_qControlObjective(1, 1e-3 * np.sqrt(tau), self.C)
         move_up.addObjective(
-            self.C.feature(ry.FS.position, [gripper], [1e1], gripper_up_pos),
-            ry.OT.sos, transient_step / 5)
+            self.C.feature(ry.FS.positionRel, [block, gripper], [1e1], [0, 0, -safe_dist]),
+            ry.OT.sos, transient_step)
 
         move_up.addObjective(
-            self.C.feature(ry.FS.vectorZDiff, ["world", gripper], [1e1]),
-            ry.OT.sos, transient_step / 5)
+            self.C.feature(ry.FS.vectorZDiff, [gripper, block], [1e0]),
+            ry.OT.sos, transient_step)
 
-        ctrl.set(move_up)
+        at_place_controller = ry.CtrlSet()
 
-        while not np.allclose(self.C.frame(gripper).getPosition(), gripper_up_pos, atol=1e-2):
+        at_place_controller.addObjective(
+            self.C.feature(ry.FS.positionRel, [block, gripper], [1e0], [0, 0, -safe_dist]),
+            ry.OT.eq, -1)
+
+        ctrl = ry.CtrlSolver(self.C, 0.1, 2)
+        while not at_place_controller.canBeInitiated(ctrl, self.eqPrecision):
+            print(at_place_controller.canBeInitiated(ctrl, self.eqPrecision))
+
             q_real = self.C.getJointState()
             q_dot = self.q - self.q_old
-
+            ctrl.set(move_up)
             ctrl.update(q_real, q_dot, self.C)
             q_target = ctrl.solve(self.C)
 
             self.botop.moveLeap(q_target, 2)
             self.botop.step(self.C, self.leap_step)
 
+            ctrl = ry.CtrlSolver(self.C, 0.1, 2)
+
             self.q = q_real
             self.q_old = self.q_old
-
+        print("done moving safely away")
         return
 
     def _is_done(self):
@@ -230,7 +236,7 @@ class SimpleSystem:
                     time.sleep(0.1)
 
                 # Cheating, but for now always move up after placing something
-                self._move_up_safely(ctrlCommand.getFrameNames()[0])
+                self._move_away_safely(*ctrlCommand.getFrameNames())
 
 
 class RLGS(SimpleSystem):
@@ -318,7 +324,7 @@ class RLGS(SimpleSystem):
                 is_any_controller_feasible = True
                 self.current_active_controller_index = i
 
-                q_dot = []#self.q - self.q_old
+                q_dot = self.q - self.q_old
                 ctrl.update(q_real, q_dot, self.C)
                 q_target = ctrl.solve(self.C)
 
@@ -340,21 +346,21 @@ class RLGS(SimpleSystem):
 
         # check feasibility of chain
         if self.use_feasy and \
-                t - self.last_feasy_check > self.feasy_check_rate and \
-                len(self.active_robust_reverse_plan) and \
-                not is_any_controller_feasible:
+                t - self.last_feasy_check > self.feasy_check_rate:
             # check rest of controller chain for feasibility
+            self.log("Checking current residual chain")
             residual_plan = self.active_robust_reverse_plan[self.current_active_controller_index::-1]
             is_current_plan_feasible, _ = check_switch_chain_feasibility(self.C, residual_plan,
                                                                          self.goal_controller,
                                                                          self.scene_objects,
-                                                                         verbose=self.verbose)
-
+                                                                         verbose=False)
             # if current plan is not feasible, check other plans
             if not is_current_plan_feasible:
                 self.log("Current Plan is not feasible!")
                 self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ctrl)
-                self.last_feasy_check = t
+
+            self.last_feasy_check = t
+
 
     def get_feasible_reverse_plan(self, ctrl):
         # find a new feasible plan
