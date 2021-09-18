@@ -10,6 +10,7 @@ from util.visualize_search import draw_search_graph
 import libpybot as pybot
 
 from tracking import Tracker
+import threading
 
 
 class SimpleSystem:
@@ -121,7 +122,7 @@ class SimpleSystem:
             if self.tracker: self.tracker.update(self.botop.get_t())
             if not self.use_real_robot: run_interference.do_interference(self.C, self.botop.get_t())
 
-            self._step(self.botop.get_t())
+            self._step_control(self.botop.get_t())
 
         t_total = self.botop.get_t() - t_start
 
@@ -129,7 +130,7 @@ class SimpleSystem:
 
         return t_total
 
-    def _step(self, t):
+    def _step_control(self, t):
 
         q_real = self.C.getJointState()
         q_target = q_real
@@ -272,7 +273,7 @@ class RLGS(SimpleSystem):
         self.no_plan_feasible = False
 
         # stuff for execution
-        self.feasy_check_rate = 5  # every second steps check for feasibility
+        self.feasy_check_rate = 1  # every second steps check for feasibility
         self.last_feasy_check = 0
 
     def init_system(self, action_list, planner, scene_objects):
@@ -285,7 +286,7 @@ class RLGS(SimpleSystem):
         self.robust_set_of_chains = get_robust_set_of_chains(self.C, self.action_tree, self.goal_controller,
                                                              verbose=self.show_plots)
         # first plan we want to execute
-        self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ry.CtrlSolver(self.C, 0.1, 2))
+        self.active_robust_reverse_plan = self.get_feasible_reverse_plan()
 
         tau = 0.01
         for name, x in nx.get_edge_attributes(self.action_tree, "implicit_ctrlsets").items():
@@ -305,17 +306,66 @@ class RLGS(SimpleSystem):
     def is_no_plan_feasible(self):
         return self.no_plan_feasible
 
-    def _step(self, t):
+    def run(self, run_interference):
+
+        t_start = self.botop.get_t()
+        self._step_control(self.botop.get_t())
+
+        if self.use_feasy:
+            feasy_check_thread = threading.Thread(target=self._check_feasy, daemon=True)
+            feasy_check_thread.start()
+
+        while not self._is_done():
+            if self.tracker: self.tracker.update(self.botop.get_t())
+
+            if not self.use_real_robot: run_interference.do_interference(self.C, self.botop.get_t())
+
+            self._step_control(self.botop.get_t())
+
+        t_total = self.botop.get_t() - t_start
+
+        self.log(f"Task took {t_total}s.")
+
+        if self.use_feasy:
+            feasy_check_thread.join(1)
+
+        return t_total
+
+    def _check_feasy(self):
+
+        while not self._is_done():
+
+            t_start = time.time()
+
+            # check rest of controller chain for feasibility
+            is_current_plan_feasible = True
+
+            if len(self.active_robust_reverse_plan) != 0:
+                self.log("Checking current residual chain")
+                residual_plan = self.active_robust_reverse_plan[self.current_active_controller_index::-1]
+                is_current_plan_feasible, _ = check_switch_chain_feasibility(self.C, residual_plan,
+                                                                             self.goal_controller,
+                                                                             self.scene_objects,
+                                                                             verbose=False,
+                                                                             show_plots=False)
+            # # if current plan is not feasible, check other plans
+            # if not is_current_plan_feasible or len(self.active_robust_reverse_plan) == 0:
+            #     self.log("Current Plan is NOT feasible!")
+            #     self.active_robust_reverse_plan = self.get_feasible_reverse_plan()
+            # else:
+            #     self.log("Current Plan is feasible!")
+
+            t_diff = time.time() - t_start
+            # time.sleep(self.feasy_check_rate-t_diff)
+
+
+    def _step_control(self, t):
 
         q_real = self.C.getJointState()
         q_target = q_real
 
         # create a new solver every step (not ideal)
         ctrl = ry.CtrlSolver(self.C, 0.1, 2)
-        is_any_controller_feasible = False
-        is_current_plan_feasible = False
-
-        self.current_active_controller_index = 0
 
         # iterate over each controller, check which can be started first
         for i, (edge, name, c) in enumerate(self.active_robust_reverse_plan):
@@ -346,26 +396,12 @@ class RLGS(SimpleSystem):
         self.botop.moveLeap(q_target, 2)
         self.botop.step(self.C, self.leap_step)
 
-        # check feasibility of chain
-        if self.use_feasy and \
-                t - self.last_feasy_check > self.feasy_check_rate:
-            # check rest of controller chain for feasibility
-            self.log("Checking current residual chain")
-            residual_plan = self.active_robust_reverse_plan[self.current_active_controller_index::-1]
-            is_current_plan_feasible, _ = check_switch_chain_feasibility(self.C, residual_plan,
-                                                                         self.goal_controller,
-                                                                         self.scene_objects,
-                                                                         verbose=False)
-            # if current plan is not feasible, check other plans
-            if not is_current_plan_feasible:
-                self.log("Current Plan is not feasible!")
-                self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ctrl)
-
-            self.last_feasy_check = t
 
 
-    def get_feasible_reverse_plan(self, ctrl):
+
+    def get_feasible_reverse_plan(self):
         # find a new feasible plan
+        ctrl = ry.CtrlSolver(self.C, 0.1, 2)
         for plan in self.robust_set_of_chains:
             for i, (edge, name, c) in enumerate(plan[::-1]):
                 if c.canBeInitiated(ctrl, self.eqPrecision):
@@ -376,16 +412,16 @@ class RLGS(SimpleSystem):
                                                                              self.scene_objects,
                                                                              verbose=False)
                     if is_feasible:
-                        if self.verbose:
-                            print("new plan found!")
-                            print(residual_plan)
+                        self.log("Found new plan!")
                         return residual_plan[::-1]
                     else:
                         self.log(f"Plan {[x[1] for x in residual_plan]} is not feasible!")
                 elif self.verbose:
-                    print(f"{edge} cannot be initiated!")
+                    pass
+                    # self.log(f"{edge} cannot be initiated!")
 
         # if no plan is feasible, return false
+        self.log("No feasible plan was found!")
         return []
 
     def cheat_update_obj(self, object_infos):

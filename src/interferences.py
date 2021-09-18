@@ -1,5 +1,8 @@
 import util.constants as constants
 
+"""
+For Interferences to work, transient_step should be 0.1
+"""
 class InterferenceTemplate:
 
     def __init__(self, start, end, max_count, description):
@@ -29,7 +32,7 @@ class NoInterference(InterferenceTemplate):
 
 class ResetPosition(InterferenceTemplate):
 
-    def __init__(self, start, end, frame_name, pos, name, max_count=1, ):
+    def __init__(self, start, end, frame_name, pos, name, max_count=1):
         super().__init__(start, end, max_count, name)
         self.frame_name = frame_name
         self.pos = pos
@@ -44,7 +47,7 @@ class ResetPosition(InterferenceTemplate):
 def get_tower_interferences():
     # first is always no interference
     interference_list = [NoInterference()]
-    infeasible_pos_b1 = (0.6, 0.6, 0.68)
+    infeasible_pos_b1 = (1, 1, 0.68)
 
     ori_pos_b2 = 0.4, 0.3, constants.table_height + 0.03
 
@@ -52,11 +55,12 @@ def get_tower_interferences():
         # b2 is knocked of tower while gripper is moving to b1
         ResetPosition(11, 13, "b2", ori_pos_b2, "b2 falls of tower while robot moves to b1"),
         # b2 is knocked of tower while gripper is holding b1
-        # ResetPosition(150, 262, "b2", ori_pos_b2, "b2 falls of tower while robot holds b1"),
+        ResetPosition(17, 19, "b2", ori_pos_b2, "b2 falls of tower while robot holds b1"),
         # # b1 is moved out of reach
-        # ResetPosition(50, 52, "b1", infeasible_pos_b1, "b1 is moved out of reach of robot"),
-        # #
-        # ResetPosition(50, 52, "b1", infeasible_pos_b1, "b2 is moved while robot moves to it"),
+        ResetPosition(1, 3, "b1", infeasible_pos_b1, "b1 is moved out of reach of robot"),
+        # b2 is placed on b3 (helping hand)
+        ResetPosition(50, 52, "b1", infeasible_pos_b1, "b2 is moved while robot moves to it"),
+        #
     ))
 
     return interference_list

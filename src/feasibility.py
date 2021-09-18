@@ -56,6 +56,16 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
                                   f.getScale(),
                                   o.getOriginalTarget())
 
+        for o in controller.getStartConditions():
+            f = o.feat()
+            # we dont care about control objectives
+            desc = f.description(C_temp)
+            if "F_qZeroVel" not in desc and "qItself" not in desc:
+                komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_temp),
+                                  o.get_OT(),
+                                  f.getScale(),
+                                  o.getOriginalTarget())
+
         # go over symbolic commands
         for ctrlCommand in controller.getSymbolicCommands():
             gripper, block = ctrlCommand.getFrameNames()
@@ -171,17 +181,18 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
     # Visualize some results
     if show_plots:
         # create a figure with two plot
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
-        df_transient.plot(ax=ax1, title="Transient Features")
-        df_immediate.plot(ax=ax2, title="Immediate Features")
-        ax1.plot((0, len(controls)), (0.1, 0.1), color="r")
-        plt.show()
+        # fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
+        # df_transient.plot(ax=ax1, title="Transient Features")
+        # df_immediate.plot(ax=ax2, title="Immediate Features")
+        # ax1.plot((0, len(controls)), (0.1, 0.1), color="r")
+        # plt.show()
 
         # visualize the switches
-        # komo.view(False, "Feasibility Check")
+        komo.view(False, "Feasibility Check")
+        time.sleep(1)
         # time.sleep(3)
-        komo.view_play(.1, True)
-        time.sleep(3)
+        # komo.view_play(.1, True)
+        # time.sleep(3)
         komo.view_close()
 
     return plan_is_feasible, komo
