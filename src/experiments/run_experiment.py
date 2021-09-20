@@ -78,6 +78,7 @@ def run_experiment(model_name, scenario, interference_num, use_real_robot, track
         exec_time = exec_model.run(interference)
 
     goal_full = exec_model.is_goal_fulfilled()
+    infeasy_detected = exec_model.is_no_plan_feasible()
     if goal_full:
         print("Plan finished!")
     else:
@@ -98,6 +99,7 @@ def run_experiment(model_name, scenario, interference_num, use_real_robot, track
             'interference_desc': interference.description,
             'date': time.strftime("%Y%m%d%H%M"),
             'real_robot': str(use_real_robot),
+            'infeasibility_detected':  str(infeasy_detected)
 
         }
         log_experiment_row(experiment_results)
@@ -111,7 +113,7 @@ def log_experiment_row(data):
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-    path = f"../../data/experiments.csv"
+    path = f"../../data/experiments_run_1.csv"
     assure_path_exists(path)
     is_new_file = os.path.exists(path)
     df.to_csv(path, mode='a', header=not is_new_file, index=False)

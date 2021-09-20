@@ -50,13 +50,16 @@ class SimpleSystem:
         self.botop = None
 
         # leap step when using the leap controller
-        self.leap_step = 0.1
+        self.leap_step = 0.05
 
         # tracking system (OptiTrack)
         self.tracker = None
 
         # gripper to robot index
         self.gripper2index = {"l_gripper": 0, "r_gripper": 1}
+
+        # grasp lost
+        self._grasp_lost = False
 
     def log_default(self, msg):
         if self.verbose:
@@ -75,8 +78,6 @@ class SimpleSystem:
 
         self.q = self.C.getJointState()
         self.q_old = self.q
-
-
 
         self.action_tree = planner.get_tree(action_list, self.scene_objects, forward=self._use_single_path)
 
@@ -114,12 +115,14 @@ class SimpleSystem:
         while not self.botop.gripperDone(1):
             time.sleep(0.01)
 
-    def run(self, run_interference):
+    def run(self, run_interference, max_time = 100):
 
         t_start = self.botop.get_t()
-        while not self._is_done():
-            if self.tracker: self.tracker.update(self.botop.get_t())
-            if not self.use_real_robot: run_interference.do_interference(self.C, self.botop.get_t())
+        while not self._is_done() and self.botop.get_t() - t_start < max_time:
+            if self.tracker:
+                self.tracker.update(self.botop.get_t())
+            if not self.use_real_robot:
+                run_interference.do_interference(self.C, self.botop.get_t())
 
             self._step(self.botop.get_t())
 
@@ -133,6 +136,8 @@ class SimpleSystem:
 
         q_real = self.C.getJointState()
         q_target = q_real
+
+        self._check_if_still_grasping()
 
         # create a new solver every step (not ideal)
         ctrl = ry.CtrlSolver(self.C, 0.1, 2)
@@ -192,8 +197,6 @@ class SimpleSystem:
 
         ctrl = ry.CtrlSolver(self.C, 0.1, 2)
         while not at_place_controller.canBeInitiated(ctrl, self.eqPrecision):
-            print(at_place_controller.canBeInitiated(ctrl, self.eqPrecision))
-
             q_real = self.C.getJointState()
             q_dot = self.q - self.q_old
             ctrl.set(move_up)
@@ -212,33 +215,67 @@ class SimpleSystem:
 
     def _is_done(self):
 
-        return self.is_goal_fulfilled()
+        return self.is_goal_fulfilled() or self.is_no_plan_feasible()
+
+    def is_no_plan_feasible(self):
+        return False
+
+    def _check_if_still_grasping(self):
+        if self._grasp_lost:
+            self.C.attach("world", self._grasp_lost[1])
+            gripper_index = self.gripper2index[self._grasp_lost[0]]
+            self.botop.gripperOpen(gripper_index, 1, 1)
+
+            while not self.botop.gripperDone(gripper_index):
+                time.sleep(0.1)
+
+            # Cheating, but for now always move up after placing something
+            self._move_away_safely(*self._grasp_lost)
+
+            self._grasp_lost = False
 
     def _handle_symbolic_commands(self, ctrlCommand):
         """
         Define what should happen if a symbolic command is executed
         """
-        if ctrlCommand.isCondition():
-            return  # only do stuff if it is not a condition
 
-        elif ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
+        if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER and not ctrlCommand.isCondition():
             if ctrlCommand.getFrameNames()[0] in self.gripper2index:
                 gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
-                self.botop.hold(True, True)
-                self.botop.gripperClose(gripper_index, 1, 0.01, 0.1)
+                self.botop.gripperClose(gripper_index, 0.01, 0.03, 0.1)
                 while not self.botop.gripperDone(gripper_index):
                     time.sleep(0.1)
 
-        elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER:
+                lost_grasp = self.botop.gripperGraspLost(gripper_index)
+                if lost_grasp:
+                    print(f"Lost grasp: {lost_grasp}")
+                    self._grasp_lost = ctrlCommand.getFrameNames()
+
+        elif ctrlCommand.getCommand() == ry.SC.OPEN_GRIPPER and not ctrlCommand.isCondition():
+            print("I wanna open")
             if ctrlCommand.getFrameNames()[0] in self.gripper2index:
                 gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
-                self.botop.hold(True, True)
                 self.botop.gripperOpen(gripper_index, 1, 0.1)
+
                 while not self.botop.gripperDone(gripper_index):
                     time.sleep(0.1)
 
                 # Cheating, but for now always move up after placing something
                 self._move_away_safely(*ctrlCommand.getFrameNames())
+
+        elif ctrlCommand.isCondition():
+            # return
+            # check if still grasping:
+            if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
+                if ctrlCommand.getFrameNames()[0] in self.gripper2index:
+                    gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
+                    self.botop.gripperClose(gripper_index, 0.01, 0.03, 0.1)
+                    lost_grasp = self.botop.gripperGraspLost(gripper_index)
+                    if lost_grasp:
+                        print(f"Lost grasp: {lost_grasp}")
+                        self._grasp_lost = ctrlCommand.getFrameNames()
+
+                        # self.C.attach("world", ctrlCommand.getFrameNames()[1])
 
 
 class RLGS(SimpleSystem):
@@ -310,10 +347,12 @@ class RLGS(SimpleSystem):
         q_real = self.C.getJointState()
         q_target = q_real
 
+        self._check_if_still_grasping()
+
         # create a new solver every step (not ideal)
         ctrl = ry.CtrlSolver(self.C, 0.1, 2)
         is_any_controller_feasible = False
-        is_current_plan_feasible = False
+        is_current_plan_feasible = True
 
         self.current_active_controller_index = 0
 
@@ -356,13 +395,14 @@ class RLGS(SimpleSystem):
                                                                          self.goal_controller,
                                                                          self.scene_objects,
                                                                          verbose=False)
-            # if current plan is not feasible, check other plans
-            if not is_current_plan_feasible:
-                self.log("Current Plan is not feasible!")
-                self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ctrl)
-
             self.last_feasy_check = t
 
+        # if current plan is not feasible, check other plans
+        if not is_current_plan_feasible:
+            self.log("Current Plan is not feasible!")
+            self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ctrl)
+
+            self.last_feasy_check = t
 
     def get_feasible_reverse_plan(self, ctrl):
         # find a new feasible plan

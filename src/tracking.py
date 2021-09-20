@@ -24,6 +24,7 @@ class Tracker:
         self.frame_names = set(frame_names)
         self.rate = rate
 
+        print("Connecting to Optitrack...")
         self.mc = motioncapture.MotionCaptureOptitrack("130.149.82.29")
 
         self.info = {frame: {"avg_pos": np.zeros(3), "count": 0} for frame in self.frame_names}

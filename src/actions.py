@@ -3,7 +3,7 @@ from pyddl import Action, neg
 import predicates as pred
 from util import constants
 
-transient_step = 0.1 # should be 0.1 default, so that interference work
+transient_step = 0.1  # should be 0.1 default, so that interference work
 world_frame = "world"
 
 
