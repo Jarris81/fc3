@@ -61,6 +61,9 @@ class SimpleSystem:
         # grasp lost
         self._grasp_lost = False
 
+        # used for experiments
+        self.time_is_up = False
+
     def log_default(self, msg):
         if self.verbose:
             print(msg)
@@ -115,16 +118,22 @@ class SimpleSystem:
         while not self.botop.gripperDone(1):
             time.sleep(0.01)
 
-    def run(self, run_interference, max_time = 100):
+    def run(self, run_interference, max_time=30):
 
         t_start = self.botop.get_t()
-        while not self._is_done() and self.botop.get_t() - t_start < max_time:
+
+        while not self._is_done() and not self.time_is_up:
+
             if self.tracker:
                 self.tracker.update(self.botop.get_t())
             if not self.use_real_robot:
                 run_interference.do_interference(self.C, self.botop.get_t())
 
             self._step(self.botop.get_t())
+
+
+            if self.botop.get_t() - t_start > max_time:
+                self.time_is_up = True
 
         t_total = self.botop.get_t() - t_start
 
@@ -269,7 +278,7 @@ class SimpleSystem:
             if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
                 if ctrlCommand.getFrameNames()[0] in self.gripper2index:
                     gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
-                    self.botop.gripperClose(gripper_index, 0.001, 0.03, 0.1)
+                    self.botop.gripperClose(gripper_index, 0.01, 0.03, 0.1)
                     lost_grasp = self.botop.gripperGraspLost(gripper_index)
                     if lost_grasp:
                         print(f"Lost grasp: {lost_grasp}")

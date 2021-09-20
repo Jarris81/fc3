@@ -23,7 +23,7 @@ exec_time,setup_time,goal_reached,scenario,model_name,interference_num,interfere
 14.8529999999978,1.3178505897522,False,tower,rlgs,4,b1 is moved out of reach,202109201343,True,True,MVI_0075.MP4
 13.445999999997,1.22963690757751,False,tower,rlgs,4,b1 is moved out of reach,202109201355,True,True,MVI_0076.MP4
 14.0829999999969,1.21810555458069,False,tower,rlgs,4,b1 is moved out of reach,202109201357,True,True,MVI_0077.MP4
-11.739999999997895,1.0036048889160156,False,tower,rlgs,4,b1 is moved out of reach,202109201747,True,True 1. neue datei auf sd karte
+11.739999999997895,1.0036048889160156,False,tower,rlgs,4,b1 is moved out of reach,202109201747,True,True, MVI_0099.MP4
 52.9349999999626,1.18028521537781,True,tower,rlgs,5,b2 falls of tower while robot holds b1,202109201441,True,False,MVI_0078.MP4
 52.8829999999628,1.22990608215332,True,tower,rlgs,5,b2 falls of tower while robot holds b1,202109201444,True,False,MVI_0080.MP4
 67.3229999999672,1.22525382041931,True,tower,rlgs,5,b2 falls of tower while robot holds b1,202109201446,True,False,MVI_0083.MP4

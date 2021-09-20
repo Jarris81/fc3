@@ -79,6 +79,7 @@ def run_experiment(model_name, scenario, interference_num, use_real_robot, track
 
     goal_full = exec_model.is_goal_fulfilled()
     infeasy_detected = exec_model.is_no_plan_feasible()
+    time_is_up = exec_model.time_is_up
     if goal_full:
         print("Plan finished!")
     else:
@@ -99,7 +100,8 @@ def run_experiment(model_name, scenario, interference_num, use_real_robot, track
             'interference_desc': interference.description,
             'date': time.strftime("%Y%m%d%H%M"),
             'real_robot': str(use_real_robot),
-            'infeasibility_detected':  str(infeasy_detected)
+            'infeasibility_detected':  str(infeasy_detected),
+            'time limit reached': time_is_up
 
         }
         log_experiment_row(experiment_results)
