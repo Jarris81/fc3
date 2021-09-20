@@ -49,18 +49,18 @@ def get_tower_interferences():
     ori_pos_b2 = 0.4, 0.3, constants.table_height + 0.03
 
     interference_list.extend((
-        # b2 is moved while robot is moving to it
+        # 1: b2 is moved while robot is moving to it
         ResetPosition(50, 52, "b1", infeasible_pos_b1, "b2 is moved while robot moves to it"),
-        # b2 is moved while robot is grabing it
+        # 2: b2 is moved while robot is grabing it
         ResetPosition(50, 52, "b1", infeasible_pos_b1, "b2 is moved while robot grabs it"),
-        # b2 is knocked of tower while gripper is moving to b1
+        # 3: b2 is knocked of tower while gripper is moving to b1
         ResetPosition(11, 13, "b2", ori_pos_b2, "b2 falls of tower while robot moves to b1"),
-        # b2 is knocked of tower while gripper is holding b1
+        # 4: b1 is moved out of reach
+        ResetPosition(50, 52, "b1", infeasible_pos_b1, "b1 is moved out of reach"),
+        # 5: b2 is knocked of tower while gripper is holding b1
         ResetPosition(150, 262, "b2", ori_pos_b2, "b2 falls of tower while robot holds b1"),
-        # b1 is moved out of reach
-        ResetPosition(50, 52, "b1", infeasible_pos_b1, "b2 is moved while robot moves to it"),
-        #  Robot is disturbed
-        ResetPosition(50, 52, "b1", infeasible_pos_b1, "b2 is moved while robot moves to it"),
+        # 6: b2 is placed on b3 (Helping Hand)
+        ResetPosition(50, 52, "b1", infeasible_pos_b1, "b2 is placed on b3 (helping Hand)"),
     ))
 
     return interference_list

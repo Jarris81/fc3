@@ -413,7 +413,7 @@ class PlaceSide(BaseAction):
 
         # necessary, so that the block is only released when on ground, and not mid-air
         open_gripper.addObjective(
-            C.feature(ry.FS.position, [block], [1e0], free_place),
+            C.feature(ry.FS.position, [block], [5e0], free_place),
             ry.OT.eq, -1)
         # open_gripper.addObjective(
         #     C.feature(ry.FS.scalarProductZZ, [block, "world"], [1e1], [1]),

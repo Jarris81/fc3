@@ -269,7 +269,7 @@ class SimpleSystem:
             if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
                 if ctrlCommand.getFrameNames()[0] in self.gripper2index:
                     gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
-                    self.botop.gripperClose(gripper_index, 0.01, 0.03, 0.1)
+                    self.botop.gripperClose(gripper_index, 0.001, 0.03, 0.1)
                     lost_grasp = self.botop.gripperGraspLost(gripper_index)
                     if lost_grasp:
                         print(f"Lost grasp: {lost_grasp}")
@@ -309,7 +309,7 @@ class RLGS(SimpleSystem):
         self.no_plan_feasible = False
 
         # stuff for execution
-        self.feasy_check_rate = 5  # every second steps check for feasibility
+        self.feasy_check_rate = 3  # every second steps check for feasibility
         self.last_feasy_check = 0
 
     def init_system(self, action_list, planner, scene_objects):
@@ -403,6 +403,8 @@ class RLGS(SimpleSystem):
             self.active_robust_reverse_plan = self.get_feasible_reverse_plan(ctrl)
 
             self.last_feasy_check = t
+        if self.active_robust_reverse_plan is None:
+            self.no_plan_feasible = True
 
     def get_feasible_reverse_plan(self, ctrl):
         # find a new feasible plan
@@ -426,7 +428,8 @@ class RLGS(SimpleSystem):
                     print(f"{edge} cannot be initiated!")
 
         # if no plan is feasible, return false
-        return []
+        self.log("No plan is feasible!")
+        return None
 
     def cheat_update_obj(self, object_infos):
         for obj_name, obj_info in object_infos.items():
