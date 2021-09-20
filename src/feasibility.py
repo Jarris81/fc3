@@ -56,6 +56,17 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
                                   f.getScale(),
                                   o.getOriginalTarget())
 
+        # get the sos objectives of current controller
+        for o in controller.getStartConditions():
+            f = o.feat()
+            # we dont care about control objectives
+            desc = f.description(C_temp)
+            if "F_qZeroVel" not in desc and "qItself" not in desc:
+                komo.addObjective([i + 1], f.getFS(), f.getFrameNames(C_temp),
+                                  o.get_OT(),
+                                  f.getScale(),
+                                  o.getOriginalTarget())
+
         # go over symbolic commands
         for ctrlCommand in controller.getSymbolicCommands():
             gripper, block = ctrlCommand.getFrameNames()
