@@ -106,6 +106,10 @@ def run_experiment(model_name, scenario, interference_num, use_real_robot, track
         }
         log_experiment_row(experiment_results)
 
+    exec_model.shutdown()
+
+    time.sleep(4)
+
 
 def log_experiment_row(data):
     df = pd.DataFrame(data, index=[0])

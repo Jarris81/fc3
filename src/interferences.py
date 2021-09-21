@@ -73,16 +73,16 @@ def get_stick_interferences():
 
     ori_pos_b2 = 0.4, 0.3
 
-    # interference_list.extend((
-    #     # b2 is knocked of tower while gripper is moving to b1
-    #     ResetPosition(190, 192, "b2", ori_pos_b2, "b2 falls of tower while robot moves to b1"),
-    #     # b2 is knocked of tower while gripper is holding b1
-    #     ResetPosition(150, 262, "b2", ori_pos_b2, "b2 falls of tower while robot holds b1"),
-    #     # b1 is moved out of reach
-    #     ResetPosition(50, 52, "b1", infeasible_pos_b1, "b1 is moved out of reach of robot"),
-    #     #
-    #     ResetPosition(50, 52, "b1", infeasible_pos_b1, "b2 is moved while robot moves to it"),
-    # ))
+    interference_list.extend((
+        # 1
+        ResetPosition(190, 192, "b1", ori_pos_b2, "b1 is moved while robot moves to it"),
+        # 2
+        ResetPosition(150, 262, "b2", ori_pos_b2, "b1 is moved out of reach"),
+        # 3
+        ResetPosition(50, 52, "b1", infeasible_pos_b1, "b1 is moved out of reach for robot, but reachable with the stick"),
+        # 4
+        ResetPosition(50, 52, "b1", infeasible_pos_b1, "b1 and stick are unreachable"),
+    ))
 
     return interference_list
 

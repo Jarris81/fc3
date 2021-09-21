@@ -118,7 +118,7 @@ class SimpleSystem:
         while not self.botop.gripperDone(1):
             time.sleep(0.01)
 
-    def run(self, run_interference, max_time=30):
+    def run(self, run_interference, max_time=40):
 
         t_start = self.botop.get_t()
 
@@ -239,7 +239,7 @@ class SimpleSystem:
                 time.sleep(0.1)
 
             # Cheating, but for now always move up after placing something
-            self._move_away_safely(*self._grasp_lost)
+            #self._move_away_safely(*self._grasp_lost)
 
             self._grasp_lost = False
 
@@ -284,8 +284,9 @@ class SimpleSystem:
                         print(f"Lost grasp: {lost_grasp}")
                         self._grasp_lost = ctrlCommand.getFrameNames()
 
-                        # self.C.attach("world", ctrlCommand.getFrameNames()[1])
+    def shutdown(self):
 
+        del self.botop
 
 class RLGS(SimpleSystem):
     """
@@ -461,6 +462,8 @@ class RLGS(SimpleSystem):
     def _is_done(self):
 
         return self.is_goal_fulfilled() or self.is_no_plan_feasible()
+
+
 
 
 class RLDSClone(RLGS):

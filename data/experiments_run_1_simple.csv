@@ -1,0 +1,36 @@
+exec_time,setup_time,goal_reached,scenario,model_name,interference_num,interference_desc,date,real_robot,infeasibility_detected,time limit reached, video file name
+31.389000000012842,0.0015146732330322266,True,tower,simple,0,None,202109211117,True,False,False, MVI_0159.MP4
+26.387000000011916,0.002843141555786133,True,tower,simple,0,None,202109211118,True,False,False, MVI_0160.MP4
+35.55000000000319,0.0014374256134033203,True,tower,simple,0,None,202109211120,True,False,False, MVI_0161.MP4
+41.97699999998818,0.0015015602111816406,True,tower,simple,0,None,202109211121,True,False,False, MVI_0162.MP4
+28.85600000001494,0.0026781558990478516,True,tower,simple,0,None,202109211126,True,False,False, MVI_0166.MP4
+29.378000000015597,0.001312255859375,True,tower,simple,1,b2 is moved while robot moves to it,202109211130,True,False,False, MVI_0167.MP4
+30.04799999996943,0.0015006065368652344,False,tower,simple,1,b2 is moved while robot moves to it,202109211131,True,False,True, MVI_0168.MP4
+30.546000000014757,0.0014696121215820312,True,tower,simple,1,b2 is moved while robot moves to it,202109211132,True,False,True, MVI_0169.MP4
+30.002000000016057,0.001474618911743164,False,tower,simple,1,b2 is moved while robot moves to it,202109211133,True,False,True, MVI_0170.MP4
+30.047000000015945,0.001516580581665039,False,tower,simple,1,b2 is moved while robot moves to it,202109211135,True,False,True, MVI_0171.MP4
+30.095000000015887,0.002026796340942383,False,tower,simple,2,b2 is moved while robot grabs it,202109211335,True,False,True, MVI_0178.MP4
+20.053000000004168,0.0014195442199707031,False,tower,simple,2,b2 is moved while robot grabs it,202109211336,True,False,True, MVI_0179.MP4
+20.020000000004142,0.0014662742614746094,False,tower,simple,2,b2 is moved while robot grabs it,202109211337,True,False,True, MVI_0180.MP4
+20.066000000004156,0.0013854503631591797,False,tower,simple,2,b2 is moved while robot grabs it,202109211338,True,False,True, MVI_0181.MP4
+20.069000000004174,0.0012786388397216797,False,tower,simple,2,b2 is moved while robot grabs it,202109211339,True,False,True, MVI_0182.MP4
+30.050000000015963,0.0030350685119628906,False,tower,simple,4, b1 is moved out of reach,202109211343,True,False,True, MVI_0184.MP4
+30.055000000016033,0.0017049312591552734,False,tower,simple,4, b1 is moved out of reach,202109211344,True,False,True, MVI_0185.MP4
+30.086000000015854,0.0015249252319335938,False,tower,simple,4, b1 is moved out of reach,202109211346,True,False,True, MVI_0186.MP4
+30.036000000016113,0.0017287731170654297,False,tower,simple,4, b1 is moved out of reach,202109211348,True,False,True, MVI_0188.MP4
+30.047000000015935,0.0013256072998046875,False,tower,simple,4, b1 is moved out of reach,202109211351,True,False,True, MVI_0190.MP4
+29.99400000001614,0.001535654067993164,False,tower,simple,3,b2 falls of tower while robot moves to b1,202109211353,True,False,True, MVI_0191.MP4
+40.01699999999274,0.00246429443359375,False,tower,simple,3,b2 falls of tower while robot moves to b1,202109211355,True,False,True, MVI_0194.MP4
+40.01599999999277,0.0012607574462890625,False,tower,simple,3,b2 falls of tower while robot moves to b1,202109211357,True,False,True, MVI_0195.MP4
+40.010999999992805,0.0019562244415283203,False,tower,simple,3,b2 falls of tower while robot moves to b1,202109211358,True,False,True, MVI_0196.MP4
+40.08799999999252,0.0014607906341552734,False,tower,simple,3,b2 falls of tower while robot moves to b1,202109211400,True,False,True, MVI_0197.MP4
+40.04899999999279,0.0016369819641113281,False,tower,simple,5,b2 falls of tower while robot holds b1,202109211407,True,False,True, MVI_0198.MP4
+39.99299999999276,0.0014460086822509766,False,tower,simple,5,b2 falls of tower while robot holds b1,202109211408,True,False,True, MVI_0199.MP4
+40.05999999999267,0.0016417503356933594,False,tower,simple,5,b2 falls of tower while robot holds b1,202109211411,True,False,True, MVI_0201.MP4
+40.04099999999271,0.0016925334930419922,False,tower,simple,5,b2 falls of tower while robot holds b1,202109211412,True,False,True, MVI_0202.MP4
+40.047999999992605,0.0016274452209472656,False,tower,simple,5,b2 falls of tower while robot holds b1,202109211414,True,False,True, MVI_0203.MP4
+24.586000000009726,0.0013740062713623047,True,tower,simple,6,b2 is placed on b3 (helping Hand),202109211415,True,False,False, MVI_0204.MP4
+40.08799999999263,0.0013799667358398438,False,tower,simple,6,b2 is placed on b3 (helping Hand),202109211416,True,False,True, MVI_0205.MP4
+40.06099999999263,0.0028924942016601562,False,tower,simple,6,b2 is placed on b3 (helping Hand),202109211418,True,False,True, MVI_0206.MP4
+30.815000000014066,0.0012924671173095703,True,tower,simple,6,b2 is placed on b3 (helping Hand),202109211419,True,False,False, MVI_0207.MP4
+40.078999999992604,0.0013539791107177734,False,tower,simple,6,b2 is placed on b3 (helping Hand),202109211420,True,False,True, MVI_0208.MP4
