@@ -75,7 +75,7 @@ def get_stick_interferences():
 
     interference_list.extend((
         # 1
-        ResetPosition(190, 192, "b1", ori_pos_b2, "b1 is moved while robot moves to it"),
+        ResetPosition(190, 192, "b1", ori_pos_b2, "b1 is moved while robot moves to it or is grabbing"),
         # 2
         ResetPosition(150, 262, "b2", ori_pos_b2, "b1 is moved out of reach"),
         # 3

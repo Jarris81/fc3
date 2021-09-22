@@ -110,7 +110,7 @@ class SimpleSystem:
 
     def is_goal_fulfilled(self):
         ctrl = ry.CtrlSolver(self.C, 0.1, 2)
-        return self.goal_controller.canBeInitiated(ctrl, self.eqPrecision)
+        return self.goal_controller.canBeInitiated(ctrl, self.eqPrecision*10)
 
     def setup(self):
         self.botop = pybot.BotOp(self.C, self.use_real_robot, "both", "ROBOTIQ")
@@ -118,7 +118,7 @@ class SimpleSystem:
         while not self.botop.gripperDone(1):
             time.sleep(0.01)
 
-    def run(self, run_interference, max_time=40):
+    def run(self, run_interference, max_time=60):
 
         t_start = self.botop.get_t()
 
@@ -278,7 +278,7 @@ class SimpleSystem:
             if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER:
                 if ctrlCommand.getFrameNames()[0] in self.gripper2index:
                     gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
-                    self.botop.gripperClose(gripper_index, 0.01, 0.03, 0.1)
+                    self.botop.gripperClose(gripper_index, 1, 0.02, 0.5)
                     lost_grasp = self.botop.gripperGraspLost(gripper_index)
                     if lost_grasp:
                         print(f"Lost grasp: {lost_grasp}")
@@ -319,7 +319,7 @@ class RLGS(SimpleSystem):
         self.no_plan_feasible = False
 
         # stuff for execution
-        self.feasy_check_rate = 3  # every second steps check for feasibility
+        self.feasy_check_rate = 2  # every second steps check for feasibility
         self.last_feasy_check = 0
 
     def init_system(self, action_list, planner, scene_objects):

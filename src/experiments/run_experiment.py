@@ -104,11 +104,10 @@ def run_experiment(model_name, scenario, interference_num, use_real_robot, track
             'time limit reached': time_is_up
 
         }
-        log_experiment_row(experiment_results)
 
-    exec_model.shutdown()
-
-    time.sleep(4)
+        if input("Press one to save") == "1":
+            print("saving data")
+            log_experiment_row(experiment_results)
 
 
 def log_experiment_row(data):

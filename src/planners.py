@@ -253,14 +253,13 @@ class StickPullPlanner:
     def get_goal_controller(self, C):
         goal_feature = ry.CtrlSet()
         # TODO put this in some domain class
-        goal_place = C.getFrame("b1").getPosition()
-        goal_place[1] -= 0.2
+        goal_place = constants.goal_stick_pull_block_pos
         constants.goal_block_pos = goal_place
         goals_block_at_goal = [x for x in self.goal if x[0] == pred.BlockAtGoal.__name__]
         block = "b1"
         stick = "stick"
         goal_feature.addObjective(
-            C.feature(ry.FS.position, [block], [1e0, 1e0, 1e0], goal_place),
+            C.feature(ry.FS.position, [block], [1e0, 1e0, 0], goal_place),
             ry.OT.eq, -1)
         goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("r_gripper", stick), True)
         goal_feature.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (stick, block), True)
