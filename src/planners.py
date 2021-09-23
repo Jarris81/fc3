@@ -177,7 +177,7 @@ class HandOverPlanner:
         goals_block_at_goal = [x for x in self.goal if x[0] == pred.BlockAtGoal.__name__]
         block = "b1"
         goal_controller.addObjective(
-            C.feature(ry.FS.position, [block], [1e0], goal_place),
+            C.feature(ry.FS.position, [block], [1e0, 1e0, 0], goal_place),
             ry.OT.eq, -1)
         goal_controller.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("r_gripper", block), True)
         goal_controller.addSymbolicCommand(ry.SC.OPEN_GRIPPER, ("l_gripper", block), True)

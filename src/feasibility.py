@@ -139,7 +139,7 @@ def check_switch_chain_feasibility(C, controls, goal, scene_objects, tolerance=0
 
     df_transient = df_transient[[col for col in df_transient.columns if
                                  "F_qZeroVel" not in col and
-                                 "F_Pose" not in col and
+                                 # "F_Pose" not in col and
                                  "F_qItself" not in col]]
     df_transient.name = "Transient features:"
 
