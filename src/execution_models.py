@@ -112,7 +112,8 @@ class SimpleSystem:
     def setup(self):
         self.botop = pybot.BotOp(self.C, self.use_real_robot, "both", "ROBOTIQ")
         self.botop.gripperOpen(self.gripper2index["r_gripper"], 1, 1)
-        while not self.botop.gripperDone(1):
+        self.botop.gripperOpen(self.gripper2index["l_gripper"], 1, 1)
+        while not self.botop.gripperDone(1) and not self.botop.gripperDone(1):
             time.sleep(0.01)
 
     def run(self, run_interference, max_time = 100):
