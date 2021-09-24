@@ -50,7 +50,7 @@ class SimpleSystem:
         self.botop = None
 
         # leap step when using the leap controller
-        self.leap_step = 0.05
+        self.leap_step = 0.1
 
         # tracking system (OptiTrack)
         self.tracker = None
@@ -116,10 +116,10 @@ class SimpleSystem:
         self.botop = pybot.BotOp(self.C, self.use_real_robot, "both", "ROBOTIQ")
         self.botop.gripperOpen(self.gripper2index["r_gripper"], 1, 1)
         self.botop.gripperOpen(self.gripper2index["l_gripper"], 1, 1)
-        while not self.botop.gripperDone(1) and not not self.botop.gripperDone(0):
+        while not self.botop.gripperDone(1) and not self.botop.gripperDone(0):
             time.sleep(0.01)
 
-    def run(self, run_interference, max_time=60):
+    def run(self, run_interference, max_time=120):
 
         t_start = self.botop.get_t()
 
@@ -251,7 +251,7 @@ class SimpleSystem:
         if ctrlCommand.getCommand() == ry.SC.CLOSE_GRIPPER and not ctrlCommand.isCondition():
             if ctrlCommand.getFrameNames()[0] in self.gripper2index:
                 gripper_index = self.gripper2index[ctrlCommand.getFrameNames()[0]]
-                self.botop.gripperClose(gripper_index, 0.01, 0.03, 0.1)
+                self.botop.gripperClose(gripper_index, 0.005, 0.03, 0.1)
                 while not self.botop.gripperDone(gripper_index):
                     time.sleep(0.1)
 
@@ -288,6 +288,7 @@ class SimpleSystem:
 
         del self.botop
 
+
 class RLGS(SimpleSystem):
     """
     Model Execution Class for this Thesis
@@ -319,7 +320,7 @@ class RLGS(SimpleSystem):
         self.no_plan_feasible = False
 
         # stuff for execution
-        self.feasy_check_rate = 5  # every second steps check for feasibility
+        self.feasy_check_rate = 10  # every second steps check for feasibility
         self.last_feasy_check = 0
 
     def init_system(self, action_list, planner, scene_objects):
@@ -417,11 +418,14 @@ class RLGS(SimpleSystem):
             self.no_plan_feasible = True
 
     def get_feasible_reverse_plan(self, ctrl):
+
+        already_checked_controllers = set()
         # find a new feasible plan
         for plan in self.robust_set_of_chains:
             for i, (edge, name, c) in enumerate(plan[::-1]):
-                if c.canBeInitiated(ctrl, self.eqPrecision):
+                if c.canBeInitiated(ctrl, self.eqPrecision) and (edge, name) not in already_checked_controllers:
                     self.log(f"{edge} CAN be initiated!")
+                    already_checked_controllers.add((edge, name))
                     residual_plan = plan[-i - 1:]
                     verbose = False
                     if edge == (16, 6):
@@ -430,7 +434,7 @@ class RLGS(SimpleSystem):
                                                                              self.goal_controller,
                                                                              self.scene_objects,
                                                                              verbose=verbose,
-                                                                             show_plots=verbose)
+                                                                             show_plots=False)
                     if is_feasible:
                         if self.verbose:
                             print("new plan found!")
@@ -466,8 +470,6 @@ class RLGS(SimpleSystem):
     def _is_done(self):
 
         return self.is_goal_fulfilled() or self.is_no_plan_feasible()
-
-
 
 
 class RLDSClone(RLGS):

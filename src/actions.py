@@ -430,7 +430,6 @@ class PlaceSide(BaseAction):
 
         return add_action_name(self.name, controllers)
 
-
 class PlaceGoal(BaseAction):
 
     def __init__(self):
@@ -462,37 +461,88 @@ class PlaceGoal(BaseAction):
         goal_place = constants.goal_block_pos
         sym2frame = _get_sym2frame(self.symbols, frames)
 
+        gripper = sym2frame[self.gripper_sym]
+        block = sym2frame[self.block_sym]
+
+        place_block_pos = ry.CtrlSet()
+
+        # block should be placed on table, doesnt matter where in x-y plane
+        place_block_pos.addObjective(
+            C.feature(ry.FS.position, [block], [1e2], goal_place),
+            ry.OT.sos, transient_step)
+
+        place_block_pos.addObjective(
+            C.feature(ry.FS.scalarProductZZ, [gripper, "world"], [1e2], [1]),
+            ry.OT.sos, transient_step)
+        # place_block_pos.addObjective(
+        #     C.feature(ry.FS.scalarProductYZ, [block, "world"], [1e1]),
+        #     ry.OT.sos, speed)
+        # place_block_pos.addObjective(
+        #     C.feature(ry.FS.positionDiff, [block, gripper], [1e0]),
+        #     ry.OT.eq, -1)
+
+        # needs to be holding the block
+        place_block_pos.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
+
+        # open gripper
+        open_gripper = ry.CtrlSet()
+        # open_gripper.addObjective(
+        #     C.feature(ry.FS.distance, [block, gripper_center], [1e0]),
+        #     ry.OT.eq, -1)
+
+        # necessary, so that the block is only released when on ground, and not mid-air
+        open_gripper.addObjective(
+            C.feature(ry.FS.position, [block], [1e0], goal_place),
+            ry.OT.eq, -1)
+        # open_gripper.addObjective(
+        #     C.feature(ry.FS.scalarProductZZ, [gripper, "world"], [1e1], [1]),
+        #     ry.OT.eq, -1)
+
+        open_gripper.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
+        open_gripper.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
+
+        # TODo add overhead
+
+        controllers = [
+            ("place_block_pos", place_block_pos),
+            ("open_gripper", open_gripper)
+        ]
+        return add_action_name(self.name, controllers)
+
+
+    def get_grounded_control_set(self, C, frames):
+        goal_place = constants.goal_block_pos
+        sym2frame = _get_sym2frame(self.symbols, frames)
+
         align_over_pos = list(goal_place)
-        align_over_pos[2] += 0.06
+        align_over_pos[2] += 0.05
 
         gripper = sym2frame[self.gripper_sym]
         block = sym2frame[self.block_sym]
 
         align_over = ry.CtrlSet()
         align_over.addObjective(
-            C.feature(ry.FS.vectorZDiff, [block, "world"], [1e1]),
+            C.feature(ry.FS.scalarProductZZ, [gripper, "world"], [1e1], [1]),
             ry.OT.sos, transient_step)
         align_over.addObjective(
-            C.feature(ry.FS.position, [block], [1e2], align_over_pos),
+            C.feature(ry.FS.position, [block], [1e0], align_over_pos),
             ry.OT.sos, transient_step)
 
         align_over.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
-
-
 
         place_block_pos = ry.CtrlSet()
 
         # block should be placed on table, doesnt matter where in x-y plane
         place_block_pos.addObjective(
-            C.feature(ry.FS.position, [block], [1e0, 1e0, 0], goal_place),
+            C.feature(ry.FS.positionDiff, [block, "table"], [1e0, 1e0, 0], goal_place),
             ry.OT.eq, -1)
 
         place_block_pos.addObjective(
-            C.feature(ry.FS.vectorZDiff, [block, "world"], [1e1]),
-            ry.OT.sos, transient_step/5)
+            C.feature(ry.FS.scalarProductZZ, [gripper, "world"], [1e0], [1]),
+            ry.OT.eq, -1)
 
         place_block_pos.addObjective(
-            C.feature(ry.FS.position, [block], [1e2], goal_place),
+            C.feature(ry.FS.positionDiff, [block, "world"], [1e2], goal_place),
             ry.OT.sos, transient_step/5)
 
         # place_block_pos.addObjective(
@@ -513,13 +563,13 @@ class PlaceGoal(BaseAction):
 
         # necessary, so that the block is only released when on ground, and not mid-air
         open_gripper.addObjective(
-            C.feature(ry.FS.position, [block], [1e1], goal_place),
+            C.feature(ry.FS.position, [block], [1e0], goal_place),
             ry.OT.eq, -1)
         # open_gripper.addObjective(
         #     C.feature(ry.FS.scalarProductZZ, [gripper, "world"], [1e1], [1]),
         #     ry.OT.eq, -1)
 
-        open_gripper.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
+        # open_gripper.addSymbolicCommand(ry.SC.CLOSE_GRIPPER, (gripper, block), True)
         open_gripper.addSymbolicCommand(ry.SC.OPEN_GRIPPER, (gripper, block), False)
 
         # TODo add overhead
@@ -530,6 +580,35 @@ class PlaceGoal(BaseAction):
             ("open_gripper", open_gripper)
         ]
         return add_action_name(self.name, controllers)
+
+# class PlaceGoal(BaseAction):
+#
+#     def __init__(self):
+#         super().__init__(__class__.__name__)
+#
+#         self.gripper_sym = "G"
+#         self.block_sym = "B"
+#
+#         self.symbols_types = {
+#             self.gripper_sym: constants.type_gripper,
+#             self.block_sym: constants.type_block,
+#         }
+#
+#         self.symbols = self.symbols_types.keys()
+#
+#         self.preconditions = [
+#             pred.InHand(self.gripper_sym, self.block_sym),
+#         ]
+#
+#         self.add_effects = [
+#             pred.BlockAtGoal(self.block_sym),
+#             pred.IsFree(self.block_sym),
+#             pred.HandEmpty(self.gripper_sym)
+#         ]
+#
+#         self.delete_effects = self.preconditions
+#
+
 
 
 class GrabStick(BaseAction):
@@ -923,9 +1002,9 @@ class HandOver(BaseAction):
             C.feature(ry.FS.scalarProductZZ, [gripper_give, gripper_take], [1e0], [-1]),
             ry.OT.eq, -1)
 
-        hand_over_1.addObjective(
-            C.feature(ry.FS.scalarProductXZ, ["world", gripper_give], [1e1], [direction]),
-            ry.OT.sos, transient_step)
+        # hand_over_1.addObjective(
+        #     C.feature(ry.FS.scalarProductXZ, ["world", gripper_give], [1e1], [direction]),
+        #     ry.OT.sos, transient_step)
 
         hand_over_1.addObjective(
             C.feature(ry.FS.position, [block], [1e0], hand_over_pos_1),
@@ -940,7 +1019,7 @@ class HandOver(BaseAction):
 
         for hand_o in [hand_over_1, hand_over_2]:
             hand_o.addObjective(
-                C.feature(ry.FS.positionRel, [gripper_take, block], [1e1]),
+                C.feature(ry.FS.positionRel, [gripper_take, block], [1e0]),
                 ry.OT.eq, -1)
 
             # hand_o.addObjective(

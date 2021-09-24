@@ -89,20 +89,27 @@ def get_stick_interferences():
 
 def get_hand_over_interferences():
     # first is always no interference
-    interference_list = [NoInterference()]
+    interference_list = []
     infeasible_pos_b1 = (0.6, 0.6, 0.68)
 
     ori_pos_b2 = 0.4, 0.3
 
-    # interference_list.extend((
-    #     # b2 is knocked of tower while gripper is moving to b1
-    #     ResetPosition(190, 192, "b2", ori_pos_b2, "b2 falls of tower while robot moves to b1"),
-    #     # b2 is knocked of tower while gripper is holding b1
-    #     ResetPosition(150, 262, "b2", ori_pos_b2, "b2 falls of tower while robot holds b1"),
-    #     # b1 is moved out of reach
-    #     ResetPosition(50, 52, "b1", infeasible_pos_b1, "b1 is moved out of reach of robot"),
-    #     #
-    #     ResetPosition(50, 52, "b1", infeasible_pos_b1, "b2 is moved while robot moves to it"),
-    # ))
+    interference_list.extend((
+        # 0
+        ResetPosition(190, 192, "b1", ori_pos_b2, "b1 goal is left side, starts on left (no interference)"),
+        # 1
+        ResetPosition(50, 52, "b1", infeasible_pos_b1, "b1 goal is left side, starts on left, "
+                                                       "interference is moving to the far right side"),
+        # 2
+        ResetPosition(50, 52, "b1", infeasible_pos_b1, "b1 goal is left side, starts on left,"
+                                                       "interference is moving to the middle"),
+        # 3
+        ResetPosition(50, 52, "b1", infeasible_pos_b1, "b1 goal is left side, starts on right, (no interference)"),
+        # 4
+        ResetPosition(0,0, "b1", infeasible_pos_b1, "b1 goal is left side, start on right, moved to left"),
+        # 5
+        ResetPosition(0,0, "b1", infeasible_pos_b1, "b1 goal is left side, starts on right, moved to middle "
+                                                    "(reachable by both)")
+    ))
 
     return interference_list

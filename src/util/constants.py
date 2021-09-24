@@ -22,7 +22,7 @@ tower_b3_pos_xy = (0.6, 0.2)
 
 handover_b1_pos_xy = (0.5, 0.4)
 
-goal_handover_block_pos = (-0.8, 0.3, 0.63)
+goal_handover_block_pos = (-0.8, 0.2, 0.63)
 goal_stick_pull_block_pos = (0.8, 0.1, 0.63)
 goal_block_pos = None
 
