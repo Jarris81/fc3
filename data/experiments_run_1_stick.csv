@@ -1,38 +1,38 @@
-exec_time,setup_time,goal_reached,scenario,model_name,interference_num,interference_desc,date,real_robot,infeasibility_detected,time limit reached, video file name
-14.69399999999763,0.001886129379272461,True,stick,simple,0,None,202109211649,True,False,False
-12.960999999997219,0.0006186962127685547,True,stick,simple,0,None,202109211650,True,False,False
-14.040999999996805,0.0022215843200683594,True,stick,simple,0,None,202109211651,True,False,False
-14.656999999997607,0.0006198883056640625,True,stick,simple,0,None,202109211652,True,False,False
-13.1849999999971,0.0005388259887695312,True,stick,simple,0,None,202109211653,True,False,False
-30.049000000015905,0.0006251335144042969,False,stick,simple,1,b1 is moved while robot moves to it,202109211655,True,False,True
-30.08200000001583,0.0016074180603027344,False,stick,simple,1,b1 is moved while robot moves to it or is grabbing,202109211656,True,False,True
-30.048000000015897,0.0006103515625,False,stick,simple,1,b1 is moved while robot moves to it or is grabbing,202109211657,True,False,True
-30.02900000001602,0.0007152557373046875,False,stick,simple,1,b1 is moved while robot moves to it or is grabbing,202109211658,True,False,True
-30.066000000015848,0.0016400814056396484,False,stick,simple,1,b1 is moved while robot moves to it or is grabbing,202109211701,True,False,True
-30.18100000001568,0.0006201267242431641,False,stick,simple,2,b1 is moved out of reach,202109211702,True,False,True
-30.045000000015904,0.0008351802825927734,False,stick,simple,2,b1 is moved out of reach,202109211703,True,False,True
-30.193000000015598,0.0006358623504638672,False,stick,simple,2,b1 is moved out of reach,202109211705,True,False,True
-30.076000000015867,0.0005497932434082031,False,stick,simple,2,b1 is moved out of reach,202109211706,True,False,True
-30.067000000015803,0.0006482601165771484,False,stick,simple,2,b1 is moved out of reach,202109211707,True,False,True
-30.17200000001565,0.0005733966827392578,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211709,True,False,True
-30.006000000016034,0.0005481243133544922,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211710,True,False,True
-30.01800000001603,0.0005366802215576172,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211712,True,False,True
-20.115000000004247,0.0005352497100830078,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211713,True,False,True
-20.086000000004255,0.0006475448608398438,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211714,True,False,True
-19.959000000004078,0.0010776519775390625,False,stick,simple,4,b1 and stick are unreachable,202109211716,True,False,True
-20.043000000004152,0.0007376670837402344,False,stick,simple,4,b1 and stick are unreachable,202109211717,True,False,True
-20.063000000004187,0.002264261245727539,False,stick,simple,4,b1 and stick are unreachable,202109211718,True,False,True
-20.041000000004153,0.0005590915679931641,False,stick,simple,4,b1 and stick are unreachable,202109211719,True,False,True
-20.075000000004216,0.0006456375122070312,False,stick,simple,4,b1 and stick are unreachable,202109211720,True,False,True
-11.93699999999778,0.8129925727844238,True,stick,rlds_clone,0,None,202109211721,True,False,False
-14.914999999997912,0.8321843147277832,True,stick,rlds_clone,0,None,202109211724,True,False,False
-16.861000000000292,0.842848539352417,True,stick,rlds_clone,0,None,202109211725,True,False,False
-14.786999999997759,0.8237428665161133,True,stick,rlds_clone,0,None,202109211725,True,False,False
-16.776000000000195,0.8425066471099854,True,stick,rlds_clone,0,None,202109211726,True,False,False
-21.489000000005944,0.8302345275878906,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211728,True,False,False
-17.720000000001317,0.816098690032959,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211729,True,False,False
-19.932000000004034,0.8131856918334961,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211730,True,False,False
-24.39400000000953,0.8357129096984863,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211731,True,False,False, MVI_0246
+exec_time,setup_time,goal_reached,scenario,model_name,interference_num,interference_desc,date,real_robot,infeasibility_detected,time_limit_reached,video_file_name
+14.69399999999763,0.001886129379272461,True,stick,simple,0,None,202109211649,True,False,False, MVI_0212.MP4
+12.960999999997219,0.0006186962127685547,True,stick,simple,0,None,202109211650,True,False,False, MVI_0213.MP4
+14.040999999996805,0.0022215843200683594,True,stick,simple,0,None,202109211651,True,False,False, MVI_0214.MP4
+14.656999999997607,0.0006198883056640625,True,stick,simple,0,None,202109211652,True,False,False, MVI_0215.MP4
+13.1849999999971,0.0005388259887695312,True,stick,simple,0,None,202109211653,True,False,False, MVI_0216.MP4
+30.049000000015905,0.0006251335144042969,False,stick,simple,1,b1 is moved while robot moves to it,202109211655,True,False,True, MVI_0217.MP4
+30.08200000001583,0.0016074180603027344,False,stick,simple,1,b1 is moved while robot moves to it or is grabbing,202109211656,True,False,True, MVI_0218.MP4
+30.048000000015897,0.0006103515625,False,stick,simple,1,b1 is moved while robot moves to it or is grabbing,202109211657,True,False,True, MVI_0219.MP4
+30.02900000001602,0.0007152557373046875,False,stick,simple,1,b1 is moved while robot moves to it or is grabbing,202109211658,True,False,True, MVI_0220.MP4
+30.066000000015848,0.0016400814056396484,False,stick,simple,1,b1 is moved while robot moves to it or is grabbing,202109211701,True,False,True, MVI_0222.MP4
+30.18100000001568,0.0006201267242431641,False,stick,simple,2,b1 is moved out of reach,202109211702,True,False,True, MVI_0223.MP4
+30.045000000015904,0.0008351802825927734,False,stick,simple,2,b1 is moved out of reach,202109211703,True,False,True, MVI_0224.MP4
+30.193000000015598,0.0006358623504638672,False,stick,simple,2,b1 is moved out of reach,202109211705,True,False,True, MVI_0225.MP4
+30.076000000015867,0.0005497932434082031,False,stick,simple,2,b1 is moved out of reach,202109211706,True,False,True, MVI_0226.MP4
+30.067000000015803,0.0006482601165771484,False,stick,simple,2,b1 is moved out of reach,202109211707,True,False,True, MVI_0227.MP4
+30.17200000001565,0.0005733966827392578,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211709,True,False,True, MVI_0228.MP4
+30.006000000016034,0.0005481243133544922,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211710,True,False,True, MVI_0229.MP4
+30.01800000001603,0.0005366802215576172,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211712,True,False,True, MVI_0230.MP4
+20.115000000004247,0.0005352497100830078,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211713,True,False,True, MVI_0231.MP4
+20.086000000004255,0.0006475448608398438,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211714,True,False,True, MVI_0232.MP4
+19.959000000004078,0.0010776519775390625,False,stick,simple,4,b1 and stick are unreachable,202109211716,True,False,True, MVI_0233.MP4
+20.043000000004152,0.0007376670837402344,False,stick,simple,4,b1 and stick are unreachable,202109211717,True,False,True, MVI_0234.MP4
+20.063000000004187,0.002264261245727539,False,stick,simple,4,b1 and stick are unreachable,202109211718,True,False,True, MVI_0235.MP4
+20.041000000004153,0.0005590915679931641,False,stick,simple,4,b1 and stick are unreachable,202109211719,True,False,True, MVI_0236.MP4
+20.075000000004216,0.0006456375122070312,False,stick,simple,4,b1 and stick are unreachable,202109211720,True,False,True, MVI_0237.MP4
+11.93699999999778,0.8129925727844238,True,stick,rlds_clone,0,None,202109211721,True,False,False, MVI_0238.MP4
+14.914999999997912,0.8321843147277832,True,stick,rlds_clone,0,None,202109211724,True,False,False, MVI_0239.MP4
+16.861000000000292,0.842848539352417,True,stick,rlds_clone,0,None,202109211725,True,False,False, MVI_0240.MP4
+14.786999999997759,0.8237428665161133,True,stick,rlds_clone,0,None,202109211725,True,False,False, MVI_0241.MP4
+16.776000000000195,0.8425066471099854,True,stick,rlds_clone,0,None,202109211726,True,False,False, MVI_0242.MP4
+21.489000000005944,0.8302345275878906,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211728,True,False,False, MVI_0243.MP4
+17.720000000001317,0.816098690032959,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211729,True,False,False, MVI_0244.MP4
+19.932000000004034,0.8131856918334961,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211730,True,False,False, MVI_0245.MP4
+24.39400000000953,0.8357129096984863,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211731,True,False,False, MVI_0246.MP4
 27.20400000001286,0.8617753982543945,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211732,True,False,False, MVI_0247.MP4
 40.096999999992555,0.8594202995300293,False,stick,rlds_clone,2,b1 is moved out of reach,202109211734,True,False,True, MVI_0249.MP4
 40.122999999992494,0.8437573909759521,False,stick,rlds_clone,2,b1 is moved out of reach,202109211735,True,False,True, MVI_0250.MP4

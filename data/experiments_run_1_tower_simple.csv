@@ -1,4 +1,4 @@
-exec_time,setup_time,goal_reached,scenario,model_name,interference_num,interference_desc,date,real_robot,infeasibility_detected,time limit reached, video file name
+exec_time,setup_time,goal_reached,scenario,model_name,interference_num,interference_desc,date,real_robot,infeasibility_detected,time_limit_reached,video_file_name
 31.389000000012842,0.0015146732330322266,True,tower,simple,0,None,202109211117,True,False,False, MVI_0159.MP4
 26.387000000011916,0.002843141555786133,True,tower,simple,0,None,202109211118,True,False,False, MVI_0160.MP4
 35.55000000000319,0.0014374256134033203,True,tower,simple,0,None,202109211120,True,False,False, MVI_0161.MP4

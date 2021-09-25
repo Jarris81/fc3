@@ -103,7 +103,7 @@ def run_experiment(model_name, scenario, interference_num, use_real_robot, track
             'date': time.strftime("%Y%m%d%H%M"),
             'real_robot': str(use_real_robot),
             'infeasibility_detected':  str(infeasy_detected),
-            'time limit reached': time_is_up
+            'time_limit_reached': time_is_up
 
         }
 

@@ -1,31 +1,31 @@
-1exec_time,setup_time,goal_reached,scenario,model_name,interference_num,interference_desc,date,real_robot,infeasibility_detected,time limit reached, video file name
-15.58999999999856,5.624006986618042,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241544,True,False,False, MVI_0331.MP4
-12.025999999998728,5.933412313461304,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241545,True,False,False, MVI_0332.MP4
-17.995000000001557,5.753108024597168,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241546,True,False,False, MVI_0333.MP4
-10.995999999999247,6.05085301399231,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241547,True,False,False, MVI_0334.MP4
-14.191999999996927,5.659656286239624,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241548,True,False,False, MVI_0335.MP4
-56.172999999955145,5.8687732219696045,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241550,True,False,False, MVI_0336.MP4
-80.31700000002986,5.5873517990112305,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241600,True,False,False, MVI_0341.MP4
-50.13099999996927,5.81981086730957,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241603,True,False,False, MVI_0343.MP4
-55.12799999995764,5.756883144378662,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241606,True,False,False, MVI_0345.MP4
-44.799999999981615,5.730232000350952,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241607,True,False,False, MVI_0346.MP4
-20.46400000000463,5.691835403442383,True,hand_over,rlgs,2,"b1 goal is left side, starts on left, interference is moving to the middle",202109241608,True,False,False, MVI_0347.MP4
-27.339000000013012,6.0813963413238525,True,hand_over,rlgs,2,"b1 goal is left side, starts on left,interference is moving to the middle",202109241610,True,False,False, MVI_0348.MP4
-37.97099999999766,5.787981748580933,True,hand_over,rlgs,2,"b1 goal is left side, starts on left,interference is moving to the middle",202109241752,True,False,False
-31.239000000015302,5.663313150405884,True,hand_over,rlgs,2,"b1 goal is left side, starts on left,interference is moving to the middle",202109241754,True,False,False
-28.36300000001421,6.142373561859131,True,hand_over,rlgs,2,"b1 goal is left side, starts on left,interference is moving to the middle",202109241756,True,False,False
-37.516999999998646,8.375314235687256,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241809,True,False,False
-33.60600000000784,8.82055950164795,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241810,True,False,False
-39.63599999999383,8.682283163070679,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241811,True,False,False
-45.450999999980255,8.011066913604736,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241813,True,False,False
-52.670999999963406,8.413198947906494,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241815,True,False,False
-28.123000000013963,8.5221426486969,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241816,True,False,False
-21.394000000005686,8.518966436386108,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241817,True,False,False
-38.613999999996174,8.381854772567749,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241819,True,False,False
-28.26800000001417,8.53262710571289,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241820,True,False,False
-21.72100000000612,8.298957109451294,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241821,True,False,False
-48.406999999976826,8.015116453170776,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241823,True,False,False
-41.93499999999178,8.23471975326538,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241829,True,False,False
-51.102999999967075,8.104130983352661,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241832,True,False,False
-53.85599999996067,8.616963863372803,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241836,True,False,False
-65.74299999995954,8.502352714538574,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241838,True,False,False
+exec_time,setup_time,goal_reached,scenario,model_name,interference_num,interference_desc,date,real_robot,infeasibility_detected,time_limit_reached,video_file_name
+15.58999999999856,5.624006986618042,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241544,True,False,False,MVI_0331.MP4
+12.025999999998728,5.933412313461304,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241545,True,False,False,MVI_0332.MP4
+17.995000000001557,5.753108024597168,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241546,True,False,False,MVI_0333.MP4
+10.995999999999247,6.05085301399231,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241547,True,False,False,MVI_0334.MP4
+14.191999999996927,5.659656286239624,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241548,True,False,False,MVI_0335.MP4
+56.172999999955145,5.8687732219696045,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241550,True,False,False,MVI_0336.MP4
+80.31700000002986,5.5873517990112305,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241600,True,False,False,MVI_0341.MP4
+50.13099999996927,5.81981086730957,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241603,True,False,False,MVI_0343.MP4
+55.12799999995764,5.756883144378662,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241606,True,False,False,MVI_0345.MP4
+44.799999999981615,5.730232000350952,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241607,True,False,False,MVI_0346.MP4
+20.46400000000463,5.691835403442383,True,hand_over,rlgs,2,"b1 goal is left side, starts on left, interference is moving to the middle",202109241608,True,False,False,MVI_0347.MP4
+27.339000000013012,6.0813963413238525,True,hand_over,rlgs,2,"b1 goal is left side, starts on left,interference is moving to the middle",202109241610,True,False,False,MVI_0348.MP4
+37.97099999999766,5.787981748580933,True,hand_over,rlgs,2,"b1 goal is left side, starts on left,interference is moving to the middle",202109241752,True,False,False,MVI_0351.MP4
+31.239000000015302,5.663313150405884,True,hand_over,rlgs,2,"b1 goal is left side, starts on left,interference is moving to the middle",202109241754,True,False,False,MVI_0352.MP4
+28.36300000001421,6.142373561859131,True,hand_over,rlgs,2,"b1 goal is left side, starts on left,interference is moving to the middle",202109241756,True,False,False,MVI_0353.MP4
+37.516999999998646,8.375314235687256,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241809,True,False,False,MVI_0356.MP4
+33.60600000000784,8.82055950164795,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241810,True,False,False,MVI_0357.MP4
+39.63599999999383,8.682283163070679,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241811,True,False,False,MVI_0358.MP4
+45.450999999980255,8.011066913604736,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241813,True,False,False,MVI_0359.MP4
+52.670999999963406,8.413198947906494,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241815,True,False,False,MVI_0360.MP4
+28.123000000013963,8.5221426486969,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241816,True,False,False,MVI_0361.MP4
+21.394000000005686,8.518966436386108,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241817,True,False,False,MVI_0362.MP4
+38.613999999996174,8.381854772567749,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241819,True,False,False,MVI_0364.MP4
+28.26800000001417,8.53262710571289,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241820,True,False,False,MVI_0365.MP4
+21.72100000000612,8.298957109451294,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241821,True,False,False,MVI_0366.MP4
+48.406999999976826,8.015116453170776,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241823,True,False,False,MVI_0367.MP4
+41.93499999999178,8.23471975326538,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241829,True,False,False,MVI_0368.MP4
+51.102999999967075,8.104130983352661,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241832,True,False,False,MVI_0370.MP4
+53.85599999996067,8.616963863372803,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241836,True,False,False,MVI_0372.MP4
+65.74299999995954,8.502352714538574,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241838,True,False,False,MVI_0374.MP4

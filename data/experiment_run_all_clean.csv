@@ -1,0 +1,211 @@
+exec_time,setup_time,goal_reached,scenario,model_name,interference_num,interference_desc,date,real_robot,infeasibility_detected,time_limit_reached,video_file_name
+31.38900000001284,0.0015146732330322,True,tower,simple,0,None,202109211117,True,False,False, MVI_0159.MP4
+26.38700000001192,0.0028431415557861,True,tower,simple,0,None,202109211118,True,False,False, MVI_0160.MP4
+35.55000000000319,0.0014374256134033,True,tower,simple,0,None,202109211120,True,False,False, MVI_0161.MP4
+41.97699999998818,0.0015015602111816,True,tower,simple,0,None,202109211121,True,False,False, MVI_0162.MP4
+28.85600000001494,0.0026781558990478,True,tower,simple,0,None,202109211126,True,False,False, MVI_0166.MP4
+29.3780000000156,0.001312255859375,True,tower,simple,1,b2 is moved while robot moves to it,202109211130,True,False,False, MVI_0167.MP4
+30.04799999996943,0.0015006065368652,False,tower,simple,1,b2 is moved while robot moves to it,202109211131,True,False,True, MVI_0168.MP4
+30.54600000001476,0.001469612121582,True,tower,simple,1,b2 is moved while robot moves to it,202109211132,True,False,True, MVI_0169.MP4
+30.002000000016057,0.0014746189117431,False,tower,simple,1,b2 is moved while robot moves to it,202109211133,True,False,True, MVI_0170.MP4
+30.047000000015945,0.001516580581665,False,tower,simple,1,b2 is moved while robot moves to it,202109211135,True,False,True, MVI_0171.MP4
+30.095000000015887,0.0020267963409423,False,tower,simple,2,b2 is moved while robot grabs it,202109211335,True,False,True, MVI_0178.MP4
+20.053000000004168,0.0014195442199707,False,tower,simple,2,b2 is moved while robot grabs it,202109211336,True,False,True, MVI_0179.MP4
+20.020000000004146,0.0014662742614746,False,tower,simple,2,b2 is moved while robot grabs it,202109211337,True,False,True, MVI_0180.MP4
+20.06600000000416,0.0013854503631591,False,tower,simple,2,b2 is moved while robot grabs it,202109211338,True,False,True, MVI_0181.MP4
+20.069000000004174,0.0012786388397216,False,tower,simple,2,b2 is moved while robot grabs it,202109211339,True,False,True, MVI_0182.MP4
+30.050000000015963,0.0030350685119628,False,tower,simple,4, b1 is moved out of reach,202109211343,True,False,True, MVI_0184.MP4
+30.055000000016037,0.0017049312591552,False,tower,simple,4, b1 is moved out of reach,202109211344,True,False,True, MVI_0185.MP4
+30.08600000001585,0.0015249252319335,False,tower,simple,4, b1 is moved out of reach,202109211346,True,False,True, MVI_0186.MP4
+30.036000000016116,0.0017287731170654,False,tower,simple,4, b1 is moved out of reach,202109211348,True,False,True, MVI_0188.MP4
+30.04700000001593,0.0013256072998046,False,tower,simple,4, b1 is moved out of reach,202109211351,True,False,True, MVI_0190.MP4
+29.99400000001614,0.0015356540679931,False,tower,simple,3,b2 falls of tower while robot moves to b1,202109211353,True,False,True, MVI_0191.MP4
+40.01699999999274,0.0024642944335937,False,tower,simple,3,b2 falls of tower while robot moves to b1,202109211355,True,False,True, MVI_0194.MP4
+40.01599999999277,0.001260757446289,False,tower,simple,3,b2 falls of tower while robot moves to b1,202109211357,True,False,True, MVI_0195.MP4
+40.010999999992805,0.0019562244415283,False,tower,simple,3,b2 falls of tower while robot moves to b1,202109211358,True,False,True, MVI_0196.MP4
+40.08799999999252,0.0014607906341552,False,tower,simple,3,b2 falls of tower while robot moves to b1,202109211400,True,False,True, MVI_0197.MP4
+40.04899999999279,0.0016369819641113,False,tower,simple,5,b2 falls of tower while robot holds b1,202109211407,True,False,True, MVI_0198.MP4
+39.99299999999276,0.0014460086822509,False,tower,simple,5,b2 falls of tower while robot holds b1,202109211408,True,False,True, MVI_0199.MP4
+40.05999999999267,0.0016417503356933,False,tower,simple,5,b2 falls of tower while robot holds b1,202109211411,True,False,True, MVI_0201.MP4
+40.04099999999271,0.0016925334930419,False,tower,simple,5,b2 falls of tower while robot holds b1,202109211412,True,False,True, MVI_0202.MP4
+40.047999999992605,0.0016274452209472,False,tower,simple,5,b2 falls of tower while robot holds b1,202109211414,True,False,True, MVI_0203.MP4
+24.58600000000973,0.0013740062713623,True,tower,simple,6,b2 is placed on b3 (helping Hand),202109211415,True,False,False, MVI_0204.MP4
+40.08799999999263,0.0013799667358398,False,tower,simple,6,b2 is placed on b3 (helping Hand),202109211416,True,False,True, MVI_0205.MP4
+40.06099999999263,0.0028924942016601,False,tower,simple,6,b2 is placed on b3 (helping Hand),202109211418,True,False,True, MVI_0206.MP4
+30.815000000014063,0.0012924671173095,True,tower,simple,6,b2 is placed on b3 (helping Hand),202109211419,True,False,False, MVI_0207.MP4
+40.07899999999261,0.0013539791107177,False,tower,simple,6,b2 is placed on b3 (helping Hand),202109211420,True,False,True, MVI_0208.MP4
+25.21300000001044,0.9883551597595216,True,tower,rlds_clone,0,None,202109201759,True,False,False,MVI_0100.MP4
+30.61900000001453,1.0342786312103271,True,tower,rlds_clone,0,None,202109201802,True,False,False,MVI_0103.MP4
+29.35500000001556,1.0146493911743164,True,tower,rlds_clone,0,None,202109201803,True,False,False,MVI_0104.MP4
+26.809000000012475,1.0472567081451416,True,tower,rlds_clone,0,None,202109201806,True,False,False,MVI_0105.MP4
+31.23700000001312,1.0833663940429688,True,tower,rlds_clone,0,None,202109201807,True,False,False,MVI_0106.MP4
+28.181000000014144,1.0551273822784424,True,tower,rlds_clone,1,b2 is moved while robot moves to it,202109201817,True,False,False,MVI_0110.MP4
+30.036000000015974,0.9752018451690674,True,tower,rlds_clone,1,b2 is moved while robot moves to it,202109201818,True,False,False,MVI_0111.MP4
+38.78299999999564,0.9998772144317628,True,tower,rlds_clone,1,b2 is moved while robot moves to it,202109201821,True,False,False,MVI_0113.MP4
+35.988000000002074,0.9837357997894288,True,tower,rlds_clone,1,b2 is moved while robot moves to it,202109201823,True,False,False,MVI_0114.MP4
+37.98299999999747,1.0294156074523926,True,tower,rlds_clone,1,b2 is moved while robot moves to it,202109201824,True,False,False,MVI_0115.MP4
+43.80499999998391,1.015718698501587,True,tower,rlds_clone,2,b2 is moved while robot grabs it,202109201826,True,False,False,MVI_0118.MP4
+43.680999999984174,0.9992880821228028,True,tower,rlds_clone,2,b2 is moved while robot grabs it,202109201828,True,False,False,MVI_0120.MP4
+47.60199999997501,0.995753049850464,True,tower,rlds_clone,2,b2 is moved while robot grabs it,202109201830,True,False,False,MVI_0121.MP4
+58.20899999995032,1.0597903728485107,True,tower,rlds_clone,2,b2 is moved while robot grabs it,202109201832,True,False,False,MVI_0122.MP4
+57.88299999995116,1.048574924468994,True,tower,rlds_clone,2,b2 is moved while robot grabs it,202109201834,True,False,False,MVI_0123.MP4
+45.235999999980535,1.0550553798675537,True,tower,rlds_clone,3,b2 falls of tower while robot moves to b1,202109201836,True,False,False,MVI_0124.MP4
+42.39599999998718,1.0059800148010254,True,tower,rlds_clone,3,b2 falls of tower while robot moves to b1,202109201914,True,False,False,MVI_0127.MP4
+37.589999999998426,0.9935629367828368,True,tower,rlds_clone,3,b2 falls of tower while robot moves to b1,202109201915,True,False,False,MVI_0129.MP4
+47.925999999974366,1.01070237159729,True,tower,rlds_clone,3,b2 falls of tower while robot moves to b1,202109201917,True,False,False,MVI_0130.MP4
+51.85399999996513,1.0541846752166748,True,tower,rlds_clone,3,b2 falls of tower while robot moves to b1,202109201918,True,False,False,MVI_0131.MP4
+30.07300000001592,1.010019063949585,False,tower,rlds_clone,4,b1 is moved out of reach,202109201935,True,False,True,MVI_0136.MP4
+30.15200000001572,1.2215092182159424,False,tower,rlds_clone,4,b1 is moved out of reach,202109211037,True,False,True,MVI_0138.MP4
+30.096000000015845,1.2535662651062012,False,tower,rlds_clone,4,b1 is moved out of reach,202109211039,True,False,True,MVI_0140.MP4
+30.04700000001588,1.1890413761138916,False,tower,rlds_clone,4,b1 is moved out of reach,202109211040,True,False,True,MVI_0142.MP4
+30.03900000001593,1.3024969100952148,False,tower,rlds_clone,4,b1 is moved out of reach,202109211042,True,False,True,MVI_0143.MP4
+30.07600000001589,1.2269928455352783,False,tower,rlds_clone,5,b2 falls of tower while robot holds b1,202109211046,True,False,True,MVI_0145.MP4
+60.01099999994462,1.1832640171051023,False,tower,rlds_clone,5,b2 falls of tower while robot holds b1,202109211048,True,False,True,MVI_0146.MP4
+50.072999999969255,1.248297929763794,False,tower,rlds_clone,5,b2 falls of tower while robot holds b1,202109211050,True,False,True,MVI_0147.MP4
+50.0779999999693,1.193964958190918,False,tower,rlds_clone,5,b2 falls of tower while robot holds b1,202109211052,True,False,True,MVI_0148.MP4
+50.046999999967895,1.236151933670044,False,tower,rlds_clone,5,b2 falls of tower while robot holds b1,202109211054,True,False,True,MVI_0149.MP4
+9.202999999999308,1.2402660846710205,True,tower,rlds_clone,6,b2 is placed on b3 (helping Hand),202109211058,True,False,False,MVI_0150.MP4
+28.042000000013893,1.2438490390777588,True,tower,rlds_clone,6,b2 is placed on b3 (helping Hand),202109211103,True,False,False,MVI_0152.MP4
+16.56199999999989,1.2015149593353271,True,tower,rlds_clone,6,b2 is placed on b3 (helping Hand),202109211105,True,False,False,MVI_0153.MP4
+5.982000000001104,1.269428253173828,True,tower,rlds_clone,6,b2 is placed on b3 (helping Hand),202109211106,True,False,False,MVI_0154.MP4
+17.174000000000646,1.2212505340576172,True,tower,rlds_clone,6,b2 is placed on b3 (helping Hand),202109211109,True,False,False,MVI_0155.MP4
+33.905000000007,1.22667407989502,True,tower,rlgs,0,None,202109201241,True,False,False, MVI_0033.MP4
+28.0300000000139,1.22841215133667,True,tower,rlgs,0,None,202109201245,True,False,False, MVI_0036.MP4
+27.6270000000135,1.2242693901062,True,tower,rlgs,0,None,202109201252,True,False,False, MVI_0038.MP4
+32.3420000000106,1.2949583530426,True,tower,rlgs,0,None,202109201255,True,False,False, MVI_0039.MP4
+25.3500000000106,1.18712830543518,True,tower,rlgs,0,None,202109201302,True,False,False, MVI_0042.MP4
+36.052000000002,1.2229495048523,True,tower,rlgs,1,b2 is moved while robot moves to it,202109201304,True,False,False, MVI_0043.MP4
+32.1410000000111,1.26205539703369,True,tower,rlgs,1,b2 is moved while robot moves to it,202109201305,True,False,False, MVI_0045.MP4
+38.4709999999963,1.39197731018066,True,tower,rlgs,1,b2 is moved while robot moves to it,202109201307,True,False,False, MVI_0047.MP4
+36.853,1.27693057060242,True,tower,rlgs,1,b2 is moved while robot moves to it,202109201308,True,False,False, MVI_0048.MP4
+38.3009999999968,1.29941391944885,True,tower,rlgs,1,b2 is moved while robot moves to it,202109201309,True,False,False, MVI_0049.MP4
+40.8849999999906,1.24637293815613,True,tower,rlgs,2,b2 is moved while robot grabs it,202109201311,True,False,False, MVI_0050.MP4
+48.0079999999741,1.31231927871704,True,tower,rlgs,2,b2 is moved while robot grabs it,202109201314,True,False,False, MVI_0051.MP4
+51.9759999999649,1.23037123680115,True,tower,rlgs,2,b2 is moved while robot grabs it,202109201315,True,False,False, MVI_0052.MP4
+42.6449999999866,1.21124362945557,True,tower,rlgs,2,b2 is moved while robot grabs it,202109201318,True,False,False, MVI_0053.MP4
+40.8709999999907,1.28675580024719,True,tower,rlgs,2,b2 is moved while robot grabs it,202109201319,True,False,False, MVI_0057.MP4
+39.7329999999934,1.22674942016602,True,tower,rlgs,3,b2 falls of tower while robot moves to b1,202109201322,True,False,False, MVI_0059.MP4
+36.025000000002,1.22373962402344,True,tower,rlgs,3,b2 falls of tower while robot moves to b1,202109201324,True,False,False, MVI_0060.MP4
+43.4139999999848,1.23620295524597,True,tower,rlgs,3,b2 falls of tower while robot moves to b1,202109201325,True,False,False, MVI_0061.MP4
+45.2889999999804,1.29844069480896,True,tower,rlgs,3,b2 falls of tower while robot moves to b1,202109201332,True,False,False, MVI_0063.MP4
+45.5879999999797,1.24758243560791,True,tower,rlgs,3,b2 falls of tower while robot moves to b1,202109201333,True,False,False, MVI_0064.MP4
+2.18599999999988,1.21449899673462,False,tower,rlgs,4,b1 is moved out of reach,202109201342,True,True,False, MVI_0072.MP4
+14.8529999999978,1.3178505897522,False,tower,rlgs,4,b1 is moved out of reach,202109201343,True,True,False, MVI_0075.MP4
+13.445999999997,1.22963690757751,False,tower,rlgs,4,b1 is moved out of reach,202109201355,True,True,False, MVI_0076.MP4
+14.0829999999969,1.21810555458069,False,tower,rlgs,4,b1 is moved out of reach,202109201357,True,True,False, MVI_0077.MP4
+11.739999999997895,1.0036048889160156,False,tower,rlgs,4,b1 is moved out of reach,202109201747,True,True, False, MVI_0099.MP4
+52.9349999999626,1.18028521537781,True,tower,rlgs,5,b2 falls of tower while robot holds b1,202109201441,True,False,False, MVI_0078.MP4
+52.8829999999628,1.22990608215332,True,tower,rlgs,5,b2 falls of tower while robot holds b1,202109201444,True,False,False, MVI_0080.MP4
+67.3229999999672,1.22525382041931,True,tower,rlgs,5,b2 falls of tower while robot holds b1,202109201446,True,False,False, MVI_0083.MP4
+50.0839999999692,1.27679467201233,True,tower,rlgs,5,b2 falls of tower while robot holds b1,202109201448,True,False,False, MVI_0084.MP4
+57.1939999999528,1.23705530166626,True,tower,rlgs,5,b2 falls of tower while robot holds b1,202109201506,True,False,False, MVI_0085.MP4
+17.4920000000011,1.2665810585022,True,tower,rlgs,6,b2 is placed on b3 (helping Hand),202109201650,True,False,False, MVI_0090.MP4
+18.3990000000022,1.25777339935303,True,tower,rlgs,6,b2 is placed on b3 (helping Hand),202109201656,True,False,False, MVI_0092.MP4
+4.48900000000063,1.22685050964355,True,tower,rlgs,6,b2 is placed on b3 (helping Hand),202109201657,True,False,False, MVI_0093.MP4
+16.0149999999992,1.23690962791443,True,tower,rlgs,6,b2 is placed on b3 (helping Hand),202109201658,True,False,False, MVI_0094.MP4
+17.5860000000011,1.28238964080811,True,tower,rlgs,6,b2 is placed on b3 (helping Hand),202109201659,True,False,False, MVI_0096.MP4
+14.69399999999763,0.0018861293792724,True,stick,simple,0,None,202109211649,True,False,False, MVI_0212.MP4
+12.96099999999722,0.0006186962127685,True,stick,simple,0,None,202109211650,True,False,False, MVI_0213.MP4
+14.040999999996805,0.0022215843200683,True,stick,simple,0,None,202109211651,True,False,False, MVI_0214.MP4
+14.656999999997607,0.000619888305664,True,stick,simple,0,None,202109211652,True,False,False, MVI_0215.MP4
+13.1849999999971,0.0005388259887695,True,stick,simple,0,None,202109211653,True,False,False, MVI_0216.MP4
+30.049000000015905,0.0006251335144042,False,stick,simple,1,b1 is moved while robot moves to it,202109211655,True,False,True, MVI_0217.MP4
+30.08200000001583,0.0016074180603027,False,stick,simple,1,b1 is moved while robot moves to it or is grabbing,202109211656,True,False,True, MVI_0218.MP4
+30.048000000015897,0.0006103515625,False,stick,simple,1,b1 is moved while robot moves to it or is grabbing,202109211657,True,False,True, MVI_0219.MP4
+30.02900000001602,0.0007152557373046,False,stick,simple,1,b1 is moved while robot moves to it or is grabbing,202109211658,True,False,True, MVI_0220.MP4
+30.066000000015848,0.0016400814056396,False,stick,simple,1,b1 is moved while robot moves to it or is grabbing,202109211701,True,False,True, MVI_0222.MP4
+30.18100000001568,0.0006201267242431,False,stick,simple,2,b1 is moved out of reach,202109211702,True,False,True, MVI_0223.MP4
+30.045000000015904,0.0008351802825927,False,stick,simple,2,b1 is moved out of reach,202109211703,True,False,True, MVI_0224.MP4
+30.1930000000156,0.0006358623504638,False,stick,simple,2,b1 is moved out of reach,202109211705,True,False,True, MVI_0225.MP4
+30.076000000015867,0.0005497932434082,False,stick,simple,2,b1 is moved out of reach,202109211706,True,False,True, MVI_0226.MP4
+30.067000000015803,0.0006482601165771,False,stick,simple,2,b1 is moved out of reach,202109211707,True,False,True, MVI_0227.MP4
+30.17200000001565,0.0005733966827392,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211709,True,False,True, MVI_0228.MP4
+30.006000000016037,0.0005481243133544,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211710,True,False,True, MVI_0229.MP4
+30.01800000001603,0.0005366802215576,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211712,True,False,True, MVI_0230.MP4
+20.115000000004247,0.000535249710083,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211713,True,False,True, MVI_0231.MP4
+20.08600000000425,0.0006475448608398,False,stick,simple,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211714,True,False,True, MVI_0232.MP4
+19.95900000000408,0.001077651977539,False,stick,simple,4,b1 and stick are unreachable,202109211716,True,False,True, MVI_0233.MP4
+20.043000000004152,0.0007376670837402,False,stick,simple,4,b1 and stick are unreachable,202109211717,True,False,True, MVI_0234.MP4
+20.063000000004187,0.0022642612457275,False,stick,simple,4,b1 and stick are unreachable,202109211718,True,False,True, MVI_0235.MP4
+20.041000000004157,0.0005590915679931,False,stick,simple,4,b1 and stick are unreachable,202109211719,True,False,True, MVI_0236.MP4
+20.075000000004216,0.000645637512207,False,stick,simple,4,b1 and stick are unreachable,202109211720,True,False,True, MVI_0237.MP4
+11.93699999999778,0.8129925727844238,True,stick,rlds_clone,0,None,202109211721,True,False,False, MVI_0238.MP4
+14.914999999997912,0.8321843147277832,True,stick,rlds_clone,0,None,202109211724,True,False,False, MVI_0239.MP4
+16.861000000000292,0.842848539352417,True,stick,rlds_clone,0,None,202109211725,True,False,False, MVI_0240.MP4
+14.78699999999776,0.8237428665161133,True,stick,rlds_clone,0,None,202109211725,True,False,False, MVI_0241.MP4
+16.776000000000195,0.8425066471099854,True,stick,rlds_clone,0,None,202109211726,True,False,False, MVI_0242.MP4
+21.489000000005944,0.8302345275878906,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211728,True,False,False, MVI_0243.MP4
+17.720000000001317,0.816098690032959,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211729,True,False,False, MVI_0244.MP4
+19.932000000004034,0.8131856918334961,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211730,True,False,False, MVI_0245.MP4
+24.39400000000953,0.8357129096984863,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211731,True,False,False, MVI_0246.MP4
+27.20400000001286,0.8617753982543945,True,stick,rlds_clone,1,b1 is moved while robot moves to it or is grabbing,202109211732,True,False,False, MVI_0247.MP4
+40.09699999999256,0.8594202995300293,False,stick,rlds_clone,2,b1 is moved out of reach,202109211734,True,False,True, MVI_0249.MP4
+40.122999999992494,0.8437573909759521,False,stick,rlds_clone,2,b1 is moved out of reach,202109211735,True,False,True, MVI_0250.MP4
+40.03999999999267,0.8296191692352295,False,stick,rlds_clone,2,b1 is moved out of reach,202109211737,True,False,True, MVI_0251.MP4
+40.08099999999259,0.838904857635498,False,stick,rlds_clone,2,b1 is moved out of reach,202109211740,True,False,True, MVI_0252.MP4
+30.043000000015997,0.8442277908325195,False,stick,rlds_clone,2,b1 is moved out of reach,202109211742,True,False,True, MVI_0253.MP4
+30.052000000015973,0.8269855976104736,False,stick,rlds_clone,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211744,True,False,True,
+30.069000000015965,0.8313138484954834,False,stick,rlds_clone,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211749,True,False,True, MVI_0254.MP4
+30.016000000016028,0.8237898349761963,False,stick,rlds_clone,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211750,True,False,True, MVI_0255.MP4
+30.01200000001605,0.8476123809814453,False,stick,rlds_clone,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211751,True,False,True, MVI_0256.MP4
+32.44200000001036,0.7932202816009521,False,stick,rlds_clone,3,"b1 is moved out of reach for robot, but reachable with the stick",202109211755,True,False,True, MVI_0257.MP4
+30.038000000015995,0.8211429119110107,False,stick,rlds_clone,4,b1 and stick are unreachable,202109221049,True,False,True, MVI_0259.MP4
+19.994000000004068,0.8439152240753174,False,stick,rlds_clone,4,b1 and stick are unreachable,202109221050,True,False,True, MVI_0261.MP4
+20.052000000004128,0.8202800750732422,False,stick,rlds_clone,4,b1 and stick are unreachable,202109221051,True,False,True, MVI_0262.MP4
+20.41500000000461,0.8340449333190918,False,stick,rlds_clone,4,b1 and stick are unreachable,202109221053,True,False,True, MVI_0263.MP4
+20.01800000000412,0.8210575580596924,False,stick,rlds_clone,4,b1 and stick are unreachable,202109221054,True,False,True, MVI_0264.MP4
+11.794999999997875,0.8013110160827637,True,stick,rlgs,0,None,202109221055,True,False,False, MVI_0265.MP4
+14.71699999999762,0.8417599201202393,True,stick,rlgs,0,None,202109221056,True,False,False, MVI_0266.MP4
+12.335999999997568,0.8287031650543213,True,stick,rlgs,0,None,202109221057,True,False,False, MVI_0267.MP4
+16.377999999999687,0.8364181518554688,True,stick,rlgs,0,None,202109221058,True,False,False, MVI_0268.MP4
+17.232000000000696,0.8594357967376709,True,stick,rlgs,0,None,202109221059,True,False,False, MVI_0269.MP4
+28.278000000014234,0.8400583267211914,True,stick,rlgs,1,b1 is moved while robot moves to it or is grabbing,202109221101,True,False,False, MVI_0270.MP4
+22.79300000000754,0.8154134750366211,True,stick,rlgs,1,b1 is moved while robot moves to it or is grabbing,202109221102,True,False,False, MVI_0271.MP4
+24.09800000000913,0.8516168594360352,True,stick,rlgs,1,b1 is moved while robot moves to it or is grabbing,202109221103,True,False,False, MVI_0272.MP4
+20.02000000000412,0.8558852672576904,True,stick,rlgs,1,b1 is moved while robot moves to it or is grabbing,202109221104,True,False,False, MVI_0273.MP4
+42.64099999998662,0.8288679122924805,True,stick,rlgs,1,b1 is moved while robot moves to it or is grabbing,202109221105,True,False,False, MVI_0274.MP4
+16.02299999999927,0.8372988700866699,False,stick,rlgs,2,b1 is moved out of reach,202109221106,True,True,False, MVI_0275.MP4
+11.64499999999795,0.8630282878875732,False,stick,rlgs,2,b1 is moved out of reach,202109221108,True,True,False, MVI_0276.MP4
+12.826999999997287,0.842717170715332,False,stick,rlgs,2,b1 is moved out of reach,202109221111,True,True,False, MVI_0278.MP4
+24.930000000010104,0.8164396286010742,False,stick,rlgs,2,b1 is moved out of reach,202109221112,True,True,False, MVI_0279.MP4
+24.38900000000949,0.8329269886016846,False,stick,rlgs,2,b1 is moved out of reach,202109221113,True,True,False, MVI_0280.MP4
+30.129000000015825,0.9223635196685792,True,stick,rlgs,3,"b1 is moved out of reach for robot, but reachable with the stick",202109221245,True,False,False, MVI_0309.MP4
+32.56700000001001,0.9497952461242676,True,stick,rlgs,3,"b1 is moved out of reach for robot, but reachable with the stick",202109221300,True,False,False, MVI_0313.MP4
+37.77199999999792,0.8994393348693848,True,stick,rlgs,3,"b1 is moved out of reach for robot, but reachable with the stick",202109221305,True,False,False, MVI_0317.MP4
+24.520000000009603,0.90842604637146,True,stick,rlgs,3,"b1 is moved out of reach for robot, but reachable with the stick",202109221307,True,False,False, MVI_0319.MP4
+35.20500000000395,0.9272890090942384,True,stick,rlgs,3,"b1 is moved out of reach for robot, but reachable with the stick",202109221312,True,False,False, MVI_0323.MP4
+16.154999999999443,0.9095101356506348,False,stick,rlgs,4,b1 and stick are unreachable,202109221318,True,True,False, MVI_0326.MP4
+11.60199999999799,0.927114963531494,False,stick,rlgs,4,b1 and stick are unreachable,202109221320,True,True,False, MVI_0327.MP4
+24.737000000009875,0.9196865558624268,False,stick,rlgs,4,b1 and stick are unreachable,202109221322,True,True,False, MVI_0328.MP4
+25.305000000010583,0.9137468338012696,False,stick,rlgs,4,b1 and stick are unreachable,202109221323,True,True,False, MVI_0329.MP4
+34.75000000000501,0.920114517211914,False,stick,rlgs,4,b1 and stick are unreachable,202109221325,True,True,False, MVI_0330.MP4
+15.58999999999856,5.624006986618042,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241544,True,False,False,MVI_0331.MP4
+12.025999999998728,5.933412313461304,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241545,True,False,False,MVI_0332.MP4
+17.995000000001557,5.753108024597168,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241546,True,False,False,MVI_0333.MP4
+10.995999999999247,6.05085301399231,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241547,True,False,False,MVI_0334.MP4
+14.191999999996929,5.659656286239624,True,hand_over,rlgs,0,"b1 goal is left side, starts on left (no interference)",202109241548,True,False,False,MVI_0335.MP4
+56.172999999955145,5.8687732219696045,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241550,True,False,False,MVI_0336.MP4
+80.31700000002986,5.587351799011231,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241600,True,False,False,MVI_0341.MP4
+50.13099999996927,5.81981086730957,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241603,True,False,False,MVI_0343.MP4
+55.12799999995764,5.756883144378662,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241606,True,False,False,MVI_0345.MP4
+44.799999999981615,5.730232000350952,True,hand_over,rlgs,1,"b1 goal is left side, starts on left, interference is moving to the far right side",202109241607,True,False,False,MVI_0346.MP4
+20.46400000000463,5.691835403442383,True,hand_over,rlgs,2,"b1 goal is left side, starts on left, interference is moving to the middle",202109241608,True,False,False,MVI_0347.MP4
+27.33900000001301,6.0813963413238525,True,hand_over,rlgs,2,"b1 goal is left side, starts on left,interference is moving to the middle",202109241610,True,False,False,MVI_0348.MP4
+37.97099999999766,5.787981748580933,True,hand_over,rlgs,2,"b1 goal is left side, starts on left,interference is moving to the middle",202109241752,True,False,False,MVI_0351.MP4
+31.239000000015302,5.663313150405884,True,hand_over,rlgs,2,"b1 goal is left side, starts on left,interference is moving to the middle",202109241754,True,False,False,MVI_0352.MP4
+28.36300000001421,6.142373561859131,True,hand_over,rlgs,2,"b1 goal is left side, starts on left,interference is moving to the middle",202109241756,True,False,False,MVI_0353.MP4
+37.516999999998646,8.375314235687256,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241809,True,False,False,MVI_0356.MP4
+33.60600000000784,8.82055950164795,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241810,True,False,False,MVI_0357.MP4
+39.63599999999383,8.682283163070679,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241811,True,False,False,MVI_0358.MP4
+45.450999999980255,8.011066913604736,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241813,True,False,False,MVI_0359.MP4
+52.670999999963406,8.413198947906494,True,hand_over,rlgs,3,"b1 goal is left side, starts on right, (no interference)",202109241815,True,False,False,MVI_0360.MP4
+28.123000000013963,8.5221426486969,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241816,True,False,False,MVI_0361.MP4
+21.394000000005686,8.518966436386108,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241817,True,False,False,MVI_0362.MP4
+38.613999999996174,8.381854772567749,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241819,True,False,False,MVI_0364.MP4
+28.26800000001417,8.53262710571289,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241820,True,False,False,MVI_0365.MP4
+21.72100000000612,8.298957109451294,True,hand_over,rlgs,4,"b1 goal is left side, start on right, moved to left",202109241821,True,False,False,MVI_0366.MP4
+48.406999999976826,8.015116453170776,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241823,True,False,False,MVI_0367.MP4
+41.93499999999178,8.23471975326538,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241829,True,False,False,MVI_0368.MP4
+51.10299999996708,8.104130983352661,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241832,True,False,False,MVI_0370.MP4
+53.85599999996067,8.616963863372803,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241836,True,False,False,MVI_0372.MP4
+65.74299999995954,8.502352714538574,True,hand_over,rlgs,5,"b1 goal is left side, starts on right, moved to middle (reachable by both)",202109241838,True,False,False,MVI_0374.MP4
