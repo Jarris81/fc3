@@ -77,8 +77,6 @@ class SimpleSystem:
         self.q = self.C.getJointState()
         self.q_old = self.q
 
-
-
         self.action_tree = planner.get_tree(action_list, self.scene_objects, forward=self._use_single_path)
 
         self.goal_controller = planner.get_goal_controller(self.C)

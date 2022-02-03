@@ -7,3 +7,6 @@
 [submodule "pyddl"]
 	path = pyddl
 	url = git@github.com:Jarris81/pyddl.git
+[submodule "thesis_2020_latex"]
+	path = thesis_2020_latex
+	url = git@github.com:Jarris81/thesis_2020_latex.git
